@@ -3,25 +3,20 @@ package fr.kriszt.theo.remindwear;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-//import android.support.v4.app.NotificationCompat;
-//import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import fr.kriszt.theo.remindwear.jobs.SetReminderJob;
 import fr.kriszt.theo.remindwear.utils.SchedulerJobService;
+;
 
 public class NotificationTestingActivity extends AppCompatActivity {
 
@@ -104,23 +99,10 @@ public class NotificationTestingActivity extends AppCompatActivity {
 
     @OnClick(R.id.scheduleButton)
     public void onScheduleButtonClicked(){
-        scheduleTask(getApplicationContext());
+//        SchedulerJobService.scheduleJob(getApplicationContext());
+        SetReminderJob.scheduleJob();
     }
 
-    public static void scheduleTask(Context context){
 
-        ComponentName serviceComponent = new ComponentName(context, SchedulerJobService.class);
-        JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
-        builder.setMinimumLatency(1 * 5000); // wait at least
-        builder.setOverrideDeadline(3 * 5000); // maximum delay
-        //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
-        //builder.setRequiresDeviceIdle(true); // device should be idle
-        //builder.setRequiresCharging(false); // we don't care if the device is charging or not
-        JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
-        jobScheduler.schedule(builder.build());
-
-        Toast.makeText(context, "Scheduling new task...", Toast.LENGTH_SHORT).show();
-
-    }
 
 }

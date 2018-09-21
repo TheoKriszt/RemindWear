@@ -16,7 +16,7 @@ public class RebootRescheduler extends BroadcastReceiver {
         Toast.makeText(context, "RemindWear : Démarrage détecté, replanification des alarmes", Toast.LENGTH_SHORT).show();
         Toast.makeText(context, "/!\\ Rescheduling Not implemented yet", Toast.LENGTH_SHORT).show();
         // Here you can schedule your Alarm again or start your service again.
-        NotificationTestingActivity.scheduleTask(context);
+        SchedulerJobService.scheduleJob(context);
     }
 }
 
