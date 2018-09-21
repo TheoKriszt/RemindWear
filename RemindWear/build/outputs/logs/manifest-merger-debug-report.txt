@@ -1,0 +1,79 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+	package
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:3:5-51
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:1-28:12
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:11-69
+application
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:5:5-26:19
+activity#fr.kriszt.theo.remindwear.RemindWear.TasksActivity
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:6:9-25:20
+	android:label
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:8:13-45
+	android:name
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:7:13-42
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:theo.kriszt.fr+data:pathPattern:/.*+data:scheme:https
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:9:13-19:29
+	android:order
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:9:28-45
+action#android.intent.action.VIEW
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:10:17-69
+	android:name
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:10:25-66
+category#android.intent.category.BROWSABLE
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:12:17-78
+	android:name
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:12:27-75
+category#android.intent.category.DEFAULT
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:13:17-76
+	android:name
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:13:27-73
+data
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:15:17-18:46
+	android:host
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:16:21-50
+	android:scheme
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:18:21-43
+	android:pathPattern
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:17:21-46
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:20:13-24:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:21:17-69
+	android:name
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:21:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:23:17-77
+	android:name
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:23:27-74
+uses-sdk
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml

@@ -1,1 +1,1 @@
-include ':RemindWear', ':app', ':base', ':instantapp', ':wear'
+include ':mobile', ':wear'
