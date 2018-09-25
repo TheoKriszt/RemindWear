@@ -3,6 +3,7 @@ package fr.kriszt.theo.remindwear;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,20 +11,23 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.kriszt.theo.remindwear.jobs.SetReminderJob;
 import fr.kriszt.theo.remindwear.utils.SchedulerJobService;
+import fr.kriszt.theo.remindwear.workers.ReminderWorker;
+
 ;
 
 public class NotificationTestingActivity extends AppCompatActivity {
 
-    public static final String CHANNEL_ID = "REMINDWEAR_NOTIFICATION_TESTING";
-    private static int notificationId = 0;
-
     @BindView(R.id.genNotifButton) Button button;
+
+    private static final String TAG = "NotifActivity";
+    public static final String CHANNEL_ID = "remindwear_notification";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,8 @@ public class NotificationTestingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification_testing);
         ButterKnife.bind(this);
         createNotificationChannel();
+        // créer le job SetReminderJob
+
     }
 
 
@@ -63,8 +69,7 @@ public class NotificationTestingActivity extends AppCompatActivity {
 
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(notificationId, nBuilder.build());
-        notificationId++;
+        notificationManager.notify(12345, nBuilder.build());
 
 
     }
@@ -80,7 +85,7 @@ public class NotificationTestingActivity extends AppCompatActivity {
 //            String description = getString(R.string."");
             String description = "";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            NotificationChannel channel = new NotificationChannel("set_reminder_job", name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -100,7 +105,22 @@ public class NotificationTestingActivity extends AppCompatActivity {
     @OnClick(R.id.scheduleButton)
     public void onScheduleButtonClicked(){
 //        SchedulerJobService.scheduleJob(getApplicationContext());
-        SetReminderJob.scheduleJob();
+        Context context = getApplicationContext();
+
+
+//        SetReminderJob.scheduleJob(context);
+
+        Toast.makeText(context, "Starting worker", Toast.LENGTH_SHORT).show();
+        ReminderWorker.scheduleWorker(3 * 60 * 1000);
+
+    }
+
+    @OnClick(R.id.startServiceButton)
+    public void startService(){
+//        Intent myIntent = new Intent(this, SchedulerJobService.class);
+//        this.startService(myIntent);
+//        Toast.makeText(this, "start service", Toast.LENGTH_SHORT).show();
+//        SetReminderJob.scheduleJob();
     }
 
 

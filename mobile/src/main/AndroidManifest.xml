@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="fr.kriszt.theo.remindwear">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,23 +24,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.activities.EditTaskActivity" />
 
-        <!--Todo : remove si JobSchedulr survit aux redemarrages-->
-        <receiver android:name=".utils.RebootRescheduler" android:enabled="true" android:exported="false" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.HOME" />
-            </intent-filter>
-        </receiver>
-        <service
-            android:name=".utils.SchedulerJobService"
-            android:label="Word service"
-            android:permission="android.permission.BIND_JOB_SERVICE" >
-
-        </service>
+        <!--<receiver android:name=".jobs.RebootReceiver" android:enabled="true" android:exported="false" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
+                <!--<category android:name="android.intent.category.HOME" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+        <!--<receiver-->
+            <!--android:name=".jobs.AddReceiver"-->
+            <!--android:exported="false">-->
+            <!--&lt;!&ndash; Creation du singleton createur de jobs au démarrage de l'appli &ndash;&gt;-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.evernote.android.job.ADD_JOB_CREATOR"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+        <!--<service-->
+            <!--android:name=".utils.SchedulerJobService"-->
+            <!--android:label="Scheduler service"-->
+            <!--android:permission="android.permission.BIND_JOB_SERVICE" >-->
+        <!--</service>-->
 
     </application>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!--<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>-->
+    <!--TODO : reschedule after restart ?-->
 
 
 

@@ -1,12 +1,17 @@
 package fr.kriszt.theo.remindwear.utils;
 
+import android.app.Service;
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
+
+import fr.kriszt.theo.remindwear.jobs.SetReminderJob;
 
 /**
  * Created by T.Kriszt on 21/09/2018.
@@ -16,7 +21,17 @@ public class SchedulerJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        Toast.makeText(this, "Scheduler service started", Toast.LENGTH_SHORT).show();
+        Handler handler = new Handler(Looper.getMainLooper());
+        final Service service = this;
+        handler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(service, "Scheduler service started", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        SetReminderJob.scheduleJob(this);
         int max = 5;
         if (count++ < max){
 
