@@ -25,8 +25,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import fr.kriszt.theo.remindwear.MainActivity;
 import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.TasksActivity;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
@@ -180,7 +180,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
                     Tasker.getInstance(getApplicationContext()).addTask(task);
                     Tasker.serializeLists();
-                    Intent intent = new Intent(this, MainActivity.class);
+                    Intent intent = new Intent(this, TasksActivity.class);
                     startActivity(intent);
                 }
             }else{
@@ -198,7 +198,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
                     Tasker.getInstance(getApplicationContext()).addTask(task);
                     Tasker.serializeLists();
-                    Intent intent = new Intent(this, MainActivity.class);
+                    Intent intent = new Intent(this, TasksActivity.class);
                     startActivity(intent);
                 }
             }
