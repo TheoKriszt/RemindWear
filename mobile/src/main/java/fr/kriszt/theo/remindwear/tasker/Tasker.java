@@ -257,4 +257,13 @@ public class Tasker {
 		return res;
 	}
 
+	public Task getTaskByID(int id){
+		for(Task t : listTasks){
+			if( t.getID() ==  id) {
+				return t;
+			}
+		}
+    	return null;
+	}
+
 }

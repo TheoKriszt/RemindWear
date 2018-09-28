@@ -10,13 +10,19 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.kriszt.theo.remindwear.jobs.SetReminderJob;
+import fr.kriszt.theo.remindwear.tasker.Task;
+import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.remindwear.utils.SchedulerJobService;
 import fr.kriszt.theo.remindwear.workers.ReminderWorker;
 
@@ -29,6 +35,8 @@ public class NotificationTestingActivity extends AppCompatActivity {
     private static final String TAG = "NotifActivity";
     public static final String CHANNEL_ID = "remindwear_notification";
 
+    private Tasker tasker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +44,10 @@ public class NotificationTestingActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         createNotificationChannel();
         // créer le job SetReminderJob
-
+        tasker = Tasker.getInstance(this);
     }
+
+
 
 
 
@@ -105,13 +115,33 @@ public class NotificationTestingActivity extends AppCompatActivity {
     @OnClick(R.id.scheduleButton)
     public void onScheduleButtonClicked(){
 //        SchedulerJobService.scheduleJob(getApplicationContext());
-        Context context = getApplicationContext();
+//        SetReminderJob.scheduleJob(this);
+
+        ArrayList<Task> tasks = tasker.getListTasks();
+        ArrayList<Task> scheduledTasks = new ArrayList<>();
+        for (Task t : tasks){
+            if (t.getIsActivatedNotification()) { // Todo : check le timeBefore etc.
+                scheduledTasks.add(t);
+            }
+        }
+
+//        scheduledTasks.add(new Task("Tâche 1", "Description 1", null, new GregorianCalendar(2018, 9, 29), 0, 0, 1));
+//        scheduledTasks.add(new Task("Tâche 2", "Description 2", null, new GregorianCalendar(2018, 9, 29), 0, 0, 2));
+//        scheduledTasks.add(new Task("Tâche 3", "Description 3", null, new GregorianCalendar(2018, 9, 29), 0, 0, 3));
+//        scheduledTasks.add(new Task("Tâche 4", "Description 4", null, new GregorianCalendar(2018, 9, 29), 0, 0, 4));
+
+        Log.w(TAG, "onScheduleButtonClicked: " + scheduledTasks.size() + " tâches a planifier");
+        Toast.makeText(this, scheduledTasks.size() + " tâches a planifier", Toast.LENGTH_SHORT).show();
+
+        for (Task st : scheduledTasks){
+            ReminderWorker.scheduleWorker(st);
+//            Tasker.removeTask(st);
+//            Tasker.serializeLists();
+        }
 
 
-//        SetReminderJob.scheduleJob(context);
-
-        Toast.makeText(context, "Starting worker", Toast.LENGTH_SHORT).show();
-        ReminderWorker.scheduleWorker(3 * 60 * 1000);
+//        Toast.makeText(context, "Starting worker", Toast.LENGTH_SHORT).show();
+//        ReminderWorker.scheduleWorker(3 * 60 * 1000);
 
     }
 

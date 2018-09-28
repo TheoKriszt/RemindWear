@@ -38,7 +38,8 @@
             android:id="@+id/startServiceButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Start service" />
+            android:text="Start service"
+            android:visibility="gone" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
