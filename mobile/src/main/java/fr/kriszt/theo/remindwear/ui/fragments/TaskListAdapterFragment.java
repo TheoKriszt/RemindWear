@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -39,6 +40,7 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
         public TextView description;
         public TextView category;
         public Switch notified;
+        public ImageView icon;
 
         public MyViewHolder(View view) {
             super(view);
@@ -50,6 +52,7 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
             description = (TextView) view.findViewById(R.id.description);
             category = (TextView) view.findViewById(R.id.category);
             notified = (Switch) view.findViewById(R.id.notified);
+            icon = (ImageView) view.findViewById(R.id.icon);
         }
     }
 
@@ -72,16 +75,17 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
         final Task fTask = taskList.get(position);
         String res;
 
+        holder.icon.setImageResource(p.getCategory().getIcon());
         holder.name.setText(p.getName());
         holder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final Intent myIntent = new Intent(view.getContext(), EditTaskActivity.class);
-
                 //TODO passer tache en intent
                 context.startActivity(myIntent);
             }
         });
+        holder.card_view.setCardBackgroundColor(p.getCategory().getColor());
         res = "";
         if(p.getDateDeb() == null){
             int day=0;

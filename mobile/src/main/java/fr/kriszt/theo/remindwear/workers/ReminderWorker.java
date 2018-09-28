@@ -27,7 +27,7 @@ public class ReminderWorker extends Worker {
         //Toast.makeText(getApplicationContext(), "Worker is running", Toast.LENGTH_SHORT).show();
         Calendar calendar = new GregorianCalendar(2018, 8, 26, 13, 30);
 //        Task test = new Task("Tâche apres redemarrage", "pliz work fine", new Category("Ma categorie"), calendar, 15);
-        Task test = new Task("Tache de test", "description", new Category("categ", R.drawable.ic_notifications_black_24dp), new GregorianCalendar(2018, 10, 28, 12, 30), 15, 12, 30);
+        Task test = new Task("Tache de test", "description", new Category("categ", R.drawable.ic_base_0, 0), new GregorianCalendar(2018, 10, 28, 12, 30), 15, 12, 30);
         new RemindNotification(test, getApplicationContext()).show(null);
 
         return Result.SUCCESS;

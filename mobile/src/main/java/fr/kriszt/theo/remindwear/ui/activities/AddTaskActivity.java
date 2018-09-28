@@ -1,29 +1,28 @@
 package fr.kriszt.theo.remindwear.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
-
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.TasksActivity;
@@ -33,9 +32,9 @@ import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 public class AddTaskActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    LayoutInflater inflator;
     private Tasker tasker;
     private Task task;
-    private Category category;
     public Calendar calendar = null;
 
     private EditText name;
@@ -55,10 +54,9 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private CheckBox checkBoxSunday;
     private Button submit;
     private NumberPicker preventBefore;
+    private ImageView addCategory;
 
 
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,21 +79,17 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         preventBefore.setMaxValue(59);
 
         spinner = (Spinner) findViewById(R.id.spinner);
-        List<String> listCat = new ArrayList<>();
-        for(Category c : Tasker.getInstance(getApplicationContext()).getListCategories()){
-            listCat.add(c.getName());
-        }
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_item, listCat);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(dataAdapter);
-        /*spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                Object item = parent.getItemAtPosition(pos);
+        spinner.setAdapter(new NewAdapter());
+        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        addCategory  = (ImageView) findViewById(R.id.addCategory);
+        addCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AddCategoryActivity.class);
+                startActivity(intent);
             }
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });*/
+        });
 
 
         calendarView = (CalendarView) findViewById(R.id.calendar);
@@ -152,13 +146,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             int mMin = time_picker_min.getValue();
             int mPreventBefore = preventBefore.getValue();
 
-            //TODO
-            Category cat = new Category("name",0);
-            for(Category c : Tasker.getInstance(getApplicationContext()).getListCategories()){
-                if(c.getName().equals(spinner.getSelectedItem().toString())){
-                    cat = c;
-                }
-            }
+            Category cat = Tasker.getInstance(getApplicationContext()).getListCategories().get(spinner.getSelectedItemPosition());
 
             Boolean[] bools = new Boolean[]{
                     checkBoxMonday.isChecked(),
@@ -169,9 +157,6 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     checkBoxSaturday.isChecked(),
                     checkBoxSunday.isChecked()
             };
-            for(Boolean b : bools){
-                Log.e("EEEEEEEEEEEE",b.toString());
-            }
             if(!checkBox.isChecked()){
                 if(calendar == null){
                     Toast.makeText(getApplicationContext(), "Ajoutez une date", Toast.LENGTH_LONG).show();
@@ -206,13 +191,44 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
     }
 
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-        // An item was selected. You can retrieve the selected item using
-        // parent.getItemAtPosition(pos)
-    }
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {}
+    public void onNothingSelected(AdapterView<?> parent) {}
 
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
+    class NewAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return Tasker.getInstance(getApplicationContext()).getListCategories().size();
+        }
+
+        @Override
+        public Object getItem(int arg0) {
+            return Tasker.getInstance(getApplicationContext()).getListCategories().get(arg0);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return Tasker.getInstance(getApplicationContext()).getListCategories().get(position).hashCode();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = inflator.inflate(R.layout.content_text_and_icon_spinner, null);
+                Category cat  = (Category) getItem(position);
+
+                ImageView icon = convertView.findViewById(R.id.icon);
+                icon.setImageResource(cat.getIcon());
+
+                TextView text =  convertView.findViewById(R.id.name);
+                text.setText(cat.getName());
+
+                LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.changeColor);
+                linearLayout.setBackgroundColor(cat.getColor());
+            }
+            return convertView;
+        }
+
     }
 
 }

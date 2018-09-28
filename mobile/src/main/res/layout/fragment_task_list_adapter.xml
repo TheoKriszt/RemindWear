@@ -12,11 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="3dp"
-        card_view:cardCornerRadius="1dp"
+        card_view:cardCornerRadius="5dp"
         android:layout_gravity="center"
         android:elevation="3dp">
 
         <LinearLayout
+            android:layout_margin="5dp"
             android:gravity="center"
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -28,7 +29,7 @@
 
                 <ImageView
                     android:layout_alignParentLeft="true"
-                    android:id="@+id/imageView"
+                    android:id="@+id/icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     card_view:srcCompat="@drawable/ic_notifications_black_24dp" />
@@ -90,11 +91,11 @@
 
             </RelativeLayout>
 
-
-
             <TextView
                 android:id="@+id/repete"
                 android:layout_alignParentLeft="true"
+                android:gravity="center"
+                android:layout_gravity="left"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

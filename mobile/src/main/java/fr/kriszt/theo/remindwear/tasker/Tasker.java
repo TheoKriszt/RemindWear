@@ -2,7 +2,6 @@ package fr.kriszt.theo.remindwear.tasker;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +13,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+
+import fr.kriszt.theo.remindwear.R;
 
 public class Tasker {
 
@@ -34,7 +35,7 @@ public class Tasker {
 	public Tasker(Context context) {
 	    this.context = context;
 	    unserializeLists();
-	    Category c = new Category("Aucune",0);
+		Category c = new Category("Aucune", R.drawable.ic_base_0, 0);
 	    this.addCategory(c);
 	    serializeLists();
     }
