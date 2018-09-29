@@ -19,11 +19,10 @@ public class RemindNotification {
     private int taskId;
 
     public RemindNotification(Task task, Context c){
-        Log.w(TAG, "RemindNotification: " + task);
+        Log.w(TAG, "RemindNotification: " + task + "(TASKID : " + task.getID() + ")");
         title = task.getCategory().getName() + " : " + task.getName();
         content = task.getDescription();
-//        taskId = task.getID();
-        taskId = 12345; // TODO : replace
+        taskId = task.getID();
         context = c;
 
     }

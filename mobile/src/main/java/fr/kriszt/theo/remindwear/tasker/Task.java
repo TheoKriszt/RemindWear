@@ -1,9 +1,6 @@
 package fr.kriszt.theo.remindwear.tasker;
 
-import android.util.Log;
-
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -16,6 +13,7 @@ public class Task implements Serializable {
 		
 	private static final long serialVersionUID = 1L;
     private int ID;
+    private UUID workID;
     private String name;
     private String description;
     private Category category;
@@ -40,6 +38,7 @@ public class Task implements Serializable {
 
 	public Task(String name, String description, Category category, Calendar dateDeb, int warningBefore, int timeHour, int timeMinutes) {
         this.ID = (int) System.currentTimeMillis()/1000;
+        this.workID = null;
         this.name = name;
         this.description = description;
         this.category = category;
@@ -65,6 +64,9 @@ public class Task implements Serializable {
 	}
 
     public int getID() {return ID;}
+
+    public UUID getWorkID() { return workID; }
+    public void setWorkID(UUID uuid) { workID = uuid; }
 
     public String getName() {return name;}
 	public void setName(String name) {this.name = name;}
