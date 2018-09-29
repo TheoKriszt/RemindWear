@@ -97,8 +97,6 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
             }
             Calendar c = new GregorianCalendar();
             Calendar cTemp = new GregorianCalendar();
-            Log.e("TOTOTOTOT", String.valueOf(day));
-            Log.e("TITITITIT", String.valueOf(cTemp.get(Calendar.DAY_OF_WEEK)));
             c.add(Calendar.DAY_OF_MONTH, day+2 - cTemp.get(Calendar.DAY_OF_WEEK));
 
 
@@ -169,7 +167,6 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
                 Tasker.changeWithSaveIsActivatedNotification(fTask);
             }
         });
-        Log.e("rrrrrrrrrrrrrrrrrrrrrr",p.getCategory().toString());
         holder.category.setText(p.getCategory().getName());
 
     }

@@ -6,7 +6,11 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.datatype.Duration;
 
 public class Task implements Serializable {
 		
@@ -109,5 +113,35 @@ public class Task implements Serializable {
 				+"\n] ";
 	}
 
+	public Calendar getNextDate(){
+		if(dateDeb == null){
+            int day=0;
+            for(int i=0; i<getRepete().length; i++){
+                if(getRepete()[i]){
+                    day = i;
+                    break;
+                }
+            }
+            Calendar c = new GregorianCalendar();
+            Calendar cTemp = new GregorianCalendar();
+            c.add(Calendar.DAY_OF_MONTH, day+2 - cTemp.get(Calendar.DAY_OF_WEEK));
+			return c;
+		}else{
+			return dateDeb;
+		}
+	}
+
+    private long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+    }
+
+	//TODO
+	public long getDuration(TimeUnit timeUnit){
+	    Date mDate  = getNextDate().getTime();
+        mDate.setHours(getTimeHour());
+	    mDate.setMinutes(getTimeMinutes());
+        return getDateDiff(mDate,new Date(),timeUnit);
+    }
 
 }

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -152,6 +153,7 @@ public class Tasker {
 		Calendar now = new GregorianCalendar();
 		for(int i=0; i < listTasks.size(); i++){
 			if(listTasks.get(i).getDateDeb() != null && listTasks.get(i).getDateDeb().compareTo(now) >= 0) {
+			    //TODO hour and time
 				   deletes.add(i);
 			}
 		}
@@ -161,34 +163,61 @@ public class Tasker {
 		serializeLists();
 	}
 	
-	public static void sort() {
+	public static void sort(final Boolean growing) {
 	    unserializeLists();
 		Collections.sort(listTasks, new Comparator<Task>() {
 			@Override
 			public int compare(Task o1, Task o2) {
-				int res = 1;
-				//TODO auusi heure et minutes
-                Calendar o1deb = null;
-                Calendar o2deb = null;
-                if(o1.getDateDeb() == null){
-
-                }else{
-                    o1deb = o1.getDateDeb();
+				int res = -1;
+				if(growing){
+				    res *= -1;
                 }
-                if(o2.getDateDeb() == null){
+                Calendar o1deb = o1.getNextDate();
+                Calendar o2deb = o2.getNextDate();
 
-                }else{
-                    o2deb = o1.getDateDeb();
+                if (o1deb.after(o2deb)) {
+                    if(o1.getTimeHour() > o2.getTimeHour()){
+                        return res * -1;
+                    }else{
+                        if(o1.getTimeMinutes() > o2.getTimeMinutes()){
+                            return res * -1;
+                        }
+                    }
                 }
-				/*if(o1deb.after(o2deb)) {
-					res = -1;
-				}else {
-					res = 1;
-				}*/
-				return res;
+                if (o1deb.before(o2deb)) {
+                    if(o1.getTimeHour() < o2.getTimeHour()){
+                        return res;
+                    }else{
+                        if(o1.getTimeMinutes() < o2.getTimeMinutes()){
+                            return res;
+                        }
+                    }
+                }
+                return 0;
 			}
 		});
 		serializeLists();
+	}
+
+	public ArrayList<Task> filter(String seq, Boolean growing) {
+		ArrayList<Task> res = new ArrayList<>();
+		sort(growing);
+		seq = seq.toUpperCase();
+		for(Task t : listTasks){
+		    //TODO check si le formatage fonctionne
+            //SimpleDateFormat formatter = new SimpleDateFormat("dd b yyyy");
+            String dateFormated = "";//formatter.format(t.getNextDate());
+			if(t.getName().toUpperCase().contains(seq)) {
+				res.add(t);
+			}else if(t.getCategory().getName().toUpperCase().contains(seq)){
+				res.add(t);
+			}else if(t.getDescription().toUpperCase().contains(seq)){
+				res.add(t);
+			}else if(dateFormated.toUpperCase().contains(seq)){
+				res.add(t);
+			}
+		}
+		return res;
 	}
 
 	public ArrayList<Task> getTasksByName(String seq) {

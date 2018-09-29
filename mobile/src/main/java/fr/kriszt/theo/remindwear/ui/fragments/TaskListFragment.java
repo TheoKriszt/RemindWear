@@ -12,11 +12,17 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -29,12 +35,23 @@ import fr.kriszt.theo.remindwear.ui.activities.AddTaskActivity;
 
 public class TaskListFragment extends Fragment {
 
-    View rootView;
-    FloatingActionButton addButton;
+    private View rootView;
+    private String userSearch = "";
+    private Boolean growing = true;
+
+    private FloatingActionButton addButton;
 
     private List<Task> tasksList;
     private RecyclerView tasks;
     private TaskListAdapterFragment tasksAdapter;
+
+    private Spinner spinnerSort;
+    private Spinner spinnerFilter;
+    private EditText searchBar;
+    private ImageView upper;
+    private ImageView lower;
+    private ImageView search;
+    private ImageView close;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,12 +66,13 @@ public class TaskListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tasksList = new ArrayList<>();
-        Tasker tasker = new Tasker(getContext());
-        tasker.unserializeLists();
-        tasksList = tasker.getListTasks();
 
-        Log.e("aaaaaaaaaaaaaaaaaaaaa", tasksList.toString());
+        tasksList = new ArrayList<>();
+        Tasker.getInstance(getContext());
+        Tasker.unserializeLists();
+        Tasker.garbageCollectOld();
+        Tasker.serializeLists();
+        tasksList = Tasker.getInstance(getContext()).getListTasks();
 
         tasks = rootView.findViewById(R.id.taskList);
         tasksAdapter = new TaskListAdapterFragment(getContext(), tasksList);
@@ -63,14 +81,6 @@ public class TaskListFragment extends Fragment {
         tasks.setLayoutManager(mLayoutManager);
         tasks.setItemAnimator(new DefaultItemAnimator());
         tasks.setAdapter(tasksAdapter);
-
-        /*
-        RecyclerView.LayoutManager mNewLayoutManager = new GridLayoutManager(getActivity(), 2);
-        tasks.setLayoutManager(mNewLayoutManager);
-        tasks.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        tasks.setItemAnimator(new DefaultItemAnimator());
-        tasks.setAdapter(tasksAdapter);
-        */
 
         addButton = (FloatingActionButton) rootView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -81,57 +91,93 @@ public class TaskListFragment extends Fragment {
             }
         });
 
+        searchBar = (EditText) rootView.findViewById(R.id.searchBar);
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                userSearch = s.toString();
+                tasksList = Tasker.getInstance(getContext()).filter(userSearch, growing);
+                strangeMethode();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        upper = (ImageView) rootView.findViewById(R.id.upper);
+        upper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                upper.setVisibility(View.GONE);
+                lower.setVisibility(View.VISIBLE);
+                growing = false;
+                Tasker.sort(growing);
+                tasksList = Tasker.getInstance(getContext()).getListTasks();
+                strangeMethode();
+            }
+        });
+
+        lower = (ImageView) rootView.findViewById(R.id.lower);
+        lower.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lower.setVisibility(View.GONE);
+                upper.setVisibility(View.VISIBLE);
+                growing = true;
+                Tasker.sort(growing);
+                tasksList = Tasker.getInstance(getContext()).getListTasks();
+                strangeMethode();
+            }
+        });
+
+        search = (ImageView) rootView.findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search.setVisibility(View.GONE);
+                close.setVisibility(View.VISIBLE);
+                upper.setVisibility(View.GONE);
+                lower.setVisibility(View.GONE);
+                searchBar.setVisibility(View.VISIBLE);
+                growing = true;
+                Tasker.sort(growing);
+                tasksList = Tasker.getInstance(getContext()).getListTasks();
+                strangeMethode();
+            }
+        });
+
+        close = (ImageView) rootView.findViewById(R.id.close);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchBar.setVisibility(View.GONE);
+                close.setVisibility(View.GONE);
+                search.setVisibility(View.VISIBLE);
+                upper.setVisibility(View.VISIBLE);
+                growing = true;
+                Tasker.sort(growing);
+                tasksList = Tasker.getInstance(getContext()).getListTasks();
+                strangeMethode();
+            }
+        });
+
+    }
+
+    public void strangeMethode(){
+        tasks = rootView.findViewById(R.id.taskList);
+        tasksAdapter = new TaskListAdapterFragment(getContext(), tasksList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+        tasks.setLayoutManager(mLayoutManager);
+        tasks.setItemAnimator(new DefaultItemAnimator());
+        tasks.setAdapter(tasksAdapter);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-    }
-
-    /**
-     * RecyclerView item decoration - give equal margin around grid item
-     */
-    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
-
-        private int spanCount;
-        private int spacing;
-        private boolean includeEdge;
-
-        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
-            this.spanCount = spanCount;
-            this.spacing = spacing;
-            this.includeEdge = includeEdge;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
-                }
-                outRect.bottom = spacing; // item bottom
-            } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
-                }
-            }
-        }
-    }
-
-    /**
-     * Converting dp to pixel
-     */
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
 

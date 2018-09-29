@@ -46,6 +46,24 @@ public class AddCategoryActivity extends AppCompatActivity {
         //TODO add other icons
         listIcons.add(R.drawable.ic_base_0);
         listIcons.add(R.drawable.ic_base_1);
+        listIcons.add(R.drawable.ic_base_2);
+        listIcons.add(R.drawable.ic_base_3);
+        listIcons.add(R.drawable.ic_base_4);
+        listIcons.add(R.drawable.ic_base_5);
+        listIcons.add(R.drawable.ic_base_6);
+        listIcons.add(R.drawable.ic_base_7);
+        listIcons.add(R.drawable.ic_base_8);
+        listIcons.add(R.drawable.ic_base_9);
+        listIcons.add(R.drawable.ic_base_10);
+        listIcons.add(R.drawable.ic_base_11);
+        listIcons.add(R.drawable.ic_base_12);
+        listIcons.add(R.drawable.ic_base_13);
+        listIcons.add(R.drawable.ic_base_14);
+        listIcons.add(R.drawable.ic_base_15);
+        listIcons.add(R.drawable.baseline_directions_run_24);
+        listIcons.add(R.drawable.ic_base_17);
+        listIcons.add(R.drawable.ic_base_18);
+        listIcons.add(R.drawable.ic_base_20);
 
 
         title = (EditText) findViewById(R.id.name);

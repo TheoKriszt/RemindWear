@@ -165,8 +165,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
                     Tasker.getInstance(getApplicationContext()).addTask(task);
                     Tasker.serializeLists();
-                    Intent intent = new Intent(this, TasksActivity.class);
-                    startActivity(intent);
+                    onBackPressed();
                 }
             }else{
                 Boolean bool = false;
@@ -183,8 +182,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
                     Tasker.getInstance(getApplicationContext()).addTask(task);
                     Tasker.serializeLists();
-                    Intent intent = new Intent(this, TasksActivity.class);
-                    startActivity(intent);
+                    onBackPressed();
                 }
             }
         }
