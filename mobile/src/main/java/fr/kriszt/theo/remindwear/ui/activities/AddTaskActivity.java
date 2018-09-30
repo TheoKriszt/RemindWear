@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.TasksActivity;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
@@ -60,7 +59,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_task);
+        setContentView(R.layout.activity_task);
 
         name = (EditText) findViewById(R.id.name);
         description = (EditText) findViewById(R.id.description);
@@ -75,8 +74,14 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         time_picker_min.setValue(30);
         preventBefore = (NumberPicker) findViewById(R.id.preventBefore);
         preventBefore.setMinValue(0);
-        preventBefore.setValue(30);
-        preventBefore.setMaxValue(59);
+        preventBefore.setMaxValue(18);
+        preventBefore.setValue(6);
+        String[] minuteValues = new String[19];
+        for (int i = 0; i < minuteValues.length; i++) {
+            String  number = Integer.toString(i*5);
+            minuteValues[i] =  number;
+        }
+        preventBefore.setDisplayedValues(minuteValues);
 
         spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(new NewAdapter());
@@ -134,7 +139,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private void submitAction(){
 
         tasker = new Tasker(getApplicationContext());
-        tasker.unserializeLists();
+        Tasker.unserializeLists();
 
 
         if(name.getText().toString().equals("")){

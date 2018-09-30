@@ -68,9 +68,7 @@ public class Tasker {
 	}
 
     static public void changeWithSaveIsActivatedNotification(Task t) {
-        //unserializeLists();
         t.setIsActivatedNotification(!t.getIsActivatedNotification());
-        Log.e("&&&&&&&&&&&&&&&&&&&&&",listTasks.toString());
 	    serializeLists();
     }
 
@@ -206,7 +204,7 @@ public class Tasker {
 		for(Task t : listTasks){
 		    //TODO check si le formatage fonctionne
             //SimpleDateFormat formatter = new SimpleDateFormat("dd b yyyy");
-            String dateFormated = "";//formatter.format(t.getNextDate());
+            String dateFormated = "&&&&&&&&&&&[]{{{&&&&&&&&&&&&&&&&&";//formatter.format(t.getNextDate());
 			if(t.getName().toUpperCase().contains(seq)) {
 				res.add(t);
 			}else if(t.getCategory().getName().toUpperCase().contains(seq)){
@@ -253,11 +251,8 @@ public class Tasker {
 	public ArrayList<Task> getTasksByDate(Calendar calDeb) {
 		ArrayList<Task> res = new ArrayList<>();
 		for(Task t : listTasks){
-			if(t.getDateDeb() != null || t.getDateDeb().after(calDeb)) {
+			if(t.getNextDate() != null && t.getNextDate().after(calDeb)) {
 				res.add(t);
-			}
-			if(t.getDateDeb() == null){
-				//TODO
 			}
 		}
 		return res;
@@ -266,11 +261,8 @@ public class Tasker {
 	public ArrayList<Task> getTasksByDate(Calendar calDeb,Calendar calEnd){
 		ArrayList<Task> res = new ArrayList<>();
 		for(Task t : listTasks){
-			if(t.getDateDeb() != null ||(t.getDateDeb().after(calDeb) && t.getDateDeb().before(calEnd))) {
+			if(t.getNextDate() != null && (t.getNextDate().after(calDeb) && t.getNextDate().before(calEnd))) {
 				res.add(t);
-			}
-			if(t.getDateDeb() == null){
-				//TODO
 			}
 		}
 		return res;

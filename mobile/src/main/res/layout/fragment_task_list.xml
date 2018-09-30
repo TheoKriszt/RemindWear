@@ -82,7 +82,7 @@
         android:id="@+id/addButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
+        android:layout_gravity="center_horizontal|bottom"
         android:clickable="true"
         app:backgroundTint="@color/colorWhite"
         android:src="@drawable/baseline_add_24"

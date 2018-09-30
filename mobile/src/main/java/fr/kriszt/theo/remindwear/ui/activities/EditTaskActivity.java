@@ -1,16 +1,312 @@
 package fr.kriszt.theo.remindwear.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.NumberPicker;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.tasker.Category;
+import fr.kriszt.theo.remindwear.tasker.Task;
+import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 
 public class EditTaskActivity extends AppCompatActivity {
 
+    LayoutInflater inflator;
+    private Tasker tasker;
+    private Task task;
+    private Task taskTemp;
+    public Calendar calendar = null;
+
+    private CardView cardView;
+    private TextView textView;
+    private ImageView cancel;
+    private ImageView validate;
+    private EditText name;
+    private EditText description;
+    private NumberPicker time_picker_hour;
+    private NumberPicker time_picker_min;
+    private Spinner spinner;
+    private CheckBox checkBox;
+    private CalendarView calendarView;
+    private LinearLayout layout_repete;
+    private CheckBox checkBoxMonday;
+    private CheckBox checkBoxTuesday;
+    private CheckBox checkBoxWednesday;
+    private CheckBox checkBoxThursday;
+    private CheckBox checkBoxFriday;
+    private CheckBox checkBoxSaturday;
+    private CheckBox checkBoxSunday;
+    private Button submit;
+    private NumberPicker preventBefore;
+    private ImageView addCategory;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_task);
+        setContentView(R.layout.activity_task);
+
+        Intent mIntent = getIntent();
+        int id = mIntent.getIntExtra("idTask", 0);
+        Task task = Tasker.getInstance(getApplicationContext()).getTaskByID(id);
+        taskTemp = task;
+
+        cardView = (CardView) findViewById(R.id.cardView);
+        cardView.setVisibility(View.VISIBLE);
+
+        textView = (TextView) findViewById(R.id.textView);
+        textView.setText("Modifier une tâche");
+
+        cancel = (ImageView) findViewById(R.id.cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+        validate = (ImageView) findViewById(R.id.validate);
+        validate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submitAction();
+            }
+        });
+
+        name = (EditText) findViewById(R.id.name);
+        name.setText(task.getName());
+
+        description = (EditText) findViewById(R.id.description);
+        description.setText(task.getDescription());
+
+        time_picker_hour = (NumberPicker) findViewById(R.id.time_picker_hour);
+        time_picker_hour.setMinValue(0);
+        time_picker_hour.setMaxValue(23);
+        time_picker_hour.setValue(task.getTimeHour());
+
+        time_picker_min = (NumberPicker) findViewById(R.id.time_picker_min);
+        time_picker_min.setMinValue(0);
+        time_picker_min.setMaxValue(59);
+        time_picker_min.setValue(task.getTimeMinutes());
+
+        preventBefore = (NumberPicker) findViewById(R.id.preventBefore);
+        preventBefore.setMinValue(0);
+        preventBefore.setMaxValue(18);
+        preventBefore.setValue(task.getWarningBefore()/5);
+        String[] minuteValues = new String[19];
+        for (int i = 0; i < minuteValues.length; i++) {
+            String  number = Integer.toString(i*5);
+            minuteValues[i] =  number;
+        }
+        preventBefore.setDisplayedValues(minuteValues);
+
+
+        //TODO set spinner avec bonne category
+        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setAdapter(new NewAdapter());
+        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //spinner.setSelection();
+
+        addCategory  = (ImageView) findViewById(R.id.addCategory);
+        addCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AddCategoryActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        calendarView = (CalendarView) findViewById(R.id.calendar);
+        calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+                calendar = new GregorianCalendar( year, month, dayOfMonth );
+            }
+        });
+
+        //TODO set correctly calendar
+        if(task.getDateDeb() != null){
+            calendarView.setDate(task.getDateDeb().getTime().getTime());
+        }
+
+        layout_repete = (LinearLayout) findViewById(R.id.layout_repete);
+        checkBox = (CheckBox) findViewById(R.id.checkBox);
+        if(task.getDateDeb() == null){
+            layout_repete.setVisibility(View.VISIBLE);
+            checkBox.setChecked(true);
+            calendarView.setVisibility(View.GONE);
+        }else{
+            layout_repete.setVisibility(View.GONE);
+            checkBox.setChecked(false);
+            calendarView.setVisibility(View.VISIBLE);
+        }
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+                if(checkBox.isChecked()){
+                    calendarView.setVisibility(View.GONE);
+                    layout_repete.setVisibility(View.VISIBLE);
+                }else{
+                    calendarView.setVisibility(View.VISIBLE);
+                    layout_repete.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        checkBoxMonday = (CheckBox) findViewById(R.id.checkBoxMonday);
+        checkBoxMonday.setChecked(task.getRepete()[0]);
+        checkBoxTuesday = (CheckBox) findViewById(R.id.checkBoxTuesday);
+        checkBoxTuesday.setChecked(task.getRepete()[1]);
+        checkBoxWednesday = (CheckBox) findViewById(R.id.checkBoxWednesday);
+        checkBoxWednesday.setChecked(task.getRepete()[2]);
+        checkBoxThursday = (CheckBox) findViewById(R.id.checkBoxThursday);
+        checkBoxThursday.setChecked(task.getRepete()[3]);
+        checkBoxFriday = (CheckBox) findViewById(R.id.checkBoxFriday);
+        checkBoxFriday.setChecked(task.getRepete()[4]);
+        checkBoxSaturday = (CheckBox) findViewById(R.id.checkBoxSaturday);
+        checkBoxSaturday.setChecked(task.getRepete()[5]);
+        checkBoxSunday = (CheckBox) findViewById(R.id.checkBoxSunday);
+        checkBoxSunday.setChecked(task.getRepete()[6]);
+
+        submit = (Button) findViewById(R.id.submit);
+        submit.setText("   Suprimmer   ");
+        submit.setTextColor(getApplication().getResources().getColor(R.color.colorRed));
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteAction();
+            }
+        });
+
     }
+
+    private void deleteAction() {
+        Tasker.getInstance(getApplicationContext());
+        Tasker.unserializeLists();
+        Tasker.removeTask(taskTemp);
+        Tasker.serializeLists();
+        onBackPressed();
+    }
+
+    private void submitAction() {
+        tasker = new Tasker(getApplicationContext());
+        Tasker.unserializeLists();
+
+
+        if(name.getText().toString().equals("")){
+            Toast.makeText(getApplicationContext(), "Ajoutez un titre", Toast.LENGTH_LONG).show();
+        }else{
+            String mName = name.getText().toString();
+            String mDescription = description.getText().toString();
+            int mHour = time_picker_hour.getValue();
+            int mMin = time_picker_min.getValue();
+            int mPreventBefore = preventBefore.getValue()*5;
+
+            Category cat = Tasker.getInstance(getApplicationContext()).getListCategories().get(spinner.getSelectedItemPosition());
+
+            Boolean[] bools = new Boolean[]{
+                    checkBoxMonday.isChecked(),
+                    checkBoxTuesday.isChecked(),
+                    checkBoxWednesday.isChecked(),
+                    checkBoxThursday.isChecked(),
+                    checkBoxFriday.isChecked(),
+                    checkBoxSaturday.isChecked(),
+                    checkBoxSunday.isChecked()
+            };
+            if(!checkBox.isChecked()){
+                if(calendar == null){
+                    Toast.makeText(getApplicationContext(), "Ajoutez une date", Toast.LENGTH_LONG).show();
+                    return;
+                }else{
+                    task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
+
+                    Tasker.removeTask(taskTemp);
+                    Tasker.getInstance(getApplicationContext()).addTask(task);
+
+                    Tasker.serializeLists();
+                    onBackPressed();
+                }
+            }else{
+                Boolean bool = false;
+                for(Boolean b : bools){
+                    if(b){
+                        bool = true;
+                        break;
+                    }
+                }
+                if(!bool){
+                    Toast.makeText(getApplicationContext(), "Ajoutez une répétition", Toast.LENGTH_LONG).show();
+                    return;
+                }else{
+                    task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
+
+                    Tasker.removeTask(taskTemp);
+                    Tasker.getInstance(getApplicationContext()).addTask(task);
+
+                    Tasker.serializeLists();
+                    onBackPressed();
+                }
+            }
+        }
+    }
+
+    class NewAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return Tasker.getInstance(getApplicationContext()).getListCategories().size();
+        }
+
+        @Override
+        public Object getItem(int arg0) {
+            return Tasker.getInstance(getApplicationContext()).getListCategories().get(arg0);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return Tasker.getInstance(getApplicationContext()).getListCategories().get(position).hashCode();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = inflator.inflate(R.layout.content_text_and_icon_spinner, null);
+                Category cat  = (Category) getItem(position);
+
+                ImageView icon = convertView.findViewById(R.id.icon);
+                icon.setImageResource(cat.getIcon());
+
+                TextView text =  convertView.findViewById(R.id.name);
+                text.setText(cat.getName());
+
+                LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.changeColor);
+                linearLayout.setBackgroundColor(cat.getColor());
+            }
+            return convertView;
+        }
+
+    }
+
 }

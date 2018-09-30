@@ -60,7 +60,8 @@
         <activity
             android:name=".ui.activities.AddCategoryActivity"
             android:label="@string/title_activity_add_category"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.activities.EditCategoryActivity"></activity>
     </application>
 
 </manifest>

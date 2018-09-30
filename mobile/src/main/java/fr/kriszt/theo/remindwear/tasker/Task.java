@@ -138,7 +138,7 @@ public class Task implements Serializable {
         return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
     }
 
-	//TODO
+	//TODO VOIR SI CA MARCHE
 	public long getDuration(TimeUnit timeUnit){
 	    Date mDate  = getNextDate().getTime();
         mDate.setHours(getTimeHour());
