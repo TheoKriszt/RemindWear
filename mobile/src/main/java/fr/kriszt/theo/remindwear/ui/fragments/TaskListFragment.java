@@ -73,6 +73,7 @@ public class TaskListFragment extends Fragment {
         //TODO QUE FAIRE???
         //Tasker.garbageCollectOld();
         Tasker.serializeLists();
+        Tasker.sort(true);
         tasksList = Tasker.getInstance(getContext()).getListTasks();
 
         tasks = rootView.findViewById(R.id.taskList);

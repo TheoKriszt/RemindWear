@@ -10,6 +10,8 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
         android:id="@+id/layoutRel"
         android:orientation="vertical"
         android:gravity="center_horizontal"

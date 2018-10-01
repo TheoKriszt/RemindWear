@@ -124,12 +124,15 @@ public class Task implements Serializable {
                     break;
                 }
             }
-            Calendar c = new GregorianCalendar();
             Calendar cTemp = new GregorianCalendar();
+            Calendar c = new GregorianCalendar(cTemp.get(Calendar.YEAR), cTemp.get(Calendar.MONTH), cTemp.get(Calendar.DAY_OF_MONTH), getTimeHour(), getTimeMinutes());
             c.add(Calendar.DAY_OF_MONTH, day+2 - cTemp.get(Calendar.DAY_OF_WEEK));
+			/*c.set(Calendar.HOUR, this.getTimeHour());
+			c.set(Calendar.MINUTE, this.getTimeMinutes());*/
 			return c;
 		}else{
-			return dateDeb;
+            Calendar c = new GregorianCalendar(dateDeb.get(Calendar.YEAR), dateDeb.get(Calendar.MONTH), dateDeb.get(Calendar.DAY_OF_MONTH), getTimeHour(), getTimeMinutes());
+            return c;
 		}
 	}
 

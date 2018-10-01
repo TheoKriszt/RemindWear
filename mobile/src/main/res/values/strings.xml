@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">RemindWear</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">Tâches</string>
+    <string name="title_dashboard">Sports</string>
     <string name="hello_blank_fragment">Hello</string>
     <string name="prompt_one_time">Une seule fois</string>
     <string name="title_activity_add_category">AddCategoryActivity</string>

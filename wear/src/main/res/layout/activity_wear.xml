@@ -5,9 +5,10 @@
     android:id="@+id/watch_view_stub"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:rectLayout="@layout/rect"
-    app:roundLayout="@layout/round"
     tools:context=".WearActivity"
     tools:deviceIds="wear" >
 
-</android.support.wearable.view.WatchViewStub>
+    //app:roundLayout="@layout/round"
+    //app:rectLayout="@layout/rect"
+
+    </android.support.wearable.view.WatchViewStub>

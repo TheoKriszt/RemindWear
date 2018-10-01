@@ -21,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.kriszt.theo.remindwear.jobs.SetReminderJob;
+import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.remindwear.utils.SchedulerJobService;
@@ -123,13 +124,13 @@ public class NotificationTestingActivity extends AppCompatActivity {
 
     }
 
-    @OnClick(R.id.startServiceButton)
+    /*@OnClick(R.id.startServiceButton)
     public void startService(){
 //        Intent myIntent = new Intent(this, SchedulerJobService.class);
 //        this.startService(myIntent);
 //        Toast.makeText(this, "start service", Toast.LENGTH_SHORT).show();
 //        SetReminderJob.scheduleJob();
-    }
+    }*/
 
 
 

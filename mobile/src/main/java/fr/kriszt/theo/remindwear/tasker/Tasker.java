@@ -166,8 +166,7 @@ public class Tasker {
 		ArrayList<Integer> deletes = new ArrayList<>();
 		Calendar now = new GregorianCalendar();
 		for(int i=0; i < listTasks.size(); i++){
-			if(listTasks.get(i).getDateDeb() != null && listTasks.get(i).getDateDeb().compareTo(now) >= 0) {
-			    //TODO hour and time
+			if(listTasks.get(i).getNextDate() != null && listTasks.get(i).getNextDate().compareTo(now) >= 0) {
 				   deletes.add(i);
 			}
 		}
@@ -182,7 +181,7 @@ public class Tasker {
 		Collections.sort(listTasks, new Comparator<Task>() {
 			@Override
 			public int compare(Task o1, Task o2) {
-				int res = -1;
+				int res = 1;
 				if(growing){
 				    res *= -1;
                 }
@@ -190,22 +189,11 @@ public class Tasker {
                 Calendar o2deb = o2.getNextDate();
 
                 if (o1deb.after(o2deb)) {
-                    if(o1.getTimeHour() > o2.getTimeHour()){
-                        return res * -1;
-                    }else{
-                        if(o1.getTimeMinutes() > o2.getTimeMinutes()){
-                            return res * -1;
-                        }
-                    }
+                    return res*-1;
                 }
+
                 if (o1deb.before(o2deb)) {
-                    if(o1.getTimeHour() < o2.getTimeHour()){
-                        return res;
-                    }else{
-                        if(o1.getTimeMinutes() < o2.getTimeMinutes()){
-                            return res;
-                        }
-                    }
+                    return res;
                 }
                 return 0;
 			}
@@ -218,9 +206,8 @@ public class Tasker {
 		sort(growing);
 		seq = seq.toUpperCase();
 		for(Task t : listTasks){
-		    //TODO check si le formatage fonctionne
-            //SimpleDateFormat formatter = new SimpleDateFormat("dd b yyyy");
-            String dateFormated = "&&&&&&&&&&&[]{{{&&&&&&&&&&&&&&&&&";//formatter.format(t.getNextDate());
+			SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy");
+            String dateFormated = format.format(t.getNextDate().getTime());
 			if(t.getName().toUpperCase().contains(seq)) {
 				res.add(t);
 			}else if(t.getCategory().getName().toUpperCase().contains(seq)){

@@ -43,13 +43,13 @@ public class TasksActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        Intent intent = getIntent();
+       /* Intent intent = getIntent();
         String fragmentClass = intent.getStringExtra(FRAGMENT_TO_LAUNCH);
         if (fragmentClass.startsWith(SportFragment.class.getName())){
             loadFragment(new SportFragment());
-        }else{ // défaut
+        }else{ // défaut*/
             loadFragment(new TaskListFragment());
-        }
+        //}
 
 
     }

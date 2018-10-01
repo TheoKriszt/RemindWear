@@ -80,12 +80,18 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         preventBefore.setValue(6);
         String[] minuteValues = new String[19];
         for (int i = 0; i < minuteValues.length; i++) {
-            String  number = Integer.toString(i*5);
+            String number = "";
+            if(i == 0){
+                number = Integer.toString(i*5)+" minute";
+            }else{
+                number = Integer.toString(i*5)+" minutes";
+            }
             minuteValues[i] =  number;
         }
         preventBefore.setDisplayedValues(minuteValues);
 
-            spinner = (Spinner) findViewById(R.id.spinner);
+        //TODO spinner fonctionne bizarement !!??
+        spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(new NewAdapter());
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
