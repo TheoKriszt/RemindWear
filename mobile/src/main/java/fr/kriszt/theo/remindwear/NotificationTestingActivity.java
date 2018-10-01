@@ -56,7 +56,7 @@ public class NotificationTestingActivity extends AppCompatActivity {
 
         // Create an explicit intent for the notification tap action
         Intent intent = new Intent(this, TasksActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
 

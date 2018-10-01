@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.TasksActivity;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
@@ -146,9 +147,9 @@ public class EditTaskActivity extends AppCompatActivity {
             }
         });
 
-        //TODO set correctly calendar
         if(task.getDateDeb() != null){
             calendarView.setDate(task.getDateDeb().getTime().getTime());
+            calendar = task.getDateDeb();
         }
 
         layout_repete = (LinearLayout) findViewById(R.id.layout_repete);
@@ -205,9 +206,12 @@ public class EditTaskActivity extends AppCompatActivity {
     private void deleteAction() {
         Tasker.getInstance(getApplicationContext());
         Tasker.unserializeLists();
-        Tasker.removeTask(taskTemp);
+        Tasker.removeTaskByID(taskTemp.getID());
         Tasker.serializeLists();
-        onBackPressed();
+
+        Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
+        //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
     }
 
     private void submitAction() {
@@ -242,11 +246,14 @@ public class EditTaskActivity extends AppCompatActivity {
                 }else{
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
-                    Tasker.removeTask(taskTemp);
+                    Tasker.unserializeLists();
+                    Tasker.removeTaskByID(taskTemp.getID());
                     Tasker.getInstance(getApplicationContext()).addTask(task);
-
                     Tasker.serializeLists();
-                    onBackPressed();
+
+                    Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
+                    //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivity(intent);
                 }
             }else{
                 Boolean bool = false;
@@ -262,11 +269,14 @@ public class EditTaskActivity extends AppCompatActivity {
                 }else{
                     task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
 
-                    Tasker.removeTask(taskTemp);
+                    Tasker.unserializeLists();
+                    Tasker.removeTaskByID(taskTemp.getID());
                     Tasker.getInstance(getApplicationContext()).addTask(task);
-
                     Tasker.serializeLists();
-                    onBackPressed();
+
+                    Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
+                    //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivity(intent);
                 }
             }
         }

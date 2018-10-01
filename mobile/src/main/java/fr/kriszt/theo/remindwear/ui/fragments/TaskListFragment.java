@@ -70,7 +70,8 @@ public class TaskListFragment extends Fragment {
         tasksList = new ArrayList<>();
         Tasker.getInstance(getContext());
         Tasker.unserializeLists();
-        Tasker.garbageCollectOld();
+        //TODO QUE FAIRE???
+        //Tasker.garbageCollectOld();
         Tasker.serializeLists();
         tasksList = Tasker.getInstance(getContext()).getListTasks();
 
@@ -87,6 +88,7 @@ public class TaskListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(view.getContext(), AddTaskActivity.class);
+                //myIntent.setFlags(myIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 getActivity().startActivity(myIntent);
             }
         });

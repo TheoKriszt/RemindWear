@@ -81,6 +81,7 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
             @Override
             public void onClick(View view) {
                 final Intent myIntent = new Intent(view.getContext(), EditTaskActivity.class);
+                //myIntent.setFlags(myIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                 myIntent.putExtra("idTask", fTask.getID());
                 context.startActivity(myIntent);
             }

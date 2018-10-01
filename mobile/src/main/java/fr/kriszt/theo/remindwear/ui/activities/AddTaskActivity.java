@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.TasksActivity;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
@@ -83,7 +85,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         }
         preventBefore.setDisplayedValues(minuteValues);
 
-        spinner = (Spinner) findViewById(R.id.spinner);
+            spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setAdapter(new NewAdapter());
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -168,9 +170,14 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     return;
                 }else{
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
+
+                    Tasker.unserializeLists();
                     Tasker.getInstance(getApplicationContext()).addTask(task);
                     Tasker.serializeLists();
-                    onBackPressed();
+
+                    Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
+                    //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivity(intent);
                 }
             }else{
                 Boolean bool = false;
@@ -185,12 +192,24 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     return;
                 }else{
                     task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
+
+                    Tasker.unserializeLists();
                     Tasker.getInstance(getApplicationContext()).addTask(task);
                     Tasker.serializeLists();
-                    onBackPressed();
+
+                    Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
+                    //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivity(intent);
                 }
             }
         }
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Tasker.unserializeLists();
 
     }
 

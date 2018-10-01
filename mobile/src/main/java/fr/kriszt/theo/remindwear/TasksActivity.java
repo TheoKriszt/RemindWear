@@ -49,18 +49,10 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void loadFragment(Fragment fragment) {
-
-        // load fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
-
-        /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_container, fragment, "BOTTOM_FRAGMENT");
-        transaction.addToBackStack(fragment.toString());
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.commit();*/
     }
 
 }

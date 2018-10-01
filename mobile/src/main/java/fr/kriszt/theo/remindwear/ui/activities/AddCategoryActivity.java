@@ -102,6 +102,7 @@ public class AddCategoryActivity extends AppCompatActivity {
             Category newCategory = new Category(this.name, this.icon, this.color);
             Tasker.getInstance(getApplicationContext()).addCategory(newCategory);
             Tasker.serializeLists();
+
             onBackPressed();
         }
     }

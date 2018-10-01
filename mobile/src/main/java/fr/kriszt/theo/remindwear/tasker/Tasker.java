@@ -44,6 +44,19 @@ public class Tasker {
 	public ArrayList<Task> getListTasks() {return listTasks;}
 	public void setListTasks(ArrayList<Task> listTasks) {this.listTasks = listTasks;}
 	public static void removeTask(Task t) {listTasks.remove(t);}
+	public static void removeTaskByID(int id){
+    	int temp =-1;
+    	for (int i =0; i < listTasks.size(); i++){
+    		if(listTasks.get(i).getID() == id){
+    			temp = i;
+    			break;
+			}
+		}
+		if (temp != -1){
+    		listTasks.remove(temp);
+		}
+	}
+
 	public Boolean addTask(Task t) {
 		for(Task x : listTasks) {
 			if(x.toString().equals(t.toString())) {

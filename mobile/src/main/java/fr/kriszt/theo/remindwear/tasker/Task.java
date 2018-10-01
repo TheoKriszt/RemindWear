@@ -140,9 +140,13 @@ public class Task implements Serializable {
 
 	//TODO VOIR SI CA MARCHE
 	public long getDuration(TimeUnit timeUnit){
+		Calendar cal = getNextDate();
+		cal.set(Calendar.HOUR, getTimeMinutes());
+		cal.set(Calendar.MINUTE, getTimeMinutes());
+		cal.add(Calendar.MINUTE, -getWarningBefore());
 	    Date mDate  = getNextDate().getTime();
-        mDate.setHours(getTimeHour());
-	    mDate.setMinutes(getTimeMinutes());
+        /*mDate.setHours(getTimeHour());
+	    mDate.setMinutes(getTimeMinutes());*/
         return getDateDiff(mDate,new Date(),timeUnit);
     }
 
