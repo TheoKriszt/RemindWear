@@ -35,11 +35,11 @@
             android:text="schedule a task" />
 
         <Button
-            android:id="@+id/startServiceButton"
+            android:id="@+id/wipeButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Start service"
-            android:visibility="gone" />
+            android:text="Wipe all tasks" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

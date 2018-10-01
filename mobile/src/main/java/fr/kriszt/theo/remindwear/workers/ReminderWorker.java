@@ -32,55 +32,29 @@ public class ReminderWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.w(TAG, "doWork: ");
-
-
         int taskID = this.getInputData().getInt(TASK_ID_KEY, -1);
+        Log.w(TAG, "doWork: taskID : " + taskID);
+
 
         Task task = Tasker.getInstance(getApplicationContext()).getTaskByID(taskID);
 
         if (task != null) {
+            Log.w(TAG, "doWork: Tâche identifiée : " + task.getName());
             new RemindNotification(task, getApplicationContext()).show(null);
+
 
             if (false /* task.isRecurrent() */){
                 // TODO : vérifier si replanification nécessaire (tâche récurrente)
             }
+            return Result.SUCCESS;
 
+        }else {
+            Log.w(TAG, "doWork: identifiant de tâche inconnu : " + taskID);
         }
 
-        return Result.SUCCESS;
+        return Result.FAILURE;
         // (Returning RETRY tells WorkManager to try this task again
         // later; FAILURE says not to try again.)
-    }
-
-    /**
-     * @deprecated
-     * @param millis
-     * @param timeUnit
-     */
-    public static void scheduleWorker(long millis, @Nullable TimeUnit timeUnit){
-
-        if (timeUnit == null) {
-            timeUnit = TimeUnit.MILLISECONDS;
-        }
-
-        Log.w(TAG, "scheduleWorker: started with " + millis + " millis");
-        OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(ReminderWorker.class)
-                .setInitialDelay(millis, timeUnit)
-                //                .setInputData(inputData)
-//                .addTag(workTag + "_" + )
-                .build();
-
-        WorkManager.getInstance().enqueue(work);
-
-//alternatively, we can use this form to determine what happens to the existing stack
-//WorkManager.getInstance().beginUniqueWork(workTag, ExistingWorkPolicy.REPLACE, notificationWork);
-
-//ExistingWorkPolicy.REPLACE - Cancel the existing sequence and replace it with the new one
-//ExistingWorkPolicy.KEEP - Keep the existing sequence and ignore your new request
-//ExistingWorkPolicy.APPEND - Append your new sequence to the existing one,
-//running the new sequence's first task after the existing sequence's last task finishes
-
     }
 
     /**
@@ -90,29 +64,19 @@ public class ReminderWorker extends Worker {
     public static void scheduleWorker(Task task) {
         Log.w(TAG, "scheduleWorker: Scheduling task " + task.getName());
 
-//        UUID taskId = task.getID();
-
-        // TODO : check if needed to schedule
-
-
         if (task.getWorkID() != null){ // La tâche est déjà planifiée, annuler le job pour le reprogrammer derrière
             Log.w(TAG, "Task is already scheduled :  rescheduling");
             WorkManager.getInstance().cancelWorkById(task.getWorkID());
         }
 
-        // TODO : a remplacer par genre task.getMinutesBeforeNextExecution()
-        int before = task.getWarningBefore();
-        int hour = task.getTimeHour();
-        int minute = task.getTimeMinutes();
-
-        String categoryTag = task.getCategory() == null ? CATEGORY_NONE_TAG : task.getCategory().getName();
-
+        long remainingSeconds = task.getDuration(TimeUnit.SECONDS) * -1; // dateDiff donne une valeur négative si dans le futur
+//        remainingSeconds /= 10; // accélérer les tests
+        Log.w(TAG, "scheduleWorker: la tâche "+ task.getName() + " commencera dans " + remainingSeconds + " secondes");
 
         Data inputData = new Data.Builder().putInt(TASK_ID_KEY, task.getID()).build();
         OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(ReminderWorker.class)
-                .setInitialDelay(minute, TimeUnit.MINUTES)  // TODO : en attendant de connaitre la prochaine execution, simuler le comportement avec les minutes
-                                                            // TODO : ex : si la tâche commence à 13h03, planifier dans 3 minutes
-                .addTag(workTag + "_" + categoryTag) // catégoriser le work par Category (de la tâche)
+                .setInitialDelay(remainingSeconds, TimeUnit.SECONDS)
+                .addTag(getCategoryTag(task.getCategory())) // catégoriser le work par Category (de la tâche)
                 .setInputData(inputData)
                 .build();
 
@@ -125,6 +89,29 @@ public class ReminderWorker extends Worker {
         UUID workId = task.getWorkID();
         LiveData<WorkStatus> workStatusLiveData = WorkManager.getInstance().getStatusById( workId );
         return workStatusLiveData;
+    }
+
+    private static String getCategoryTag(Category category){
+
+        String categoryTag = category == null ? CATEGORY_NONE_TAG : category.getName();
+        return workTag + "_" + categoryTag;
+    }
+
+    /**
+     * Annule toutes les plannifications appartenant à la catégorie donnée
+     * @param category
+     * @return targetsNumber le nombre d'executions déplanifiées
+     */
+    public static int unScheduleCategory(@NonNull Category category){
+        String categoryTag = getCategoryTag(category);
+
+        int targetsNumber = WorkManager.getInstance().getStatusesByTag(categoryTag).getValue().size();
+        WorkManager.getInstance().cancelAllWorkByTag(categoryTag);
+        return targetsNumber;
+    }
+
+    public static void unScheduleAll(){
+        WorkManager.getInstance().cancelAllWork();
     }
 
 

@@ -54,32 +54,10 @@ public class NotificationTestingActivity extends AppCompatActivity {
     @OnClick(R.id.genNotifButton)
     void onButtonClicked(){
 
-        // Create an explicit intent for the notification tap action
-        Intent intent = new Intent(this, TasksActivity.class);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-
-        NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setContentTitle("Notification de l'appli")
-                .setContentText("Lorem Ipsum blablabla")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true) // automatically closes the notif. when tapped
-                ;
-
-        // TODO : wearable notif extension
-        //Wear OS requires a hint to display the reply action inline.
-        NotificationCompat.Action.WearableExtender actionExtender =
-                new NotificationCompat.Action.WearableExtender()
-                        .setHintLaunchesActivity(true)
-                        .setHintDisplayActionInline(true);
-
-
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(12345, nBuilder.build());
+        Category none = tasker.getCategoryByName(Tasker.CATEGORY_NONE_TAG);
+        Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
+        Task task = new Task("Titre de ma tâche", "Description de ma tâche", sport, new GregorianCalendar(2018, 30, 9), 0, 23, 15);
+        new RemindNotification(task, this).show(null);
 
 
     }

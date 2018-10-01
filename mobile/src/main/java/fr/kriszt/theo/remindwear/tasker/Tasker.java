@@ -23,6 +23,9 @@ public class Tasker {
 	private static ArrayList<Task> listTasks = new ArrayList<Task>();
 	private static Context context;
 
+	public static final String CATEGORY_NONE_TAG = "Aucune";
+	public static final String CATEGORY_SPORT_TAG = "Sport";
+
     private static Tasker INSTANCE = null;
     public static synchronized Tasker getInstance(Context context)
     {
@@ -36,8 +39,8 @@ public class Tasker {
 	public Tasker(Context context) {
 	    this.context = context;
 	    unserializeLists();
-		Category c = new Category("Aucune", R.drawable.ic_base_0, 0);
-	    this.addCategory(c);
+		addCategory( new Category(CATEGORY_NONE_TAG, R.drawable.ic_base_0, 0));
+	    addCategory( new Category(CATEGORY_SPORT_TAG, R.drawable.baseline_directions_run_24, 0));
 	    serializeLists();
     }
 
@@ -291,13 +294,22 @@ public class Tasker {
 		return res;
 	}
 
-	public Task getTaskByID(int id){
+	public static Task getTaskByID(int id){
 		for(Task t : listTasks){
 			if( t.getID() ==  id) {
 				return t;
 			}
 		}
     	return null;
+	}
+
+	public static Category getCategoryByName(String catName){
+    	for (Category c : listCategories){
+    		if (c.getName().equals(catName)){
+    			return c;
+			}
+		}
+		return null;
 	}
 
 }
