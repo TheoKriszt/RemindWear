@@ -116,14 +116,12 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
         holder.date.setText(res);
         holder.description.setText(p.getDescription());
         res= "";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            res += p.getTimeHour();
-            res += ":";
-            if(p.getTimeMinutes() <10){
-                res += "0";
-            }
-            res += p.getTimeMinutes();
+        res += p.getTimeHour();
+        res += ":";
+        if(p.getTimeMinutes() <10){
+            res += "0";
         }
+        res += p.getTimeMinutes();
         holder.time.setText(res);
 
         if(p.getDateDeb() == null){

@@ -66,7 +66,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 
-        category = Tasker.getInstance(getApplicationContext()).getListCategories().get(0);
+        Category categoryTemp = Tasker.getInstance(getApplicationContext()).getListCategories().get(0);
 
         name = (EditText) findViewById(R.id.name);
         description = (EditText) findViewById(R.id.description);
@@ -104,17 +104,17 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
-        editCategory  = (ImageView) findViewById(R.id.addCategory);
+        editCategory  = (ImageView) findViewById(R.id.editCategory);
         editCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AddCategoryActivity.class);
+                Intent intent = new Intent(v.getContext(), EditCategoryActivity.class);
                 intent.putExtra("idCateory", category.getID() );
                 startActivity(intent);
             }
         });
-        if(category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
-                category.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+        if(categoryTemp.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                categoryTemp.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
             editCategory.setVisibility(View.GONE);
         }else{
             editCategory.setVisibility(View.VISIBLE);
@@ -143,7 +143,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         calendarView = (CalendarView) findViewById(R.id.calendar);
         calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                calendar = new GregorianCalendar( year, month, dayOfMonth );
+                calendar = new GregorianCalendar( year, month, dayOfMonth ,time_picker_hour.getValue(),time_picker_min.getValue());
             }
         });
         layout_repete = (LinearLayout) findViewById(R.id.layout_repete);
@@ -184,7 +184,6 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         tasker = new Tasker(getApplicationContext());
         Tasker.unserializeLists();
 
-
         if(name.getText().toString().equals("")){
             Toast.makeText(getApplicationContext(), "Ajoutez un titre", Toast.LENGTH_LONG).show();
         }else{
@@ -211,6 +210,13 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     return;
                 }else{
                     //TODO check si date > now
+                    Calendar c = new GregorianCalendar();
+                    //c.set(Calendar.HOUR, time_picker_hour.getValue());
+                    //c.set(Calendar.MINUTE, time_picker_min.getValue());
+                    if(calendar.before(c)){
+                        Toast.makeText(getApplicationContext(), "Ajoutez une date a partir d'aujourd'hui", Toast.LENGTH_LONG).show();
+                        return;
+                    }
 
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 

@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -23,11 +22,10 @@ import java.util.List;
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
-import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 
-public class SportListFragment extends Fragment {
+public class SportTaskListFragment extends Fragment {
 
     View rootView;
     private String userSearch = "";
@@ -35,7 +33,7 @@ public class SportListFragment extends Fragment {
 
     private List<SportTask> tasksSportList;
     private RecyclerView sportList;
-    private TaskSportListAdapterFragment tasksSportAdapter;
+    private SportTaskListAdapterFragment tasksSportAdapter;
 
     private EditText searchBar;
     private ImageView upper;
@@ -43,7 +41,7 @@ public class SportListFragment extends Fragment {
     private ImageView search;
     private ImageView close;
 
-    public SportListFragment(){}
+    public SportTaskListFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,18 +59,23 @@ public class SportListFragment extends Fragment {
         Tasker.unserializeLists();
         Tasker.garbageCollectOld();
         Tasker.serializeLists();
-        Tasker.sort(true);
+        Tasker.sportSort(true);
 
         tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
 
-        /*
-        TODO serialisation et deserialisation,  trie, test
-         */
-        SportTask s = new SportTask("e","d", new Category("n", 0, 0), new GregorianCalendar(), 30,23, 12, new Boolean[]{});
-        tasksSportList.add(s);
+        //TODO REMOVE
+        Tasker.unserializeLists();
+        if(Tasker.getInstance(getContext()).getListSportTasks().size() <= 0){
+            SportTask s = new SportTask("e","d", new Category("n", 0, 0),
+                    new GregorianCalendar(), 30,23, 12, new Boolean[]{},
+                    50, 60, 364, 788944321);
+            Tasker.getInstance(getContext()).addSportTask(s);
+            tasksSportList.add(s);
+        }
+        Tasker.serializeLists();
 
         sportList = rootView.findViewById(R.id.sportList);
-        tasksSportAdapter = new TaskSportListAdapterFragment(getContext(), tasksSportList);
+        tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         sportList.setLayoutManager(mLayoutManager);
@@ -102,7 +105,7 @@ public class SportListFragment extends Fragment {
                 upper.setVisibility(View.GONE);
                 lower.setVisibility(View.VISIBLE);
                 growing = false;
-                Tasker.sort(growing);
+                Tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }
@@ -116,7 +119,7 @@ public class SportListFragment extends Fragment {
                 lower.setVisibility(View.GONE);
                 upper.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sort(growing);
+                Tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }
@@ -132,7 +135,7 @@ public class SportListFragment extends Fragment {
                 lower.setVisibility(View.GONE);
                 searchBar.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sort(growing);
+                Tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }
@@ -147,7 +150,7 @@ public class SportListFragment extends Fragment {
                 search.setVisibility(View.VISIBLE);
                 upper.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sort(growing);
+                Tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }
@@ -158,7 +161,7 @@ public class SportListFragment extends Fragment {
 
     public void updateRecyclerView(){
         sportList = rootView.findViewById(R.id.sportList);
-        tasksSportAdapter = new TaskSportListAdapterFragment(getContext(), tasksSportList);
+        tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         sportList.setLayoutManager(mLayoutManager);
         sportList.setItemAnimator(new DefaultItemAnimator());

@@ -2,22 +2,22 @@ package fr.kriszt.theo.remindwear.tasker;
 
 public class Coordonate {
 
-    private double x;
-    private double y;
-    private double z;
+    private double lat;
+    private double lng;
+    private double h;
 
-    public Coordonate(double x, double y, double z){
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Coordonate(double lat, double lng, double height){
+        this.lat = lat;
+        this.lng = lng;
+        this.h = height;
     }
 
-    public double getX() {return x;}
-    public void setX(double x) {this.x = x;}
+    public double getLat() {return lat;}
+    public void setLat(double lat) {this.lat = lat;}
 
-    public double getY() {return y;}
-    public void setY(double y) {this.y = y;}
+    public double getLng() {return lng;}
+    public void setLng(double lng) {this.lng = lng;}
 
-    public double getZ() {return z;}
-    public void setZ(double z) {this.z = z;}
+    public double getHeight() {return h;}
+    public void setHeight(double height) {this.h = height;}
 }

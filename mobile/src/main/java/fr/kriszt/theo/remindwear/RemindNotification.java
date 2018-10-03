@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 
 import fr.kriszt.theo.remindwear.tasker.Task;
-import fr.kriszt.theo.remindwear.ui.fragments.SportListFragment;
+import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
 
 public class RemindNotification {
     public static final String TAG = "REMINDER_NOTIFICATION";
@@ -56,7 +56,7 @@ public class RemindNotification {
         // Ajouter l'action START TRACKING pour la catégorie sport
 
         Intent intent = new Intent(context, TasksActivity.class);
-        intent.putExtra(TasksActivity.FRAGMENT_TO_LAUNCH, SportListFragment.class.getName());
+        intent.putExtra(TasksActivity.FRAGMENT_TO_LAUNCH, SportTaskListFragment.class.getName());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 

@@ -125,9 +125,10 @@ public class Tasker {
     }
 
 	public static void serializeLists() {
-		serializeList(listCategories, "Category.txt");		
+		serializeList(listCategories, "Category.txt");
 		serializeList(listTasks, "Task.txt");
-		
+		serializeList(listSportTasks, "SportTask.txt");
+
 	}	
 	
 	public static void serializeList(ArrayList<?> list, String name) {
@@ -145,6 +146,7 @@ public class Tasker {
 	public static void unserializeLists() {
 		unserializeListCategories();
 		unserializeListTasks();
+		unserializeListSportTasks();
 	}
 	
 	public static void unserializeListCategories() {
@@ -196,6 +198,31 @@ public class Tasker {
         }
         listTasks = list;
     }
+
+	public static void unserializeListSportTasks() {
+		ArrayList<SportTask> list = new ArrayList<>();
+		try {
+			FileInputStream fis = context.openFileInput("SportTask.txt");
+			ObjectInputStream is = new ObjectInputStream(fis);
+			list = (ArrayList<SportTask>) is.readObject();
+			is.close();
+			fis.close();
+
+		}catch (Exception e){
+			serializeLists();
+			try{
+				FileInputStream fis = context.openFileInput("SportTask.txt");
+				ObjectInputStream is = new ObjectInputStream(fis);
+				list = (ArrayList<SportTask>) is.readObject();
+				is.close();
+				fis.close();
+			}catch (Exception e2){
+				e2.printStackTrace();
+			}
+			e.printStackTrace();
+		}
+		listSportTasks = list;
+	}
 	
 	public static void garbageCollectOld() {
 	    unserializeLists();
@@ -213,13 +240,13 @@ public class Tasker {
 	}
 	
 	public static void sort(final Boolean growing) {
-	    unserializeLists();
-		Collections.sort(listTasks, new Comparator<Task>() {
-			@Override
-			public int compare(Task o1, Task o2) {
-				int res = 1;
-				if(growing){
-				    res *= -1;
+        unserializeLists();
+        Collections.sort(listTasks, new Comparator<Task>() {
+            @Override
+            public int compare(Task o1, Task o2) {
+                int res = 1;
+                if(growing){
+                    res *= -1;
                 }
                 Calendar o1deb = o1.getNextDate();
                 Calendar o2deb = o2.getNextDate();
@@ -232,10 +259,35 @@ public class Tasker {
                     return res;
                 }
                 return 0;
-			}
-		});
-		serializeLists();
-	}
+            }
+        });
+        serializeLists();
+    }
+
+    public static void sportSort(final Boolean growing) {
+        unserializeLists();
+        Collections.sort(listSportTasks, new Comparator<Task>() {
+            @Override
+            public int compare(Task o1, Task o2) {
+                int res = 1;
+                if(growing){
+                    res *= -1;
+                }
+                Calendar o1deb = o1.getNextDate();
+                Calendar o2deb = o2.getNextDate();
+
+                if (o1deb.after(o2deb)) {
+                    return res*-1;
+                }
+
+                if (o1deb.before(o2deb)) {
+                    return res;
+                }
+                return 0;
+            }
+        });
+        serializeLists();
+    }
 
 	public ArrayList<Task> filter(String seq, Boolean growing) {
 		ArrayList<Task> res = new ArrayList<>();
@@ -277,7 +329,7 @@ public class Tasker {
         return res;
     }
 
-	public ArrayList<Task> getTasksByName(String seq) {
+	/*public ArrayList<Task> getTasksByName(String seq) {
 		ArrayList<Task> res = new ArrayList<>();
 		for(Task t : listTasks){
 			if(t.getName().contains(seq)) {
@@ -335,7 +387,7 @@ public class Tasker {
 			}
 		}
 		return res;
-	}
+	}*/
 
 	public static Task getTaskByID(int id){
 		for(Task t : listTasks){
@@ -345,6 +397,15 @@ public class Tasker {
 		}
     	return null;
 	}
+
+    public static SportTask getSportTaskByID(int id){
+        for(SportTask t : listSportTasks){
+            if( t.getID() ==  id) {
+                return t;
+            }
+        }
+        return null;
+    }
 
 	public static Category getCategoryByID(int id){
 		for(Category c : listCategories){

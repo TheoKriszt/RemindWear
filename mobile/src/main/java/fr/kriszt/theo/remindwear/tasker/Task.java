@@ -141,7 +141,6 @@ public class Task implements Serializable {
         return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
     }
 
-	//TODO VOIR SI CA MARCHE
 	public long getDuration(TimeUnit timeUnit){
 		Calendar cal = getNextDate();
 		cal.set(Calendar.HOUR, getTimeMinutes());
