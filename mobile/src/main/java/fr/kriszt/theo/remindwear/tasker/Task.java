@@ -147,6 +147,7 @@ public class Task implements Serializable {
 		cal.set(Calendar.HOUR, getTimeMinutes());
 		cal.set(Calendar.MINUTE, getTimeMinutes());
 		cal.add(Calendar.MINUTE, -getWarningBefore());
+		//cal.roll(Calendar.MINUTE, getWarningBefore());
 	    Date mDate  = getNextDate().getTime();
         /*mDate.setHours(getTimeHour());
 	    mDate.setMinutes(getTimeMinutes());*/

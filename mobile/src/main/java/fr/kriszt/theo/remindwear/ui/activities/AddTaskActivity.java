@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -37,6 +38,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private Tasker tasker;
     private Task task;
     public Calendar calendar = null;
+    private Category category;
 
     private EditText name;
     private EditText description;
@@ -56,12 +58,15 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private Button submit;
     private NumberPicker preventBefore;
     private ImageView addCategory;
+    private ImageView editCategory;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
+
+        category = Tasker.getInstance(getApplicationContext()).getListCategories().get(0);
 
         name = (EditText) findViewById(R.id.name);
         description = (EditText) findViewById(R.id.description);
@@ -90,11 +95,6 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         }
         preventBefore.setDisplayedValues(minuteValues);
 
-        //TODO spinner fonctionne bizarement !!??
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setAdapter(new NewAdapter());
-        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         addCategory  = (ImageView) findViewById(R.id.addCategory);
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +104,41 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
+        editCategory  = (ImageView) findViewById(R.id.addCategory);
+        editCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AddCategoryActivity.class);
+                intent.putExtra("idCateory", category.getID() );
+                startActivity(intent);
+            }
+        });
+        if(category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                category.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+            editCategory.setVisibility(View.GONE);
+        }else{
+            editCategory.setVisibility(View.VISIBLE);
+        }
+
+        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setAdapter(new NewAdapter(Tasker.getInstance(getApplicationContext()).getListCategories()));
+        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                category = Tasker.getInstance(getApplicationContext()).getListCategories().get(position);
+                if(category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                        category.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+                    editCategory.setVisibility(View.GONE);
+                }else{
+                    editCategory.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {}
+
+        });
 
         calendarView = (CalendarView) findViewById(R.id.calendar);
         calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
@@ -175,6 +210,8 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     Toast.makeText(getApplicationContext(), "Ajoutez une date", Toast.LENGTH_LONG).show();
                     return;
                 }else{
+                    //TODO check si date > now
+
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
                     Tasker.unserializeLists();
@@ -224,39 +261,58 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
     class NewAdapter extends BaseAdapter {
 
-        @Override
-        public int getCount() {
-            return Tasker.getInstance(getApplicationContext()).getListCategories().size();
+        private ArrayList<Category> items;
+
+        public NewAdapter(ArrayList<Category> items) {
+            this.items = items;
         }
 
         @Override
-        public Object getItem(int arg0) {
-            return Tasker.getInstance(getApplicationContext()).getListCategories().get(arg0);
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return Tasker.getInstance(getApplicationContext()).getListCategories().get(position).hashCode();
+            return position ;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = inflator.inflate(R.layout.content_text_and_icon_spinner, null);
-                Category cat  = (Category) getItem(position);
-
-                ImageView icon = convertView.findViewById(R.id.icon);
-                icon.setImageResource(cat.getIcon());
-
-                TextView text =  convertView.findViewById(R.id.name);
-                text.setText(cat.getName());
-
-                LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.changeColor);
-                linearLayout.setBackgroundColor(cat.getColor());
+                viewHolder = new ViewHolder(convertView);
+                convertView.setTag(viewHolder);
+            }else{
+                viewHolder  = (ViewHolder) convertView.getTag();
             }
+            Category cat  = (Category) getItem(position);
+
+            viewHolder.itemName.setText(cat.getName());
+            viewHolder.itemIcon.setImageResource(cat.getIcon());
+            viewHolder.itemLayout.setBackgroundColor(cat.getColor());
+
             return convertView;
         }
 
+    }
+
+    private class ViewHolder {
+        TextView itemName;
+        ImageView itemIcon;
+        LinearLayout itemLayout;
+
+        public ViewHolder(View view) {
+            itemName = (TextView)view.findViewById(R.id.name);
+            itemIcon = (ImageView) view.findViewById(R.id.icon);
+            itemLayout = (LinearLayout) view.findViewById(R.id.changeColor);
+        }
     }
 
 }

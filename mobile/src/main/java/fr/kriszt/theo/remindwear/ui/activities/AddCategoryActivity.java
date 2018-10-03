@@ -31,7 +31,7 @@ public class AddCategoryActivity extends AppCompatActivity {
     private int color;
     private int icon;
     private String name;
-    List<Integer> listIcons = new ArrayList<>();
+    ArrayList<Integer> listIcons = new ArrayList<>();
 
     private EditText title;
     private Spinner spinner;
@@ -68,7 +68,7 @@ public class AddCategoryActivity extends AppCompatActivity {
         title = (EditText) findViewById(R.id.name);
 
         spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setAdapter(new NewAdapter());
+        spinner.setAdapter(new NewAdapter(listIcons));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         colorPickerView = (ColorPickerView) findViewById(R.id.colorPickerView);
@@ -114,35 +114,53 @@ public class AddCategoryActivity extends AppCompatActivity {
 
     class NewAdapter extends BaseAdapter {
 
-        @Override
-        public int getCount() {
-            return listIcons.size();
+        private ArrayList<Integer> items;
+
+        public NewAdapter(ArrayList<Integer> items) {
+            this.items = items;
         }
 
         @Override
-        public Object getItem(int arg0) {
-            return listIcons.get(arg0);
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            return position ;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = inflator.inflate(R.layout.content_icon_spinner, null);
-
-                ImageView icon = convertView.findViewById(R.id.icon);
-
-                int ic = listIcons.get(position);
-                icon.setImageResource(ic);
-
+                viewHolder = new ViewHolder(convertView);
+                convertView.setTag(viewHolder);
+            }else{
+                viewHolder  = (ViewHolder) convertView.getTag();
             }
+            int ic = (Integer) getItem(position);
+
+            viewHolder.itemIcon.setImageResource(ic);
             return convertView;
         }
 
+
+}
+
+private class ViewHolder {
+    ImageView itemIcon;
+
+    public ViewHolder(View view) {
+        itemIcon = (ImageView) view.findViewById(R.id.icon);
     }
+}
+
 
 }

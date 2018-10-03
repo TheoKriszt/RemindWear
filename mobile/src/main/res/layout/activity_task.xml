@@ -25,15 +25,16 @@
             android:backgroundTint="@color/colorPrimaryDark">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:gravity="center_vertical"
+                android:layout_height="40dp"
+                android:layout_width="wrap_content">
 
                 <ImageView
                     android:id="@+id/cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_close_24dp" />
 
                 <ImageView
@@ -41,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginRight="10dp"
                     android:src="@drawable/ic_check_24dp" />
 
             </RelativeLayout>
@@ -151,6 +152,7 @@
 
                     <TextView
                         android:text="Select category:"
+                        android:layout_gravity="center_vertical"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
@@ -158,16 +160,33 @@
 
                     <Spinner
                         android:id="@+id/spinner"
+                        android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                         android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
                         android:layout_weight="1"
                         android:layout_width="fill_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="60dp" />
 
-                    <ImageView
-                        android:id="@+id/addCategory"
+                    <LinearLayout
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/baseline_add_24" />
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/addCategory"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/baseline_add_24" />
+
+                        <ImageView
+                            android:id="@+id/editCategory"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/ic_edit_black_24dp" />
+
+                    </LinearLayout>
+
+
 
                 </LinearLayout>
 

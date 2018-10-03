@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -21,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -37,6 +40,7 @@ public class EditTaskActivity extends AppCompatActivity {
     LayoutInflater inflator;
     private Tasker tasker;
     private Task task;
+    private Category category;
     private Task taskTemp;
     public Calendar calendar = null;
 
@@ -62,6 +66,7 @@ public class EditTaskActivity extends AppCompatActivity {
     private Button submit;
     private NumberPicker preventBefore;
     private ImageView addCategory;
+    private ImageView editCategory;
 
 
     @Override
@@ -72,6 +77,7 @@ public class EditTaskActivity extends AppCompatActivity {
         Intent mIntent = getIntent();
         int id = mIntent.getIntExtra("idTask", 0);
         Task task = Tasker.getInstance(getApplicationContext()).getTaskByID(id);
+        category = task.getCategory();
         taskTemp = task;
 
         cardView = (CardView) findViewById(R.id.cardView);
@@ -124,13 +130,14 @@ public class EditTaskActivity extends AppCompatActivity {
         preventBefore.setDisplayedValues(minuteValues);
 
 
-        //TODO set spinner avec bonne category
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setAdapter(new NewAdapter());
-        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        //spinner.setSelection();
-
+        editCategory  = (ImageView) findViewById(R.id.editCategory);
         addCategory  = (ImageView) findViewById(R.id.addCategory);
+        if(task.getCategory().getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                task.getCategory().getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+            editCategory.setVisibility(View.GONE);
+        }else{
+            editCategory.setVisibility(View.VISIBLE);
+        }
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,6 +146,43 @@ public class EditTaskActivity extends AppCompatActivity {
             }
         });
 
+        editCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), EditCategoryActivity.class);
+                intent.putExtra("idCaterory", category.getID());
+                startActivity(intent);
+            }
+        });
+
+        int resPositionCategory = 0;
+        ArrayList<Category> listC = Tasker.getInstance(getApplicationContext()).getListCategories();
+        for(int c=0;c< listC.size();c++){
+            if(listC.get(c).toString().equals(task.getCategory().toString())){
+                resPositionCategory = c;
+                break;
+            }
+        }
+        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setAdapter(new NewAdapter(Tasker.getInstance(getApplicationContext()).getListCategories()));
+        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        spinner.setSelection(resPositionCategory);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                category = Tasker.getInstance(getApplicationContext()).getListCategories().get(position);
+                if(Tasker.getInstance(getApplicationContext()).getListCategories().get(position).getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                        Tasker.getInstance(getApplicationContext()).getListCategories().get(position).getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+                    editCategory.setVisibility(View.GONE);
+                }else{
+                    editCategory.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {}
+
+        });
 
         calendarView = (CalendarView) findViewById(R.id.calendar);
         calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
@@ -200,7 +244,6 @@ public class EditTaskActivity extends AppCompatActivity {
                 deleteAction();
             }
         });
-
     }
 
     private void deleteAction() {
@@ -244,6 +287,8 @@ public class EditTaskActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Ajoutez une date", Toast.LENGTH_LONG).show();
                     return;
                 }else{
+
+                    //TODO check si date > now
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
                     Tasker.unserializeLists();
@@ -284,39 +329,58 @@ public class EditTaskActivity extends AppCompatActivity {
 
     class NewAdapter extends BaseAdapter {
 
-        @Override
-        public int getCount() {
-            return Tasker.getInstance(getApplicationContext()).getListCategories().size();
+        private ArrayList<Category> items;
+
+        public NewAdapter(ArrayList<Category> items) {
+            this.items = items;
         }
 
         @Override
-        public Object getItem(int arg0) {
-            return Tasker.getInstance(getApplicationContext()).getListCategories().get(arg0);
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return Tasker.getInstance(getApplicationContext()).getListCategories().get(position).hashCode();
+            return position ;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = inflator.inflate(R.layout.content_text_and_icon_spinner, null);
-                Category cat  = (Category) getItem(position);
-
-                ImageView icon = convertView.findViewById(R.id.icon);
-                icon.setImageResource(cat.getIcon());
-
-                TextView text =  convertView.findViewById(R.id.name);
-                text.setText(cat.getName());
-
-                LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.changeColor);
-                linearLayout.setBackgroundColor(cat.getColor());
+                viewHolder = new ViewHolder(convertView);
+                convertView.setTag(viewHolder);
+            }else{
+                viewHolder  = (ViewHolder) convertView.getTag();
             }
+            Category cat  = (Category) getItem(position);
+
+            viewHolder.itemName.setText(cat.getName());
+            viewHolder.itemIcon.setImageResource(cat.getIcon());
+            viewHolder.itemLayout.setBackgroundColor(cat.getColor());
+
             return convertView;
         }
 
+    }
+
+    private class ViewHolder {
+        TextView itemName;
+        ImageView itemIcon;
+        LinearLayout itemLayout;
+
+        public ViewHolder(View view) {
+            itemName = (TextView)view.findViewById(R.id.name);
+            itemIcon = (ImageView) view.findViewById(R.id.icon);
+            itemLayout = (LinearLayout) view.findViewById(R.id.changeColor);
+        }
     }
 
 }

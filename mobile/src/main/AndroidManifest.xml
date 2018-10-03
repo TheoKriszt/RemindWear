@@ -8,6 +8,14 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
 
+    <!--
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the 'MyLocation' functionality. 
+    -->
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> -->
     <!-- TODO : reschedule after restart ? -->
     <application
@@ -62,7 +70,13 @@
             android:name=".ui.activities.AddCategoryActivity"
             android:label="@string/title_activity_add_category"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.activities.EditCategoryActivity"></activity>
+        <activity android:name=".ui.activities.EditCategoryActivity" />
+        <activity android:name=".ui.activities.SportDetailsActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
     </application>
 
 </manifest>

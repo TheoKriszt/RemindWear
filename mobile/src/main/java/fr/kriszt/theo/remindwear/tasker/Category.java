@@ -7,15 +7,19 @@ import java.io.Serializable;
 public class Category implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private int ID;
 	private String name;
 	private int icon;
 	private int color;
 
 	public Category(String name, int icon , int color) {
+		this.ID = (int) System.currentTimeMillis()/1000;
 		this.setName(name);
 		this.setIcon(icon);
 		this.setColor(color);
 	}
+
+	public int getID() {return ID;}
 	
 	public String getName() {return name;}
 	public void setName(String name) {this.name = name;}

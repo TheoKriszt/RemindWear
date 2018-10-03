@@ -19,8 +19,9 @@ import fr.kriszt.theo.remindwear.R;
 
 public class Tasker {
 
-	private static ArrayList<Category> listCategories = new ArrayList<Category>();
-	private static ArrayList<Task> listTasks = new ArrayList<Task>();
+	private static ArrayList<Category> listCategories = new ArrayList<>();
+	private static ArrayList<Task> listTasks = new ArrayList<>();
+	private static ArrayList<SportTask> listSportTasks = new ArrayList<>();
 	private static Context context;
 
 	public static final String CATEGORY_NONE_TAG = "Aucune";
@@ -38,14 +39,16 @@ public class Tasker {
 
 	public Tasker(Context context) {
 	    this.context = context;
-	    unserializeLists();
-		addCategory( new Category(CATEGORY_NONE_TAG, R.drawable.ic_base_0, 0));
-	    addCategory( new Category(CATEGORY_SPORT_TAG, R.drawable.baseline_directions_run_24, 0));
-	    serializeLists();
+	    if(INSTANCE == null){
+            unserializeLists();
+            addCategory( new Category(CATEGORY_NONE_TAG, R.drawable.ic_base_0, 0));
+            addCategory( new Category(CATEGORY_SPORT_TAG, R.drawable.baseline_directions_run_24, 0));
+            serializeLists();
+        }
     }
 
 	public ArrayList<Task> getListTasks() {return listTasks;}
-	public void setListTasks(ArrayList<Task> listTasks) {this.listTasks = listTasks;}
+	public void setListTasks(ArrayList<Task> listTasks) {Tasker.listTasks = listTasks;}
 	public static void removeTask(Task t) {listTasks.remove(t);}
 	public static void removeTaskByID(int id){
     	int temp =-1;
@@ -70,8 +73,41 @@ public class Tasker {
 		return true;
 	}
 
+	public ArrayList<SportTask> getListSportTasks() {return listSportTasks;}
+	public void setListSportTasks(ArrayList<SportTask> listSportTasks) {Tasker.listSportTasks = listSportTasks;}
+	public static void removeSportTask(SportTask t) {listSportTasks.remove(t);}
+	public static void removeSportTaskByID(int id){
+		int temp =-1;
+		for (int i =0; i < listSportTasks.size(); i++){
+			if(listSportTasks.get(i).getID() == id){
+				temp = i;
+				break;
+			}
+		}
+		if (temp != -1){
+			listSportTasks.remove(temp);
+		}
+	}
+
+	public Boolean addSportTask(SportTask t) {
+		for(Task x : listSportTasks) {
+			if(x.toString().equals(t.toString())) {
+				return false;
+			}
+		}
+		listSportTasks.add(t);
+		return true;
+	}
+
+	public void editCategoryById(int id, Category c){
+		Category cat = getCategoryByID(id);
+		cat.setColor(c.getColor());
+		cat.setIcon(c.getIcon());
+		cat.setName(c.getName());
+	}
+
 	public ArrayList<Category> getListCategories() {return listCategories;}
-	public void setListCategories(ArrayList<Category> listCategories) {this.listCategories = listCategories;}
+	public void setListCategories(ArrayList<Category> listCategories) {Tasker.listCategories = listCategories;}
 	public void removeCategory(Category c) {listCategories.remove(c);}
 	public Boolean addCategory(Category c) {
 		for(Category x : listCategories) {
@@ -166,12 +202,12 @@ public class Tasker {
 		ArrayList<Integer> deletes = new ArrayList<>();
 		Calendar now = new GregorianCalendar();
 		for(int i=0; i < listTasks.size(); i++){
-			if(listTasks.get(i).getNextDate() != null && listTasks.get(i).getNextDate().compareTo(now) >= 0) {
-				   deletes.add(i);
+			if(listTasks.get(i).getNextDate() != null && listTasks.get(i).getNextDate().compareTo(now) < 0) {
+				   deletes.add(listTasks.get(i).getID());
 			}
 		}
 		for(Integer i : deletes) {
-			removeTask(listTasks.get(i));
+			removeTaskByID(i);
 		}
 		serializeLists();
 	}
@@ -220,6 +256,26 @@ public class Tasker {
 		}
 		return res;
 	}
+
+    public ArrayList<SportTask> sportFilter(String seq, Boolean growing) {
+        ArrayList<SportTask> res = new ArrayList<>();
+        sort(growing);
+        seq = seq.toUpperCase();
+        for(SportTask t : listSportTasks){
+            SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy");
+            String dateFormated = format.format(t.getNextDate().getTime());
+            if(t.getName().toUpperCase().contains(seq)) {
+                res.add(t);
+            }else if(t.getCategory().getName().toUpperCase().contains(seq)){
+                res.add(t);
+            }else if(t.getDescription().toUpperCase().contains(seq)){
+                res.add(t);
+            }else if(dateFormated.toUpperCase().contains(seq)){
+                res.add(t);
+            }
+        }
+        return res;
+    }
 
 	public ArrayList<Task> getTasksByName(String seq) {
 		ArrayList<Task> res = new ArrayList<>();
@@ -288,6 +344,15 @@ public class Tasker {
 			}
 		}
     	return null;
+	}
+
+	public static Category getCategoryByID(int id){
+		for(Category c : listCategories){
+			if( c.getID() ==  id) {
+				return c;
+			}
+		}
+		return null;
 	}
 
 	public static Category getCategoryByName(String catName){

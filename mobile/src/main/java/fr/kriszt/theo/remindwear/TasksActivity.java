@@ -1,6 +1,5 @@
 package fr.kriszt.theo.remindwear;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,7 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import fr.kriszt.theo.remindwear.ui.fragments.SportFragment;
+import fr.kriszt.theo.remindwear.ui.fragments.SportListFragment;
 import fr.kriszt.theo.remindwear.ui.fragments.TaskListFragment;
 
 public class TasksActivity extends AppCompatActivity {
@@ -27,7 +26,7 @@ public class TasksActivity extends AppCompatActivity {
                     loadFragment(fragment);
                     return true;
                 case R.id.navigation_sport:
-                    fragment = new SportFragment();
+                    fragment = new SportListFragment();
                     loadFragment(fragment);
                     return true;
             }
@@ -45,8 +44,8 @@ public class TasksActivity extends AppCompatActivity {
 
        /* Intent intent = getIntent();
         String fragmentClass = intent.getStringExtra(FRAGMENT_TO_LAUNCH);
-        if (fragmentClass.startsWith(SportFragment.class.getName())){
-            loadFragment(new SportFragment());
+        if (fragmentClass.startsWith(SportListFragment.class.getName())){
+            loadFragment(new SportListFragment());
         }else{ // défaut*/
             loadFragment(new TaskListFragment());
         //}
