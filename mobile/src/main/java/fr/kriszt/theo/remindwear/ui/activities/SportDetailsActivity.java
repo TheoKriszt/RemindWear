@@ -34,15 +34,17 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
     private TextView heart;
     private TextView distance;
     private TextView duration;
+    private Tasker tasker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sport_task_details);
+        tasker = Tasker.getInstance(this);
 
 
         int id = getIntent().getIntExtra("idSportTask", 0);
-        sTask = Tasker.getSportTaskByID(id);
+        sTask = tasker.getSportTaskByID(id);
         listCoordonate = sTask.getListCoord();
 
         graph = (GraphView) findViewById(R.id.graph);

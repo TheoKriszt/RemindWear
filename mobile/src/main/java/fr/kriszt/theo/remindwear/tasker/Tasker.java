@@ -15,20 +15,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 
+import androidx.annotation.Nullable;
 import fr.kriszt.theo.remindwear.R;
 
 public class Tasker {
 
-	private static ArrayList<Category> listCategories = new ArrayList<>();
-	private static ArrayList<Task> listTasks = new ArrayList<>();
-	private static ArrayList<SportTask> listSportTasks = new ArrayList<>();
-	private static Context context;
+	private ArrayList<Category> listCategories = new ArrayList<>();
+	private ArrayList<Task> listTasks = new ArrayList<>();
+	private ArrayList<SportTask> listSportTasks = new ArrayList<>();
+	private Context context;
 
 	public static final String CATEGORY_NONE_TAG = "Aucune";
 	public static final String CATEGORY_SPORT_TAG = "Sport";
 
     private static Tasker INSTANCE = null;
-    public static synchronized Tasker getInstance(Context context)
+
+    public static synchronized Tasker getInstance(@Nullable Context context)
     {
         if (INSTANCE == null)
         {
@@ -39,18 +41,23 @@ public class Tasker {
 
 	public Tasker(Context context) {
 	    this.context = context;
-	    if(INSTANCE == null){
+	    //if(INSTANCE == null){
             unserializeLists();
-            addCategory( new Category(CATEGORY_NONE_TAG, R.drawable.ic_base_0, 0));
-            addCategory( new Category(CATEGORY_SPORT_TAG, R.drawable.baseline_directions_run_24, 0));
+
+            if (getCategoryByName(CATEGORY_NONE_TAG) == null){
+				addCategory( new Category(CATEGORY_NONE_TAG, R.drawable.ic_base_0, 0));
+			}
+			if (getCategoryByName(CATEGORY_SPORT_TAG) == null){
+				addCategory( new Category(CATEGORY_SPORT_TAG, R.drawable.baseline_directions_run_24, 0));
+			}
             serializeLists();
-        }
+        //}
     }
 
 	public ArrayList<Task> getListTasks() {return listTasks;}
-	public void setListTasks(ArrayList<Task> listTasks) {Tasker.listTasks = listTasks;}
-	public static void removeTask(Task t) {listTasks.remove(t);}
-	public static void removeTaskByID(int id){
+	public void setListTasks(ArrayList<Task> listTasks) {this.listTasks = listTasks;}
+	public void removeTask(Task t) {listTasks.remove(t);}
+	public void removeTaskByID(int id){
     	int temp =-1;
     	for (int i =0; i < listTasks.size(); i++){
     		if(listTasks.get(i).getID() == id){
@@ -64,6 +71,11 @@ public class Tasker {
 	}
 
 	public Boolean addTask(Task t) {
+
+        if (t instanceof SportTask){
+            return addSportTask((SportTask) t);
+        }
+
 		for(Task x : listTasks) {
 			if(x.toString().equals(t.toString())) {
 				return false;
@@ -74,9 +86,9 @@ public class Tasker {
 	}
 
 	public ArrayList<SportTask> getListSportTasks() {return listSportTasks;}
-	public void setListSportTasks(ArrayList<SportTask> listSportTasks) {Tasker.listSportTasks = listSportTasks;}
-	public static void removeSportTask(SportTask t) {listSportTasks.remove(t);}
-	public static void removeSportTaskByID(int id){
+	public void setListSportTasks(ArrayList<SportTask> listSportTasks) {this.listSportTasks = listSportTasks;}
+	public void removeSportTask(SportTask t) {listSportTasks.remove(t);}
+	public void removeSportTaskByID(int id){
 		int temp =-1;
 		for (int i =0; i < listSportTasks.size(); i++){
 			if(listSportTasks.get(i).getID() == id){
@@ -107,7 +119,7 @@ public class Tasker {
 	}
 
 	public ArrayList<Category> getListCategories() {return listCategories;}
-	public void setListCategories(ArrayList<Category> listCategories) {Tasker.listCategories = listCategories;}
+	public void setListCategories(ArrayList<Category> listCategories) {this.listCategories = listCategories;}
 	public void removeCategory(Category c) {listCategories.remove(c);}
 	public Boolean addCategory(Category c) {
 		for(Category x : listCategories) {
@@ -119,19 +131,19 @@ public class Tasker {
 		return true;
 	}
 
-    static public void changeWithSaveIsActivatedNotification(Task t) {
+    public void changeWithSaveIsActivatedNotification(Task t) {
         t.setIsActivatedNotification(!t.getIsActivatedNotification());
 	    serializeLists();
     }
 
-	public static void serializeLists() {
+	public void serializeLists() {
 		serializeList(listCategories, "Category.txt");
 		serializeList(listTasks, "Task.txt");
 		serializeList(listSportTasks, "SportTask.txt");
 
 	}	
 	
-	public static void serializeList(ArrayList<?> list, String name) {
+	public void serializeList(ArrayList<?> list, String name) {
         try {
             FileOutputStream fos = context.openFileOutput(name, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -143,13 +155,13 @@ public class Tasker {
         }
 	}
 	
-	public static void unserializeLists() {
+	public void unserializeLists() {
 		unserializeListCategories();
 		unserializeListTasks();
 		unserializeListSportTasks();
 	}
 	
-	public static void unserializeListCategories() {
+	public void unserializeListCategories() {
 		ArrayList<Category> list = new ArrayList<Category>();
         try {
             FileInputStream fis = context.openFileInput("Category.txt");
@@ -174,7 +186,7 @@ public class Tasker {
 		listCategories  = list;
 	}
 	
-	public static void unserializeListTasks() {
+	public void unserializeListTasks() {
 		ArrayList<Task> list = new ArrayList<Task>();
         try {
             FileInputStream fis = context.openFileInput("Task.txt");
@@ -199,7 +211,7 @@ public class Tasker {
         listTasks = list;
     }
 
-	public static void unserializeListSportTasks() {
+	public void unserializeListSportTasks() {
 		ArrayList<SportTask> list = new ArrayList<>();
 		try {
 			FileInputStream fis = context.openFileInput("SportTask.txt");
@@ -224,7 +236,7 @@ public class Tasker {
 		listSportTasks = list;
 	}
 	
-	public static void garbageCollectOld() {
+	public void garbageCollectOld() {
 	    unserializeLists();
 		ArrayList<Integer> deletes = new ArrayList<>();
 		Calendar now = new GregorianCalendar();
@@ -239,7 +251,7 @@ public class Tasker {
 		serializeLists();
 	}
 	
-	public static void sort(final Boolean growing) {
+	public void sort(final Boolean growing) {
         unserializeLists();
         Collections.sort(listTasks, new Comparator<Task>() {
             @Override
@@ -264,7 +276,7 @@ public class Tasker {
         serializeLists();
     }
 
-    public static void sportSort(final Boolean growing) {
+    public void sportSort(final Boolean growing) {
         unserializeLists();
         Collections.sort(listSportTasks, new Comparator<Task>() {
             @Override
@@ -389,7 +401,7 @@ public class Tasker {
 		return res;
 	}*/
 
-	public static Task getTaskByID(int id){
+	public Task getTaskByID(int id){
 		for(Task t : listTasks){
 			if( t.getID() ==  id) {
 				return t;
@@ -398,7 +410,7 @@ public class Tasker {
     	return null;
 	}
 
-    public static SportTask getSportTaskByID(int id){
+    public SportTask getSportTaskByID(int id){
         for(SportTask t : listSportTasks){
             if( t.getID() ==  id) {
                 return t;
@@ -407,7 +419,7 @@ public class Tasker {
         return null;
     }
 
-	public static Category getCategoryByID(int id){
+	public Category getCategoryByID(int id){
 		for(Category c : listCategories){
 			if( c.getID() ==  id) {
 				return c;
@@ -416,7 +428,7 @@ public class Tasker {
 		return null;
 	}
 
-	public static Category getCategoryByName(String catName){
+	public Category getCategoryByName(String catName){
     	for (Category c : listCategories){
     		if (c.getName().equals(catName)){
     			return c;

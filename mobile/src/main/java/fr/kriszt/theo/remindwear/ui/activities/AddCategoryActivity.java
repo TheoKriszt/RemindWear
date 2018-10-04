@@ -101,7 +101,7 @@ public class AddCategoryActivity extends AppCompatActivity {
             this.icon = listIcons.get(spinner.getSelectedItemPosition());
             Category newCategory = new Category(this.name, this.icon, this.color);
             Tasker.getInstance(getApplicationContext()).addCategory(newCategory);
-            Tasker.serializeLists();
+            Tasker.getInstance(getApplicationContext()).serializeLists();
 
             onBackPressed();
         }

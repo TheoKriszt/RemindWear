@@ -66,7 +66,9 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 
-        Category categoryTemp = Tasker.getInstance(getApplicationContext()).getListCategories().get(0);
+
+        tasker = Tasker.getInstance(this);
+        Category categoryTemp = tasker.getListCategories().get(0);
 
         name = (EditText) findViewById(R.id.name);
         description = (EditText) findViewById(R.id.description);
@@ -121,12 +123,12 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         }
 
         spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setAdapter(new NewAdapter(Tasker.getInstance(getApplicationContext()).getListCategories()));
+        spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                category = Tasker.getInstance(getApplicationContext()).getListCategories().get(position);
+                category = tasker.getListCategories().get(position);
                 if(category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
                         category.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
                     editCategory.setVisibility(View.GONE);
@@ -181,8 +183,8 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
     private void submitAction(){
 
-        tasker = new Tasker(getApplicationContext());
-        Tasker.unserializeLists();
+
+        tasker.unserializeLists();
 
         if(name.getText().toString().equals("")){
             Toast.makeText(getApplicationContext(), "Ajoutez un titre", Toast.LENGTH_LONG).show();
@@ -193,7 +195,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             int mMin = time_picker_min.getValue();
             int mPreventBefore = preventBefore.getValue();
 
-            Category cat = Tasker.getInstance(getApplicationContext()).getListCategories().get(spinner.getSelectedItemPosition());
+            Category cat = tasker.getListCategories().get(spinner.getSelectedItemPosition());
 
             Boolean[] bools = new Boolean[]{
                     checkBoxMonday.isChecked(),
@@ -220,9 +222,11 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
-                    Tasker.unserializeLists();
-                    Tasker.getInstance(getApplicationContext()).addTask(task);
-                    Tasker.serializeLists();
+
+
+                    tasker.unserializeLists();
+                    tasker.getInstance(getApplicationContext()).addTask(task);
+                    tasker.serializeLists();
 
                     Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
                     //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -242,9 +246,9 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                 }else{
                     task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
 
-                    Tasker.unserializeLists();
-                    Tasker.getInstance(getApplicationContext()).addTask(task);
-                    Tasker.serializeLists();
+                    tasker.unserializeLists();
+                    tasker.getInstance(getApplicationContext()).addTask(task);
+                    tasker.serializeLists();
 
                     Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
                     //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -258,7 +262,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onResume(){
         super.onResume();
-        Tasker.unserializeLists();
+        tasker.unserializeLists();
 
     }
 

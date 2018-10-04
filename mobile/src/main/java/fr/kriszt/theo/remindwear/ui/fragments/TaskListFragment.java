@@ -50,10 +50,13 @@ public class TaskListFragment extends Fragment {
     private ImageView lower;
     private ImageView search;
     private ImageView close;
+    private Tasker tasker;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView =  inflater.inflate(R.layout.fragment_task_list, container, false);
+
+        tasker = Tasker.getInstance(getContext());
         return rootView;
 
     }
@@ -66,12 +69,11 @@ public class TaskListFragment extends Fragment {
 
 
         tasksList = new ArrayList<>();
-        Tasker.getInstance(getContext());
-        Tasker.unserializeLists();
-        Tasker.garbageCollectOld();
-        Tasker.serializeLists();
-        Tasker.sort(true);
-        tasksList = Tasker.getInstance(getContext()).getListTasks();
+        tasker.unserializeLists();
+        tasker.garbageCollectOld();
+        tasker.serializeLists();
+        tasker.sort(true);
+        tasksList = tasker.getListTasks();
 
         tasks = rootView.findViewById(R.id.taskList);
         tasksAdapter = new TaskListAdapterFragment(getContext(), tasksList);
@@ -114,7 +116,7 @@ public class TaskListFragment extends Fragment {
                 upper.setVisibility(View.GONE);
                 lower.setVisibility(View.VISIBLE);
                 growing = false;
-                Tasker.sort(growing);
+                tasker.sort(growing);
                 tasksList = Tasker.getInstance(getContext()).getListTasks();
                 strangeMethode();
             }
@@ -127,7 +129,7 @@ public class TaskListFragment extends Fragment {
                 lower.setVisibility(View.GONE);
                 upper.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sort(growing);
+                tasker.sort(growing);
                 tasksList = Tasker.getInstance(getContext()).getListTasks();
                 strangeMethode();
             }
@@ -143,7 +145,7 @@ public class TaskListFragment extends Fragment {
                 lower.setVisibility(View.GONE);
                 searchBar.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sort(growing);
+                tasker.sort(growing);
                 tasksList = Tasker.getInstance(getContext()).getListTasks();
                 strangeMethode();
             }
@@ -158,7 +160,7 @@ public class TaskListFragment extends Fragment {
                 search.setVisibility(View.VISIBLE);
                 upper.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sort(growing);
+                tasker.sort(growing);
                 tasksList = Tasker.getInstance(getContext()).getListTasks();
                 strangeMethode();
             }

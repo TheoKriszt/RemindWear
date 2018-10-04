@@ -74,9 +74,11 @@ public class EditTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 
+        tasker = Tasker.getInstance(getApplicationContext());
+
         Intent mIntent = getIntent();
         int id = mIntent.getIntExtra("idTask", 0);
-        Task task = Tasker.getInstance(getApplicationContext()).getTaskByID(id);
+        Task task = tasker.getTaskByID(id);
         category = task.getCategory();
         taskTemp = task;
 
@@ -156,7 +158,7 @@ public class EditTaskActivity extends AppCompatActivity {
         });
 
         int resPositionCategory = 0;
-        ArrayList<Category> listC = Tasker.getInstance(getApplicationContext()).getListCategories();
+        ArrayList<Category> listC = tasker.getListCategories();
         for(int c=0;c< listC.size();c++){
             if(listC.get(c).toString().equals(task.getCategory().toString())){
                 resPositionCategory = c;
@@ -164,15 +166,15 @@ public class EditTaskActivity extends AppCompatActivity {
             }
         }
         spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setAdapter(new NewAdapter(Tasker.getInstance(getApplicationContext()).getListCategories()));
+        spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         spinner.setSelection(resPositionCategory);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                category = Tasker.getInstance(getApplicationContext()).getListCategories().get(position);
-                if(Tasker.getInstance(getApplicationContext()).getListCategories().get(position).getName().equals(Tasker.CATEGORY_NONE_TAG) ||
-                        Tasker.getInstance(getApplicationContext()).getListCategories().get(position).getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+                category = tasker.getListCategories().get(position);
+                if(tasker.getListCategories().get(position).getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                        tasker.getListCategories().get(position).getName().equals(Tasker.CATEGORY_SPORT_TAG)){
                     editCategory.setVisibility(View.GONE);
                 }else{
                     editCategory.setVisibility(View.VISIBLE);
@@ -247,10 +249,9 @@ public class EditTaskActivity extends AppCompatActivity {
     }
 
     private void deleteAction() {
-        Tasker.getInstance(getApplicationContext());
-        Tasker.unserializeLists();
-        Tasker.removeTaskByID(taskTemp.getID());
-        Tasker.serializeLists();
+        tasker.unserializeLists();
+        tasker.removeTaskByID(taskTemp.getID());
+        tasker.serializeLists();
 
         Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
         //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -258,8 +259,7 @@ public class EditTaskActivity extends AppCompatActivity {
     }
 
     private void submitAction() {
-        tasker = new Tasker(getApplicationContext());
-        Tasker.unserializeLists();
+        tasker.unserializeLists();
 
 
         if(name.getText().toString().equals("")){
@@ -271,7 +271,7 @@ public class EditTaskActivity extends AppCompatActivity {
             int mMin = time_picker_min.getValue();
             int mPreventBefore = preventBefore.getValue()*5;
 
-            Category cat = Tasker.getInstance(getApplicationContext()).getListCategories().get(spinner.getSelectedItemPosition());
+            Category cat = tasker.getListCategories().get(spinner.getSelectedItemPosition());
 
             Boolean[] bools = new Boolean[]{
                     checkBoxMonday.isChecked(),
@@ -291,10 +291,10 @@ public class EditTaskActivity extends AppCompatActivity {
                     //TODO check si date > now
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
-                    Tasker.unserializeLists();
-                    Tasker.removeTaskByID(taskTemp.getID());
-                    Tasker.getInstance(getApplicationContext()).addTask(task);
-                    Tasker.serializeLists();
+                    tasker.unserializeLists();
+                    tasker.removeTaskByID(taskTemp.getID());
+                    tasker.addTask(task);
+                    tasker.serializeLists();
 
                     Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
                     //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -314,10 +314,10 @@ public class EditTaskActivity extends AppCompatActivity {
                 }else{
                     task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
 
-                    Tasker.unserializeLists();
-                    Tasker.removeTaskByID(taskTemp.getID());
-                    Tasker.getInstance(getApplicationContext()).addTask(task);
-                    Tasker.serializeLists();
+                    tasker.unserializeLists();
+                    tasker.removeTaskByID(taskTemp.getID());
+                    tasker.addTask(task);
+                    tasker.serializeLists();
 
                     Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
                     //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);

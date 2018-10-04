@@ -10,12 +10,14 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.kriszt.theo.remindwear.tasker.Category;
+import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.remindwear.workers.ReminderWorker;
@@ -50,7 +52,15 @@ public class NotificationTestingActivity extends AppCompatActivity {
 
         Category none = tasker.getCategoryByName(Tasker.CATEGORY_NONE_TAG);
         Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
+
+        ArrayList<SportTask> sportTasks = tasker.getListSportTasks();
+
+
+
         Task task = new Task("Titre de ma tâche", "Description de ma tâche", sport, new GregorianCalendar(2018, 30, 9), 0, 23, 15);
+
+
+
         new RemindNotification(task, this).show(null);
 
 

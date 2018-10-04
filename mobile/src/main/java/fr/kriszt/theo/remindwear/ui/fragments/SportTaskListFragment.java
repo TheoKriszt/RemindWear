@@ -40,12 +40,14 @@ public class SportTaskListFragment extends Fragment {
     private ImageView lower;
     private ImageView search;
     private ImageView close;
+    private Tasker tasker;
 
     public SportTaskListFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView =  inflater.inflate(R.layout.fragment_sport_list, container, false);
+        tasker  = Tasker.getInstance(getContext());
         return rootView;
 
     }
@@ -55,16 +57,15 @@ public class SportTaskListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         tasksSportList = new ArrayList<>();
-        Tasker.getInstance(getContext());
-        Tasker.unserializeLists();
-        Tasker.garbageCollectOld();
-        Tasker.serializeLists();
-        Tasker.sportSort(true);
+        tasker.unserializeLists();
+        tasker.garbageCollectOld();
+        tasker.serializeLists();
+        tasker.sportSort(true);
 
         tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
 
         //TODO REMOVE
-        Tasker.unserializeLists();
+        tasker.unserializeLists();
         if(Tasker.getInstance(getContext()).getListSportTasks().size() <= 0){
             SportTask s = new SportTask("e","d", new Category("n", 0, 0),
                     new GregorianCalendar(), 30,23, 12, new Boolean[]{},
@@ -72,7 +73,7 @@ public class SportTaskListFragment extends Fragment {
             Tasker.getInstance(getContext()).addSportTask(s);
             tasksSportList.add(s);
         }
-        Tasker.serializeLists();
+        tasker.serializeLists();
 
         sportList = rootView.findViewById(R.id.sportList);
         tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
@@ -105,7 +106,7 @@ public class SportTaskListFragment extends Fragment {
                 upper.setVisibility(View.GONE);
                 lower.setVisibility(View.VISIBLE);
                 growing = false;
-                Tasker.sportSort(growing);
+                tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }
@@ -119,7 +120,7 @@ public class SportTaskListFragment extends Fragment {
                 lower.setVisibility(View.GONE);
                 upper.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sportSort(growing);
+                tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }
@@ -135,7 +136,7 @@ public class SportTaskListFragment extends Fragment {
                 lower.setVisibility(View.GONE);
                 searchBar.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sportSort(growing);
+                tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }
@@ -150,7 +151,7 @@ public class SportTaskListFragment extends Fragment {
                 search.setVisibility(View.VISIBLE);
                 upper.setVisibility(View.VISIBLE);
                 growing = true;
-                Tasker.sportSort(growing);
+                tasker.sportSort(growing);
                 tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
                 updateRecyclerView();
             }

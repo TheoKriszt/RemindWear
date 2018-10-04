@@ -36,7 +36,7 @@ public class SchedulerService extends Service {
 
         int taskId = (int) intent.getExtras().get(TASK_ID_TAG);
 
-        Task task = Tasker.getTaskByID(taskId);
+        Task task = Tasker.getInstance(getApplicationContext()).getTaskByID(taskId);
 
 
 

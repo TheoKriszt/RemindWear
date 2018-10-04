@@ -163,7 +163,7 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
         holder.notified.setChecked(p.getIsActivatedNotification());
         holder.notified.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Tasker.changeWithSaveIsActivatedNotification(fTask);
+                Tasker.getInstance(context).changeWithSaveIsActivatedNotification(fTask);
             }
         });
         holder.category.setText(p.getCategory().getName());

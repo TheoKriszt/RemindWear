@@ -21,6 +21,15 @@ public class SportTask extends Task {
         this.duration = duration;
     }
 
+    public SportTask(Task base, int steps, int heart, int distance, long duration){
+        this(base.getName(), base.getDescription(), base.getCategory(), base.getDateDeb(), base.getWarningBefore(), base.getTimeHour(), base.getTimeMinutes(), base.getRepete(),
+        steps, heart, distance, duration);
+    }
+
+    public SportTask(Task base){
+        this(base, 0, 0, 0, 0);
+    }
+
     public void addCoord(Coordonate c){listCoord.add(c);}
     public ArrayList<Coordonate> getListCoord() {return listCoord;}
 
