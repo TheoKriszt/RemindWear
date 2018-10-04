@@ -15,6 +15,7 @@ import fr.kriszt.theo.remindwear.jobs.SetReminderJob;
 
 /**
  * Created by T.Kriszt on 21/09/2018.
+ * @deprecated
  */
 public class SchedulerJobService extends JobService {
     public static int count = 0;

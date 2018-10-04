@@ -8,7 +8,9 @@ import com.evernote.android.job.Job;
 import com.evernote.android.job.JobCreator;
 
 
-
+/**
+ * @deprecated
+ */
 public class ReminderJobCreator implements JobCreator {
 
     public static final String TAG = "ReminderJobCreator";

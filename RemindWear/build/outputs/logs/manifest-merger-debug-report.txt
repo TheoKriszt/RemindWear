@@ -23,7 +23,7 @@ INJECTED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main
 		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:2:11-69
 application
 ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:5:5-26:19
-activity#fr.kriszt.theo.remindwear.RemindWear.TasksActivity
+activity#fr.kriszt.theo.remindwear.RemindWearWatchFace.TasksActivity
 ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:6:9-25:20
 	android:label
 		ADDED from C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\src\main\AndroidManifest.xml:8:13-45

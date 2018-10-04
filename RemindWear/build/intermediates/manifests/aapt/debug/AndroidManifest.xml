@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fr.kriszt.theo.remindwear.RemindWear"
+    package="fr.kriszt.theo.remindwear.RemindWearWatchFace"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -10,7 +10,7 @@
 
     <application>
         <activity
-            android:name="fr.kriszt.theo.remindwear.RemindWear.TasksActivity"
+            android:name="fr.kriszt.theo.remindwear.RemindWearWatchFace.TasksActivity"
             android:label="@string/app_name" >
             <intent-filter android:order="1" >
                 <action android:name="android.intent.action.VIEW" />

@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="fr.kriszt.theo.remindwear.RemindWear.TasksActivity"
+            android:name="fr.kriszt.theo.remindwear.RemindWearWatchFace.TasksActivity"
             android:label="@string/app_name" >
             <intent-filter android:order="1" >
                 <action android:name="android.intent.action.VIEW" />

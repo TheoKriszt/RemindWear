@@ -6,19 +6,16 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
-import fr.kriszt.theo.remindwear.NotificationTestingActivity;
 import fr.kriszt.theo.remindwear.TasksActivity;
 import fr.kriszt.theo.remindwear.utils.SchedulerJobService;
 
 /**
  * Created by T.Kriszt on 21/09/2018.
  * Replanifie les tâche au redémarrage du téléphone
+ * @deprecated
  */
 public class RebootReceiver extends BroadcastReceiver {
     @Override

@@ -189,7 +189,7 @@ MERGED from [com.android.support:versionedparcelable:28.0.0-rc02] C:\Users\Theo\
 		ADDED from [:base] C:\Users\Theo\AndroidStudioProjects\RemindWear\base\build\intermediates\manifests\full\debug\AndroidManifest.xml:12:9-35
 	android:theme
 		ADDED from [:base] C:\Users\Theo\AndroidStudioProjects\RemindWear\base\build\intermediates\manifests\full\debug\AndroidManifest.xml:17:9-40
-activity#fr.kriszt.theo.remindwear.RemindWear.TasksActivity
+activity#fr.kriszt.theo.remindwear.RemindWearWatchFace.TasksActivity
 ADDED from [:RemindWear] C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\build\intermediates\manifests\full\debug\AndroidManifest.xml:12:9-31:20
 	android:label
 		ADDED from [:RemindWear] C:\Users\Theo\AndroidStudioProjects\RemindWear\RemindWear\build\intermediates\manifests\full\debug\AndroidManifest.xml:14:13-45

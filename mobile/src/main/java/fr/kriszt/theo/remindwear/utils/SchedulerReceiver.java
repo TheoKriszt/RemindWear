@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 /**
  * Created by T.Kriszt on 21/09/2018.
+ * @deprecated
  */
 public class SchedulerReceiver extends BroadcastReceiver {
     @Override

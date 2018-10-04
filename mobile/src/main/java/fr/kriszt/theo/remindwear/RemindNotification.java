@@ -9,9 +9,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
+import android.util.Log;
 
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
+import fr.kriszt.theo.remindwear.workers.ReminderWorker;
+import fr.kriszt.theo.remindwear.workers.SchedulerService;
 
 public class RemindNotification {
     public static final String TAG = "REMINDER_NOTIFICATION";
@@ -55,40 +58,29 @@ public class RemindNotification {
     private void addActions(Task task, NotificationCompat.Builder builder, NotificationCompat.WearableExtender extender) {
         // Ajouter l'action START TRACKING pour la catégorie sport
 
-        Intent intent = new Intent(context, TasksActivity.class);
-        intent.putExtra(TasksActivity.FRAGMENT_TO_LAUNCH, SportTaskListFragment.class.getName());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        Intent trackingIntent = new Intent(context, TasksActivity.class);
+        trackingIntent.putExtra(TasksActivity.FRAGMENT_TO_LAUNCH, SportTaskListFragment.class.getName());
+        trackingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingTrackingIntent = PendingIntent.getActivity(context, 0, trackingIntent, PendingIntent.FLAG_ONE_SHOT);
 
+        Intent postponeIntent = new Intent(context, SchedulerService.class);
+        postponeIntent.putExtra(SchedulerService.TASK_ID_TAG, task.getID());
+        Log.w(TAG, "addActions: adding taskId " + taskId);
+        //Log.w(TAG, "addActions: task" + task);
 
-
-//        builder
-//                .setSmallIcon(R.drawable.ic_base_0)
-//                .setContentTitle("My notification")
-//                .setContentText("Hello World!")
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                // Set the intent that will fire when the user taps the notification
-//                .setContentIntent(pendingIntent)
-//                .setAutoCancel(true);
+        PendingIntent pendingPostponeIntent = PendingIntent.getService(context, 0, postponeIntent, 0);
+        //context.startService(postponeIntent);
 
         builder.addAction(new NotificationCompat.Action(
-                R.drawable.baseline_directions_run_24, "Start tracking", pendingIntent
+                R.drawable.baseline_directions_run_24, "Track", pendingTrackingIntent
         ));
 
-//
-//        if (task.getCategory() != null) {
-//            if (task.getCategory().getName().equals(Tasker.CATEGORY_SPORT_TAG)) {
-//                extender.addAction(new NotificationCompat.Action(
-//                        R.drawable.baseline_directions_run_24,
-//                        "Start tracking",
-//                        pendingIntent)
-//                );
-//
-//                builder.setContentIntent(pendingIntent);
-//            }
-//        }
-//
-//        // TODO : Ajouter l'action Snooze (me rappeler dans 10 minutes)
+        builder.addAction(new NotificationCompat.Action(
+                R.drawable.ic_snooze, "Later", pendingPostponeIntent
+        ));
+
+
+
     }
 
     private NotificationCompat.Builder build(Task task){

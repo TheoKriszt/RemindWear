@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.datatype.Duration;
 
-public class Task implements Serializable {
+public class
+Task implements Serializable {
 		
 	private static final long serialVersionUID = 1L;
     private int ID;
@@ -101,6 +102,7 @@ public class Task implements Serializable {
 			r+="\n\t\t"+x;
 		}
 		return " [ "
+                + "\n\tID : "+ID
                 + "\n\t"+name
 				+ "\n\t"+description
 				+ "\n\t"+category
