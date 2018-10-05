@@ -68,7 +68,7 @@ public class SportTaskListFragment extends Fragment {
         if(Tasker.getInstance(getContext()).getListSportTasks().size() <= 0){
             SportTask s = new SportTask("e","d", new Category("n", 0, 0),
                     new GregorianCalendar(), 30,23, 12, new Boolean[]{},
-                    50, 60, 364, 788944321);
+                    50, 60, 364, 4005);
             Tasker.getInstance(getContext()).addSportTask(s);
             tasksSportList.add(s);
         }

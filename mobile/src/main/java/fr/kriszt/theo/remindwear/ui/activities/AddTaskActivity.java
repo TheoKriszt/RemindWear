@@ -71,14 +71,34 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         name = (EditText) findViewById(R.id.name);
         description = (EditText) findViewById(R.id.description);
 
+        Calendar forTimePicker = new GregorianCalendar();
+        forTimePicker.add(Calendar.MINUTE, 5);
+
+        calendar = new GregorianCalendar();
+        calendar.add(Calendar.DAY_OF_MONTH, -20);
+
         time_picker_hour = (NumberPicker) findViewById(R.id.time_picker_hour);
         time_picker_hour.setMinValue(0);
         time_picker_hour.setMaxValue(23);
-        time_picker_hour.setValue(12);
+        time_picker_hour.setValue(forTimePicker.get(Calendar.HOUR));
+
         time_picker_min = (NumberPicker) findViewById(R.id.time_picker_min);
         time_picker_min.setMinValue(0);
         time_picker_min.setMaxValue(59);
-        time_picker_min.setValue(30);
+        time_picker_min.setValue(forTimePicker.get(Calendar.MINUTE));
+        time_picker_min.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                calendar = new GregorianCalendar( calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) ,time_picker_hour.getValue(),time_picker_min.getValue());
+            }
+        });
+
+        time_picker_hour.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                calendar = new GregorianCalendar( calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) ,time_picker_hour.getValue(),time_picker_min.getValue());
+            }
+        });
         preventBefore = (NumberPicker) findViewById(R.id.preventBefore);
         preventBefore.setMinValue(0);
         preventBefore.setMaxValue(18);
@@ -109,7 +129,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), EditCategoryActivity.class);
-                intent.putExtra("idCateory", category.getID() );
+                intent.putExtra("idCategory", category.getID() );
                 startActivity(intent);
             }
         });
@@ -209,15 +229,11 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     Toast.makeText(getApplicationContext(), "Ajoutez une date", Toast.LENGTH_LONG).show();
                     return;
                 }else{
-                    //TODO check si date > now
                     Calendar c = new GregorianCalendar();
-                    //c.set(Calendar.HOUR, time_picker_hour.getValue());
-                    //c.set(Calendar.MINUTE, time_picker_min.getValue());
                     if(calendar.before(c)){
                         Toast.makeText(getApplicationContext(), "Ajoutez une date a partir d'aujourd'hui", Toast.LENGTH_LONG).show();
                         return;
                     }
-
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
                     Tasker.unserializeLists();

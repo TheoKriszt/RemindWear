@@ -1,5 +1,7 @@
 package fr.kriszt.theo.remindwear.tasker;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -117,18 +119,26 @@ public class Task implements Serializable {
 
 	public Calendar getNextDate(){
 		if(dateDeb == null){
+			Calendar now = new GregorianCalendar();
             int day=0;
+            int first = 0;
             for(int i=0; i<getRepete().length; i++){
-                if(getRepete()[i]){
+                if(getRepete()[i] && first == 0){
+                    first = i;
+                }
+                if((i+1 >= now.get(Calendar.DAY_OF_WEEK)) && getRepete()[i]){
                     day = i;
                     break;
                 }
             }
-            Calendar cTemp = new GregorianCalendar();
-            Calendar c = new GregorianCalendar(cTemp.get(Calendar.YEAR), cTemp.get(Calendar.MONTH), cTemp.get(Calendar.DAY_OF_MONTH), getTimeHour(), getTimeMinutes());
-            c.add(Calendar.DAY_OF_MONTH, day+2 - cTemp.get(Calendar.DAY_OF_WEEK));
-			/*c.set(Calendar.HOUR, this.getTimeHour());
-			c.set(Calendar.MINUTE, this.getTimeMinutes());*/
+            Log.e("ddddddddddddddddddDAY", String.valueOf(day));
+            Log.e("ffffffffffffffffirst", String.valueOf(first));
+            if(day == 0){
+                day = first + 7;
+            }
+            Calendar c = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), getTimeHour(), getTimeMinutes());
+            c.add(Calendar.DAY_OF_MONTH, day+2 - now.get(Calendar.DAY_OF_WEEK));
+            Log.e("ccccccccccccccccccccc", String.valueOf(c.get(Calendar.DAY_OF_MONTH)));
 			return c;
 		}else{
             Calendar c = new GregorianCalendar(dateDeb.get(Calendar.YEAR), dateDeb.get(Calendar.MONTH), dateDeb.get(Calendar.DAY_OF_MONTH), getTimeHour(), getTimeMinutes());
@@ -145,7 +155,7 @@ public class Task implements Serializable {
 		Calendar cal = getNextDate();
 		cal.set(Calendar.HOUR, getTimeMinutes());
 		cal.set(Calendar.MINUTE, getTimeMinutes());
-		cal.add(Calendar.MINUTE, -getWarningBefore());
+		cal.add(Calendar.MINUTE, -1 * getWarningBefore());
 		//cal.roll(Calendar.MINUTE, getWarningBefore());
 	    Date mDate  = getNextDate().getTime();
         /*mDate.setHours(getTimeHour());

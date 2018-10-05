@@ -47,14 +47,14 @@ public class EditCategoryActivity extends AppCompatActivity {
     private ImageView validate;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
         Intent mIntent = getIntent();
-        int id = mIntent.getIntExtra("idCaterory", 0);
+        int id = mIntent.getIntExtra("idCategory", 0);
+        Tasker.unserializeLists();
         category = Tasker.getInstance(getApplicationContext()).getCategoryByID(id);
         Category tempCategory = category;
 

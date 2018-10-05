@@ -229,7 +229,7 @@ public class Tasker {
 		ArrayList<Integer> deletes = new ArrayList<>();
 		Calendar now = new GregorianCalendar();
 		for(int i=0; i < listTasks.size(); i++){
-			if(listTasks.get(i).getNextDate() != null && listTasks.get(i).getNextDate().compareTo(now) < 0) {
+			if(listTasks.get(i).getDateDeb() != null && listTasks.get(i).getNextDate().compareTo(now) < 0) {
 				   deletes.add(listTasks.get(i).getID());
 			}
 		}
