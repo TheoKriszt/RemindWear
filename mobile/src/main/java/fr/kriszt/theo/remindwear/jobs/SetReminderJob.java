@@ -18,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.TasksActivity;
 
+/**
+ * @deprecated
+ */
 public class SetReminderJob extends Job {
     public static final String TAG = "set_reminder_job";
     private static int executions = 0;

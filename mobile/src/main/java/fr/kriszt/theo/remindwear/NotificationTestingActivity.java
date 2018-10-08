@@ -2,6 +2,7 @@ package fr.kriszt.theo.remindwear;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,17 +11,16 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.kriszt.theo.remindwear.tasker.Category;
-import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.remindwear.wear.PhoneDataService;
 import fr.kriszt.theo.remindwear.workers.ReminderWorker;
+import fr.kriszt.theo.shared.Constants;
 
 ;
 
@@ -53,15 +53,16 @@ public class NotificationTestingActivity extends AppCompatActivity {
         Category none = tasker.getCategoryByName(Tasker.CATEGORY_NONE_TAG);
         Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
 
-        ArrayList<SportTask> sportTasks = tasker.getListSportTasks();
+        ArrayList<Task> sportTasks = tasker.getTasksByCategory(sport);
+
+        if (sportTasks.isEmpty()){
+            Toast.makeText(this, "Aucune tâche de sport trouvée", Toast.LENGTH_SHORT).show();
+        }else {
+            Task t = sportTasks.get(0);
+            new RemindNotification(t, this).show(null);
+        }
 
 
-
-        Task task = new Task("Titre de ma tâche", "Description de ma tâche", sport, new GregorianCalendar(2018, 30, 9), 0, 23, 15);
-
-
-
-        new RemindNotification(task, this).show(null);
 
 
     }
@@ -134,6 +135,13 @@ public class NotificationTestingActivity extends AppCompatActivity {
 //        Toast.makeText(this, "start service", Toast.LENGTH_SHORT).show();
 //        SetReminderJob.scheduleJob();
     }*/
+
+    @OnClick(R.id.remoteLaunchButton)
+    public void launchRemoteWearApp(){
+        Intent startLauncherService = new Intent(this, PhoneDataService.class);
+        startLauncherService.setAction(Constants.ACTION_LAUNCH_WEAR_APP);
+        startService(startLauncherService);
+    }
 
 
 

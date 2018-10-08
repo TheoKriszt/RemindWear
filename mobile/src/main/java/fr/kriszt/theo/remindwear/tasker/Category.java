@@ -1,8 +1,8 @@
 package fr.kriszt.theo.remindwear.tasker;
 
-import android.graphics.drawable.Drawable;
-
 import java.io.Serializable;
+
+import androidx.annotation.Nullable;
 
 public class Category implements Serializable {
 
@@ -38,5 +38,8 @@ public class Category implements Serializable {
 				+ "\n] ";
 	}
 
-
+	@Override
+	public boolean equals(@Nullable Object obj) {
+		return this.toString().equals(obj.toString());
+	}
 }

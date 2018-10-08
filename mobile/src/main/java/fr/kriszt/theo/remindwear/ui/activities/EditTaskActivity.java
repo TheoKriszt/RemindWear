@@ -253,7 +253,7 @@ public class EditTaskActivity extends AppCompatActivity {
         checkBoxSunday.setChecked(task.getRepete()[6]);
 
         submit = (Button) findViewById(R.id.submit);
-        submit.setText("   Suprimmer   ");
+        submit.setText("   Supprimer   ");
         submit.setTextColor(getApplication().getResources().getColor(R.color.colorRed));
         submit.setOnClickListener(new View.OnClickListener() {
             @Override

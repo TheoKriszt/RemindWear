@@ -23,6 +23,13 @@ import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 
+/**
+ * Planificateur de tâches (comme CRON)
+ * Gère la persistance après la fermeture de l'appli voire le redémarrage du tél.
+ *
+ * Appeler scheduleWorker(Task) pour chaque nouvelle tâche créée ou reprogrammée
+ * La tâche interne planifiée fera apparaitre une notification de RemindWear à l'heure de rappel de la tâche entrée par l'utilisateur depuis l'UI
+ */
 public class ReminderWorker extends Worker {
     public static final String TAG = "REMINDER_WORKER";
     private static final String CATEGORY_NONE_TAG = "AUCUNE";
@@ -43,8 +50,8 @@ public class ReminderWorker extends Worker {
             new RemindNotification(task, getApplicationContext()).show(null);
 
 
-            if (false /* task.isRecurrent() */){
-                // TODO : vérifier si replanification nécessaire (tâche récurrente)
+            if (task.getDateDeb() == null){ // tâche récurrente
+                scheduleWorker(task); // replanifier pour la prochaine occurence
             }
             return Result.SUCCESS;
 

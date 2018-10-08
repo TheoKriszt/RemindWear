@@ -5,16 +5,18 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
-import android.util.Log;
 
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
-import fr.kriszt.theo.remindwear.workers.ReminderWorker;
+import fr.kriszt.theo.remindwear.wear.PhoneDataService;
+import fr.kriszt.theo.remindwear.wear.WearListener_bak;
 import fr.kriszt.theo.remindwear.workers.SchedulerService;
+import fr.kriszt.theo.shared.Constants;
 
 public class RemindNotification {
     public static final String TAG = "REMINDER_NOTIFICATION";
@@ -34,8 +36,8 @@ public class RemindNotification {
 //        bigText = "Rappel : " + task.getName() + " à " + task.getTimeHour() + "h" + task.getTimeMinutes()
 //                    + "\n\t" + content;
 
-        String longText = "" //+ "<big>" + task.getName() + "</big><br/>"
-                + "Commence à " + task.getTimeHour() + "h" + task.getTimeMinutes()
+
+        String longText = "Commence à " + String.format("%02d", task.getTimeHour()) + "h" + String.format("%02d", task.getTimeMinutes())
                 + "<p>" + task.getDescription() + "</p>";
         bigText = new NotificationCompat.BigTextStyle().bigText(Html.fromHtml(longText));
 //        bigText = new NotificationCompat.BigTextStyle().bigText(task.getName() + " commence à " + task.getTimeHour() + "h" + task.getTimeMinutes());
@@ -61,25 +63,27 @@ public class RemindNotification {
         Intent trackingIntent = new Intent(context, TasksActivity.class);
         trackingIntent.putExtra(TasksActivity.FRAGMENT_TO_LAUNCH, SportTaskListFragment.class.getName());
         trackingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingTrackingIntent = PendingIntent.getActivity(context, 0, trackingIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingTrackingIntent = PendingIntent.getActivity(context, 0, trackingIntent, 0);
+
+        Intent sendMessageIntent = new Intent(context, PhoneDataService.class);
+        sendMessageIntent.setAction(Constants.ACTION_LAUNCH_WEAR_APP);
+        sendMessageIntent.putExtra(Constants.KEY_TASK_ID, task.getID());
+        PendingIntent sendMessagePendingIntent = PendingIntent.getService(context, taskId, sendMessageIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent postponeIntent = new Intent(context, SchedulerService.class);
-        postponeIntent.putExtra(SchedulerService.TASK_ID_TAG, task.getID());
-        Log.w(TAG, "addActions: adding taskId " + taskId);
-        //Log.w(TAG, "addActions: task" + task);
+        Bundle postponeBundle = new Bundle();
+        postponeBundle.putSerializable(SchedulerService.TASK_TAG, task);
+        postponeIntent.putExtras(postponeBundle);
 
-        PendingIntent pendingPostponeIntent = PendingIntent.getService(context, 0, postponeIntent, 0);
-        //context.startService(postponeIntent);
+        PendingIntent pendingPostponeIntent = PendingIntent.getService(context, taskId, postponeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         builder.addAction(new NotificationCompat.Action(
-                R.drawable.baseline_directions_run_24, "Track", pendingTrackingIntent
+                R.drawable.baseline_directions_run_24, "Track", sendMessagePendingIntent
         ));
 
         builder.addAction(new NotificationCompat.Action(
                 R.drawable.ic_snooze, "Later", pendingPostponeIntent
         ));
-
-
 
     }
 

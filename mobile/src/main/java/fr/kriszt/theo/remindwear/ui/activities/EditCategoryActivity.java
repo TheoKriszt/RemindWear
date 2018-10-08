@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
+import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 public class EditCategoryActivity extends AppCompatActivity {
@@ -35,6 +36,8 @@ public class EditCategoryActivity extends AppCompatActivity {
     private String name;
     private Category category;
     private ArrayList<Integer> listIcons = new ArrayList<>();
+
+    Tasker tasker;
 
     private EditText title;
     private ImageView colorView;
@@ -54,7 +57,8 @@ public class EditCategoryActivity extends AppCompatActivity {
 
         Intent mIntent = getIntent();
         int id = mIntent.getIntExtra("idCategory", 0);
-        Tasker.unserializeLists();
+        tasker = Tasker.getInstance(getApplicationContext());
+        tasker.unserializeLists();
         category = Tasker.getInstance(getApplicationContext()).getCategoryByID(id);
         Category tempCategory = category;
 
@@ -145,8 +149,8 @@ public class EditCategoryActivity extends AppCompatActivity {
             Log.e("this.name", this.name);
             Log.e("this.color", String.valueOf(this.color));
             Log.e("this.icon", String.valueOf(this.icon));
-            Tasker.getInstance(getApplicationContext()).editCategoryById(category.getID(), newCategory);
-            Tasker.serializeLists();
+            tasker.editCategoryById(category.getID(), newCategory);
+            tasker.serializeLists();
             onBackPressed();
         }
     }

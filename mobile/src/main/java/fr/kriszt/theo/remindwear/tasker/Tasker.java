@@ -17,6 +17,7 @@ import java.util.GregorianCalendar;
 
 import androidx.annotation.Nullable;
 import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.workers.ReminderWorker;
 
 public class Tasker {
 
@@ -82,6 +83,7 @@ public class Tasker {
 			}
 		}
 		listTasks.add(t);
+		ReminderWorker.scheduleWorker(t);
 		return true;
 	}
 
@@ -436,5 +438,15 @@ public class Tasker {
 		}
 		return null;
 	}
+
+    public ArrayList<Task> getTasksByCategory(Category c){
+        ArrayList<Task> matches = new ArrayList<>();
+        for (Task t : getListTasks()){
+            if (t.getCategory().equals(c)){
+                matches.add(t);
+            }
+        }
+        return matches;
+    }
 
 }

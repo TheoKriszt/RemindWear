@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.wearable.view.WatchViewStub xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.support.wear.widget.BoxInsetLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/watch_view_stub"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WearActivity"
-    tools:deviceIds="wear" >
+    android:id="@+id/wear_root" >
 
-    //app:roundLayout="@layout/round"
-    //app:rectLayout="@layout/rect"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    </android.support.wearable.view.WatchViewStub>
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="stopTracking"
+            android:text="Stop tracking" />
+
+        <TextView
+            android:id="@+id/stepText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre de pas : 0" />
+    </LinearLayout>
+
+</android.support.wear.widget.BoxInsetLayout>
