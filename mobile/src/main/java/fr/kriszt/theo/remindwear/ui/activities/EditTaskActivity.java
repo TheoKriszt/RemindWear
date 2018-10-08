@@ -82,6 +82,9 @@ public class EditTaskActivity extends AppCompatActivity {
         category = task.getCategory();
         taskTemp = task;
 
+        calendar =new GregorianCalendar(task.getNextDate().get(Calendar.YEAR), task.getNextDate().get(Calendar.MONTH),
+                task.getNextDate().get(Calendar.DAY_OF_MONTH), task.getTimeHour(), task.getTimeMinutes());
+
         cardView = (CardView) findViewById(R.id.cardView);
         cardView.setVisibility(View.VISIBLE);
 
@@ -119,6 +122,19 @@ public class EditTaskActivity extends AppCompatActivity {
         time_picker_min.setMinValue(0);
         time_picker_min.setMaxValue(59);
         time_picker_min.setValue(task.getTimeMinutes());
+        time_picker_min.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                calendar = new GregorianCalendar( calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) ,time_picker_hour.getValue(),time_picker_min.getValue());
+            }
+        });
+
+        time_picker_hour.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                calendar = new GregorianCalendar( calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) ,time_picker_hour.getValue(),time_picker_min.getValue());
+            }
+        });
 
         preventBefore = (NumberPicker) findViewById(R.id.preventBefore);
         preventBefore.setMinValue(0);
@@ -152,7 +168,7 @@ public class EditTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), EditCategoryActivity.class);
-                intent.putExtra("idCaterory", category.getID());
+                intent.putExtra("idCategory", category.getID());
                 startActivity(intent);
             }
         });
@@ -189,14 +205,13 @@ public class EditTaskActivity extends AppCompatActivity {
         calendarView = (CalendarView) findViewById(R.id.calendar);
         calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                calendar = new GregorianCalendar( year, month, dayOfMonth );
+                calendar = new GregorianCalendar( year, month, dayOfMonth, time_picker_hour.getValue(), time_picker_min.getValue() );
             }
         });
-
         if(task.getDateDeb() != null){
             calendarView.setDate(task.getDateDeb().getTime().getTime());
-            calendar = task.getDateDeb();
         }
+
 
         layout_repete = (LinearLayout) findViewById(R.id.layout_repete);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
@@ -287,8 +302,11 @@ public class EditTaskActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Ajoutez une date", Toast.LENGTH_LONG).show();
                     return;
                 }else{
-
-                    //TODO check si date > now
+                    Calendar c = new GregorianCalendar();
+                    if(calendar.before(c)){
+                        Toast.makeText(getApplicationContext(), "Ajoutez une date a partir d'aujourd'hui", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
                     tasker.unserializeLists();

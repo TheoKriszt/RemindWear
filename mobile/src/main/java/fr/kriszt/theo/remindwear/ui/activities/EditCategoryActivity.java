@@ -25,13 +25,11 @@ import java.util.ArrayList;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
-import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 public class EditCategoryActivity extends AppCompatActivity {
 
     private LayoutInflater inflator;
-    private Tasker tasker;
     private int color;
     private int icon;
     private String name;
@@ -49,17 +47,15 @@ public class EditCategoryActivity extends AppCompatActivity {
     private ImageView validate;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        tasker = Tasker.getInstance(getApplicationContext());
-
         Intent mIntent = getIntent();
-        int id = mIntent.getIntExtra("idCaterory", 0);
-        category = tasker.getCategoryByID(id);
+        int id = mIntent.getIntExtra("idCategory", 0);
+        Tasker.unserializeLists();
+        category = Tasker.getInstance(getApplicationContext()).getCategoryByID(id);
         Category tempCategory = category;
 
 
@@ -149,8 +145,8 @@ public class EditCategoryActivity extends AppCompatActivity {
             Log.e("this.name", this.name);
             Log.e("this.color", String.valueOf(this.color));
             Log.e("this.icon", String.valueOf(this.icon));
-            tasker.editCategoryById(category.getID(), newCategory);
-            tasker.serializeLists();
+            Tasker.getInstance(getApplicationContext()).editCategoryById(category.getID(), newCategory);
+            Tasker.serializeLists();
             onBackPressed();
         }
     }

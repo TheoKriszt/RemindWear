@@ -84,18 +84,7 @@ public class SportTaskListAdapterFragment extends RecyclerView.Adapter<SportTask
 
         res = "";
         if(p.getDateDeb() == null){
-            int day=0;
-            for(int i=0; i<p.getRepete().length; i++){
-                if(p.getRepete()[i]){
-                    day = i;
-                    break;
-                }
-            }
-            Calendar c = new GregorianCalendar();
-            Calendar cTemp = new GregorianCalendar();
-            c.add(Calendar.DAY_OF_MONTH, day+2 - cTemp.get(Calendar.DAY_OF_WEEK));
-
-
+            Calendar c = p.getNextDate();
             res += c.get(Calendar.DAY_OF_MONTH);
             res += " ";
             res += new SimpleDateFormat("MMM").format(c.getTime());

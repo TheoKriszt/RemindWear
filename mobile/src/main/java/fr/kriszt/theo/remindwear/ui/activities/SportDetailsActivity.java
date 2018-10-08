@@ -48,17 +48,30 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         listCoordonate = sTask.getListCoord();
 
         graph = (GraphView) findViewById(R.id.graph);
-        //TODO transform listCoordonate to DataPoint[]
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
+
+        ArrayList<DataPoint> listPoint = new ArrayList<>();
+        //TODO attention ordonné la liste par x croissant
+        for(int i=0; i<sTask.getListCoord().size(); i++){
+            listPoint.add(new DataPoint(i,sTask.getListCoord().get(i).getHeight()));
+        }
+
+        //TODO REMOVE
+        listPoint.add(new DataPoint(1.3, 200));
+        listPoint.add(new DataPoint(2, 250));
+        listPoint.add(new DataPoint(3.5, 300));
+        listPoint.add(new DataPoint(4, 650));
+        listPoint.add(new DataPoint(5, 498));
+        listPoint.add(new DataPoint(32, 200));
+
+
+        DataPoint[] simpleArray = new DataPoint[ listPoint.size() ];
+        listPoint.toArray( simpleArray );
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(simpleArray);
+
         series.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         series.setDrawBackground(true);
         graph.addSeries(series);
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -81,7 +94,6 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         duration = (TextView) findViewById(R.id.duration);
         long s = sTask.getDuration();
         res = String.format("%d : %02d : %02d", s / 3600, (s % 3600) / 60, (s % 60));
-        //TODO tramsform duration to String
         duration.setText(res);
 
     }
@@ -90,8 +102,12 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        //TODO transform listCoordonate to listTracker
         ArrayList<LatLng> listTracker = new ArrayList<>();
+        for(Coordonate c : sTask.getListCoord()){
+            listTracker.add(new LatLng(c.getLat(),c.getLng()));
+        }
+
+        //TODO REMOVE
         listTracker.add(new LatLng(-35.016, 143.321));
         listTracker.add(new LatLng(-34.747, 145.592));
         listTracker.add(new LatLng(-34.364, 147.891));
