@@ -13,13 +13,15 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/stepTextLabel"
+            android:id="@+id/timeTextValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:text="Nombre de pas : "
-            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:layout_marginTop="2dp"
+            android:text="00h 00m 00s"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            app:layout_constraintBottom_toTopOf="@+id/stepTextValue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,42 +29,41 @@
             android:id="@+id/stepTextValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:text="9999"
             android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/stepTextLabel"
+            app:layout_constraintBottom_toTopOf="@+id/distanceTextValue"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/stepTextLabel" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/stepIcon"
+            app:layout_constraintTop_toBottomOf="@+id/timeTextValue"
+            app:layout_constraintVertical_bias="0.6" />
 
         <TextView
-            android:id="@+id/timeTextLabel"
+            android:id="@+id/distanceTextValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Durée : "
+            android:layout_marginBottom="8dp"
+            android:text="0.0 km"
             android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
-            app:layout_constraintStart_toStartOf="@+id/stepTextLabel"
-            app:layout_constraintTop_toBottomOf="@+id/stepTextLabel" />
-
-        <TextView
-            android:id="@+id/timeTextValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00h 00m"
-            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/timeTextLabel"
+            app:layout_constraintBottom_toTopOf="@+id/speedTextValue"
             app:layout_constraintEnd_toEndOf="@+id/stepTextValue"
-            app:layout_constraintTop_toTopOf="@+id/timeTextLabel" />
+            app:layout_constraintStart_toStartOf="@+id/stepTextValue"
+            app:layout_constraintTop_toBottomOf="@+id/stepTextValue" />
 
         <TextView
-            android:id="@+id/speedTextLabel"
+            android:id="@+id/heartRateTextValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Vitesse :"
+            android:layout_marginStart="5dp"
+            android:text="0 BPM "
             android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
-            app:layout_constraintStart_toStartOf="@+id/timeTextLabel"
-            app:layout_constraintTop_toBottomOf="@+id/timeTextLabel" />
+            app:layout_constraintBottom_toBottomOf="@+id/speedTextValue"
+            app:layout_constraintEnd_toStartOf="@+id/speedIcon"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/heartRateIcon"
+            app:layout_constraintTop_toTopOf="@+id/speedTextValue" />
 
         <TextView
             android:id="@+id/speedTextValue"
@@ -70,29 +71,11 @@
             android:layout_height="wrap_content"
             android:text="0 km/h"
             android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/speedTextLabel"
-            app:layout_constraintEnd_toEndOf="@+id/timeTextValue"
-            app:layout_constraintTop_toTopOf="@+id/speedTextLabel" />
-
-        <TextView
-            android:id="@+id/distanceTextValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0.0 km"
-            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/distanceTextLabel"
-            app:layout_constraintEnd_toEndOf="@+id/speedTextValue"
-            app:layout_constraintTop_toTopOf="@+id/distanceTextLabel" />
-
-        <TextView
-            android:id="@+id/distanceTextLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Distance :"
-            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
-            app:layout_constraintStart_toStartOf="@+id/timeTextLabel"
-            app:layout_constraintTop_toBottomOf="@+id/speedTextLabel" />
+            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/speedIcon"
+            app:layout_constraintTop_toBottomOf="@+id/distanceTextValue" />
 
         <Button
             android:id="@+id/button"
@@ -104,8 +87,63 @@
             android:text="Stop tracking"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/speedTextValue" />
+
+        <ImageView
+            android:id="@+id/stepIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/accept_deny_dialog_positive_bg"
+            android:contentDescription="steps"
+            app:layout_constraintBottom_toBottomOf="@+id/stepTextValue"
+            app:layout_constraintEnd_toStartOf="@+id/stepTextValue"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/stepTextValue"
+            app:srcCompat="@drawable/ic_feet_step" />
+
+        <ImageView
+            android:id="@+id/distanceIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/accept_deny_dialog_positive_bg"
+            android:contentDescription="Dist"
+            app:layout_constraintBottom_toBottomOf="@+id/distanceTextValue"
+            app:layout_constraintStart_toStartOf="@+id/stepIcon"
+            app:layout_constraintTop_toTopOf="@+id/distanceTextValue"
+            app:srcCompat="@drawable/ic_distance" />
+
+        <ImageView
+            android:id="@+id/heartRateIcon"
+            android:layout_width="24dp"
+            android:layout_height="23dp"
+            android:background="@drawable/accept_deny_dialog_positive_bg"
+            android:contentDescription="Heart"
+            app:layout_constraintBottom_toBottomOf="@+id/speedTextValue"
+            app:layout_constraintEnd_toStartOf="@+id/heartRateTextValue"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/speedTextValue"
+            app:srcCompat="@drawable/ic_heart_pulse" />
+
+        <ImageView
+            android:id="@+id/speedIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:adjustViewBounds="false"
+            android:background="@drawable/accept_deny_dialog_positive_bg"
+            android:contentDescription="Speed"
+            android:cropToPadding="false"
+            app:layout_constraintBottom_toBottomOf="@+id/speedTextValue"
+            app:layout_constraintEnd_toStartOf="@+id/speedTextValue"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/heartRateTextValue"
+            app:layout_constraintTop_toTopOf="@+id/speedTextValue"
+            app:srcCompat="@drawable/ic_speedometer" />
 
     </android.support.constraint.ConstraintLayout>
 

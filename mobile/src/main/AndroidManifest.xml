@@ -9,14 +9,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality. 
-
-    -->
-
-
 
     <application
         android:allowBackup="true"
@@ -26,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <service android:name=".workers.SchedulerService"/>
+        <service android:name=".workers.SchedulerService" />
 
         <activity
             android:name=".TasksActivity"
@@ -34,29 +26,30 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".NotificationTestingActivity"
-            android:label="Notificator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <!-- <activity -->
+        <!-- android:name=".NotificationTestingActivity" -->
+        <!-- android:label="Notificator"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.activities.GooglePlayServicesActivity"
-            android:label="WearSensorTest">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
+        <!-- <activity -->
+        <!-- android:name=".ui.activities.GooglePlayServicesActivity" -->
+        <!-- android:label="WearSensorTest"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
         <activity android:name=".ui.activities.EditTaskActivity" />
         <activity android:name=".ui.activities.AddTaskActivity" />
-
         <activity
             android:name=".ui.activities.AddCategoryActivity"
             android:label="@string/title_activity_add_category"
@@ -71,9 +64,12 @@
         <!-- Echange de messages Mobile <==> Montre -->
         <service android:name=".wear.PhoneDataService">
             <intent-filter>
-
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-                <data android:scheme="wear" android:host="*" android:pathPrefix="/phone"/>
+
+                <data
+                    android:host="*"
+                    android:pathPrefix="/phone"
+                    android:scheme="wear" />
             </intent-filter>
         </service>
 

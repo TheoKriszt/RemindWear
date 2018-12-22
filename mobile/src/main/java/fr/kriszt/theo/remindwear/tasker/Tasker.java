@@ -1,8 +1,8 @@
 package fr.kriszt.theo.remindwear.tasker;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,11 +15,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.workers.ReminderWorker;
 
 public class Tasker {
+
+    @SuppressLint("StaticFieldLeak")
+    private static Tasker INSTANCE = null;
 
 	private ArrayList<Category> listCategories = new ArrayList<>();
 	private ArrayList<Task> listTasks = new ArrayList<>();
@@ -29,7 +33,7 @@ public class Tasker {
 	public static final String CATEGORY_NONE_TAG = "Aucune";
 	public static final String CATEGORY_SPORT_TAG = "Sport";
 
-    private static Tasker INSTANCE = null;
+
 
     public static synchronized Tasker getInstance(@Nullable Context context)
     {
@@ -143,9 +147,10 @@ public class Tasker {
 		serializeList(listTasks, "Task.txt");
 		serializeList(listSportTasks, "SportTask.txt");
 
-	}	
-	
-	public void serializeList(ArrayList<?> list, String name) {
+	}
+
+    @SuppressWarnings("unchecked")
+    private void serializeList(ArrayList<?> list, String name) {
         try {
             FileOutputStream fos = context.openFileOutput(name, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -162,9 +167,10 @@ public class Tasker {
 		unserializeListTasks();
 		unserializeListSportTasks();
 	}
-	
-	public void unserializeListCategories() {
-		ArrayList<Category> list = new ArrayList<Category>();
+
+    @SuppressWarnings("unchecked")
+    private void unserializeListCategories() {
+		ArrayList<Category> list = new ArrayList<>();
         try {
             FileInputStream fis = context.openFileInput("Category.txt");
             ObjectInputStream is = new ObjectInputStream(fis);
@@ -187,9 +193,10 @@ public class Tasker {
         }
 		listCategories  = list;
 	}
-	
-	public void unserializeListTasks() {
-		ArrayList<Task> list = new ArrayList<Task>();
+
+	@SuppressWarnings("unchecked")
+	private void unserializeListTasks() {
+		ArrayList<Task> list = new ArrayList<>();
         try {
             FileInputStream fis = context.openFileInput("Task.txt");
             ObjectInputStream is = new ObjectInputStream(fis);
@@ -213,7 +220,8 @@ public class Tasker {
         listTasks = list;
     }
 
-	public void unserializeListSportTasks() {
+    @SuppressWarnings("unchecked")
+	private void unserializeListSportTasks() {
 		ArrayList<SportTask> list = new ArrayList<>();
 		try {
 			FileInputStream fis = context.openFileInput("SportTask.txt");
@@ -308,7 +316,7 @@ public class Tasker {
 		sort(growing);
 		seq = seq.toUpperCase();
 		for(Task t : listTasks){
-			SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy");
+			SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
             String dateFormated = format.format(t.getNextDate().getTime());
 			if(t.getName().toUpperCase().contains(seq)) {
 				res.add(t);
@@ -328,7 +336,7 @@ public class Tasker {
         sort(growing);
         seq = seq.toUpperCase();
         for(SportTask t : listSportTasks){
-            SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy");
+            SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
             String dateFormated = format.format(t.getNextDate().getTime());
             if(t.getName().toUpperCase().contains(seq)) {
                 res.add(t);

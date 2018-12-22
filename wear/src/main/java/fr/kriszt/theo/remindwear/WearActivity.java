@@ -1,36 +1,47 @@
 package fr.kriszt.theo.remindwear;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.wearable.Wearable;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Random;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import fr.kriszt.theo.remindwear.sensingStrategies.SensorUtils;
 import fr.kriszt.theo.remindwear.sensingStrategies.UnavailableSensorException;
 import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListener;
 import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerFactory;
 import fr.kriszt.theo.shared.Constants;
+import fr.kriszt.theo.shared.Coordinates;
 
 /**
  * Simple activité wearable
@@ -39,29 +50,52 @@ import fr.kriszt.theo.shared.Constants;
  * Si ouvert depuis les applis mobiles :
  *     propose de commencer un exercice
  */
-public class WearActivity extends WearableActivity {
+public class WearActivity extends WearableActivity
+    implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener
+{
 
     private boolean hasGPS = false;
-    private boolean hasPedometer = false;
+    private boolean hasPodometer = false;
     private boolean hasCardiometer = false;
 
-    private TextView stepLabel;
-    private TextView speedLabel;
-    private TextView distanceLabel;
+    @BindView(R.id.stepTextValue)
+    TextView stepValue;
 
-    private TextView stepValue;
-    private TextView timeValue;
-    private TextView speedValue;
-    private TextView distanceValue;
+    @BindView(R.id.heartRateTextValue)
+    TextView heartRateValue;
+
+    @BindView(R.id.timeTextValue)
+     TextView timeValue;
+
+    @BindView(R.id.speedTextValue)
+     TextView speedValue;
+
+    @BindView(R.id.distanceTextValue)
+     TextView distanceValue;
+
+    @BindView(R.id.stepIcon)
+    ImageView stepIcon;
+
+    @BindView(R.id.speedIcon)
+    ImageView speedIcon;
+
+    @BindView(R.id.distanceIcon)
+    ImageView distanceIcon;
+
+    @BindView(R.id.heartRateIcon)
+    ImageView heartRateIcon;
 
     private StepListener stepListener;
 
-    public void setStepsCount(int stepsCount) {
-        this.stepsCount = stepsCount;
-    }
-
+    // infos a afficher
     private int stepsCount = 0;
+    private int heartRate = 0;
     private long startTime = System.currentTimeMillis();
+    private Coordinates coordinates = null;
+    private Coordinates lastCoordinates = null;
     private float currentSpeed = 0;
     private float totalDistance = 0;
 
@@ -69,21 +103,31 @@ public class WearActivity extends WearableActivity {
     private static final String distanceUnit = "km";
 
     private static final String TAG = "wear_activity";
-    private static final int REQUEST_OAUTH_REQUEST_CODE = 0x1001;
 
     private SensorManager sensorManager;
 
-    private Handler layoutUpdater;
+//    // bunch of location related apis
+//    private FusedLocationProviderClient mFusedLocationClient;
+//    private SettingsClient mSettingsClient;
+//    private LocationRequest mLocationRequest;
+//    private LocationSettingsRequest mLocationSettingsRequest;
+//    private LocationCallback mLocationCallback;
+//    private Location mCurrentLocation;
+//    // boolean flag to toggle the ui
+//    private Boolean mRequestingLocationUpdates;
 
-    // bunch of location related apis
-    private FusedLocationProviderClient mFusedLocationClient;
-    private SettingsClient mSettingsClient;
-    private LocationRequest mLocationRequest;
-    private LocationSettingsRequest mLocationSettingsRequest;
-    private LocationCallback mLocationCallback;
-    private Location mCurrentLocation;
+    // Constantes parametres GPS
+    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10;
+    private static final int REQUEST_CHECK_SETTINGS = 100;
+
+    private GoogleApiClient mGoogleApiClient;
+    private LocationCallback locationCallback;
+
 
     // Thread parallele : met à jour l'affichage
+    private Handler layoutUpdater;
+    private static final long REFRESH_RATE = 500;
     Runnable timeStatusChecker = new Runnable() {
         @Override
         public void run() {
@@ -91,20 +135,27 @@ public class WearActivity extends WearableActivity {
                 updateValues();
                 updateDisplay();
             } finally {
-                layoutUpdater.postDelayed(timeStatusChecker, 500);
+                layoutUpdater.postDelayed(timeStatusChecker, REFRESH_RATE);
             }
         }
     };
 
 
     private void updateValues() {
+//        currentSpeed = (float) (new Random().nextFloat()%10.0) * 10;
+        if (coordinates == null) {
+            currentSpeed = 0;
+        } else {
+            currentSpeed = (float) coordinates.getSpeedkmh();
+        }
 
-        // TODO : remove tests
+        if (hasGPS){
+            if (lastCoordinates != null && coordinates != null){
+                totalDistance += lastCoordinates.distanceTo(coordinates) / 1000; // en km
+            }
+        }
 
-        totalDistance += 0.01;
-        currentSpeed = (float) (new Random().nextFloat()%10.0) * 10;
-
-        if (hasPedometer){
+        if (hasPodometer){
             stepsCount = stepListener.getSteps();
         }
     }
@@ -124,26 +175,55 @@ public class WearActivity extends WearableActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_wear);
+        ButterKnife.bind(this);
 
-        stepLabel = findViewById(R.id.stepTextLabel);
-//        timeLabel = findViewById(R.id.timeTextLabel);
-        speedLabel = findViewById(R.id.speedTextLabel);
-        distanceLabel = findViewById(R.id.distanceTextLabel);
-
-        stepValue = findViewById(R.id.stepTextValue);
-        timeValue = findViewById(R.id.timeTextValue);
-        speedValue = findViewById(R.id.speedTextValue);
-        distanceValue = findViewById(R.id.distanceTextValue);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addApi(Wearable.API)  // used for data layer API
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
 
         createSensors();
 
-        // TODO : check capabilities
+        hideMissingSensors();
+
         layoutUpdater = new Handler();
         timeStatusChecker.run(); // démarrer le màj du layout
+
+//        Todo : check permisisons
+        boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (!hasGPSPermission){
+            Log.w(TAG, "onCreate: Asking for GPS access");
+            askForGPSPermission();
+        }
+//        else {
+//            Log.i(TAG, "onCreate: GPS access granted");
+//            startLocationUpdates();
+//        }
+    }
+
+    private void hideMissingSensors() {
+        if (!hasGPS){
+            speedValue.setVisibility(View.INVISIBLE);
+            distanceValue.setVisibility(View.INVISIBLE);
+            distanceIcon.setVisibility(View.INVISIBLE);
+            speedIcon.setVisibility(View.INVISIBLE);
+        }
+
+        if (!hasPodometer){
+            stepValue.setVisibility(View.INVISIBLE);
+            stepIcon.setVisibility(View.INVISIBLE);
+
+
+        }
+        if (!hasCardiometer){
+            heartRateValue.setVisibility(View.GONE);
+            heartRateIcon.setVisibility(View.GONE);
+        }
     }
 
 //    @Override
@@ -160,7 +240,8 @@ public class WearActivity extends WearableActivity {
 
 
     public void stopTracking(View view){
-        Log.w(TAG, "stopTracking: ");
+
+        // Envoyer l'info d'arrêt vers le telephone
         Intent stopIntent = new Intent(this, WearDataService.class);
         stopIntent.setAction(Constants.ACTION_END_TRACK);
         this.startService(stopIntent);
@@ -172,45 +253,266 @@ public class WearActivity extends WearableActivity {
         sensorManager = ((SensorManager)getSystemService(SENSOR_SERVICE));
         try {
             stepListener = StepListenerFactory.getStepListener(sensorManager);
-            hasPedometer = true;
+            hasPodometer = true;
         } catch (UnavailableSensorException e) {
-            hasPedometer = false;
+            hasPodometer = false;
         }
 
         hasGPS = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
         hasCardiometer = getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE);
 
-        Log.w(TAG, "createSensors: Has a GPS ? " + hasGPS);
-
-        if (hasGPS){
-            initGPS();
-        }
-
     }
 
-    private void initGPS() {
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mSettingsClient = LocationServices.getSettingsClient(this);
+//    private void initGPS() {
+//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        mSettingsClient = LocationServices.getSettingsClient(this);
+//
+//        mLocationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                super.onLocationResult(locationResult);
+//                // location is received
+//                mCurrentLocation = locationResult.getLastLocation();
+//
+//                Log.w(TAG, "onLocationResult: " + mCurrentLocation);
+//                Log.w(TAG, "onLocationResult: GPS acquis ??");
+////                updateLocationUI();
+//            }
+//        };
+//
+//        mRequestingLocationUpdates = true;
+//
+//        mLocationRequest = new LocationRequest();
+//        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+//        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//
+//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+//        builder.addLocationRequest(mLocationRequest);
+//        mLocationSettingsRequest = builder.build();
+//    }
 
-        mLocationCallback = new LocationCallback() {
+
+    public void askForGPSPermission() {
+        // Requesting ACCESS_FINE_LOCATION using Dexter library
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        Log.i(TAG, "onPermissionGranted: GPS access OK");
+//                        mRequestingLocationUpdates = true;
+//                        startLocationUpdates();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        if (response.isPermanentlyDenied()) {
+                            Toast.makeText(WearActivity.this, "Acces to GPS is denied", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
+    }
+
+    /**
+     * Starting location updates
+     * Check whether location settings are satisfied and then
+     * location updates will be requested
+     */
+//    private void startLocationUpdates() {
+//        Toast.makeText(this, "Start locating device", Toast.LENGTH_SHORT).show();
+//        Log.i(TAG, "startLocationUpdates: ");
+//        mSettingsClient
+//                .checkLocationSettings(mLocationSettingsRequest)
+//                .addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+//                    @SuppressLint("MissingPermission")
+//                    @Override
+//                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+//                        Log.i(TAG, "All location settings are satisfied.");
+//
+//                        Toast.makeText(getApplicationContext(), "Started location updates!", Toast.LENGTH_SHORT).show();
+//
+//                        //noinspection MissingPermission
+//                        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+//                                mLocationCallback, Looper.myLooper());
+//
+//
+////                        updateLocationUI();
+//                    }
+//                })
+//                .addOnFailureListener(this, new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.e(TAG, "onFailure: ", e);
+//                        int statusCode = ((ApiException) e).getStatusCode();
+//                        switch (statusCode) {
+//                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+//                                Log.i(TAG, "Location settings are not satisfied. Attempting to upgrade " +
+//                                        "location settings ");
+//                                try {
+//                                    // Show the dialog by calling startResolutionForResult(), and check the
+//                                    // result in onActivityResult().
+//                                    ResolvableApiException rae = (ResolvableApiException) e;
+//                                    rae.startResolutionForResult(WearActivity.this, REQUEST_CHECK_SETTINGS);
+//                                } catch (IntentSender.SendIntentException sie) {
+//                                    Log.i(TAG, "PendingIntent unable to execute request.");
+//                                }
+//                                break;
+//                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+//                                String errorMessage = "Location settings are inadequate, and cannot be " +
+//                                        "fixed here. Fix in Settings.";
+//                                Log.e(TAG, errorMessage);
+//
+//                                Toast.makeText(WearActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+//
+//                        }
+//
+////                        updateLocationUI();
+//                    }
+//                });
+//    }
+
+//    public void stopLocationUpdates() {
+//        // Removing location updates
+//        mFusedLocationClient
+//                .removeLocationUpdates(mLocationCallback)
+//                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        Toast.makeText(getApplicationContext(), "Location updates stopped!", Toast.LENGTH_SHORT).show();
+////                        toggleButtons();
+//                    }
+//                });
+//    }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        switch (requestCode) {
+//            // Check for the integer request code originally supplied to startResolutionForResult().
+//            case REQUEST_CHECK_SETTINGS:
+//                switch (resultCode) {
+//                    case Activity.RESULT_OK:
+//                        Log.e(TAG, "User agreed to make required location settings changes.");
+//                        // Nothing to do. startLocationupdates() gets called in onResume again.
+//                        break;
+//                    case Activity.RESULT_CANCELED:
+//                        Log.e(TAG, "User chose not to make required location settings changes.");
+//                        mRequestingLocationUpdates = false;
+//                        break;
+//                }
+//                break;
+//        }
+//    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+//        if (mRequestingLocationUpdates && SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+//            startLocationUpdates();
+//        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        final LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(UPDATE_INTERVAL_IN_MILLISECONDS)
+                .setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        locationCallback = new LocationCallback(){
+
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                // location is received
-                mCurrentLocation = locationResult.getLastLocation();
+                Location lastLocation = locationResult.getLastLocation();
+                lastCoordinates = coordinates;
+                coordinates = new Coordinates(lastLocation);
+            }
 
-                Log.w(TAG, "onLocationResult: " + mCurrentLocation);
-//                updateLocationUI();
+            @Override
+            public void onLocationAvailability(LocationAvailability locationAvailability) {
+                super.onLocationAvailability(locationAvailability);
+                Log.w(TAG, "onLocationAvailability: " + locationAvailability);
             }
         };
+
+        LocationServices.getFusedLocationProviderClient(this)
+                .requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "onPause: ");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "onConnectionSuspended: ");
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.i(TAG, "onLocationChanged: " + location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.i(TAG, "onStatusChanged: " + provider);
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.i(TAG, "onProviderEnabled: ");
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.i(TAG, "onProviderDisabled: ");
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(TAG, "onConnectionFailed: ");
+
+    }
+
+
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "onDestroy: ");
         layoutUpdater.removeCallbacks(timeStatusChecker);
         // TODO :  unregister listeners
-        stepListener.unregisterSensor();
+        stepListener.unregisterSensor(); // Capteur de pas
+//        stopLocationUpdates(); // Position GPS
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
+        }
+        mGoogleApiClient.disconnect();
     }
 }

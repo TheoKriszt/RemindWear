@@ -19,13 +19,13 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.util.ArrayList;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.tasker.Coordinate;
+import fr.kriszt.theo.shared.Coordinates;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 public class SportDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private ArrayList<Coordinate> listCoordinate;
+    private ArrayList<Coordinates> listCoordinate;
     private SportTask sTask;
 
     private GraphView graph;
@@ -103,7 +103,7 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         mMap = googleMap;
 
         ArrayList<LatLng> listTracker = new ArrayList<>();
-        for(Coordinate c : sTask.getListCoord()){
+        for(Coordinates c : sTask.getListCoord()){
             listTracker.add(new LatLng(c.getLat(),c.getLng()));
         }
 
