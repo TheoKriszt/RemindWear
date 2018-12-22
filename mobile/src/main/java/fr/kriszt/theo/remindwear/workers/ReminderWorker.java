@@ -1,23 +1,22 @@
 package fr.kriszt.theo.remindwear.workers;
 
-import android.arch.lifecycle.LiveData;
+import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
-import androidx.work.WorkStatus;
+//import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
-import fr.kriszt.theo.remindwear.R;
+import androidx.work.WorkerParameters;
 import fr.kriszt.theo.remindwear.RemindNotification;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
@@ -36,6 +35,10 @@ public class ReminderWorker extends Worker {
     private static String workTag = "REMINDER_WORK";
     private static final String TASK_ID_KEY = "UUID";
 
+    public ReminderWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
     @NonNull
     @Override
     public Result doWork() {
@@ -47,19 +50,21 @@ public class ReminderWorker extends Worker {
 
         if (task != null) {
             Log.w(TAG, "doWork: Tâche identifiée : " + task.getName());
+
+
             new RemindNotification(task, getApplicationContext()).show(null);
 
 
             if (task.getDateDeb() == null){ // tâche récurrente
                 scheduleWorker(task); // replanifier pour la prochaine occurence
             }
-            return Result.SUCCESS;
+            return Result.success();//.SUCCESS;
 
         }else {
-            Log.w(TAG, "doWork: identifiant de tâche inconnu : " + taskID);
+            Log.w(TAG, "doWork: identifiant de tâche inconnu (sans doute supprimé entre temps) : " + taskID);
         }
 
-        return Result.FAILURE;
+        return Result.failure();//.FAILURE;
         // (Returning RETRY tells WorkManager to try this task again
         // later; FAILURE says not to try again.)
     }
@@ -92,11 +97,11 @@ public class ReminderWorker extends Worker {
         task.setWorkID(work.getId());
     }
 
-    public static LiveData<WorkStatus> getWorkStatus(Task task){
-        UUID workId = task.getWorkID();
-        LiveData<WorkStatus> workStatusLiveData = WorkManager.getInstance().getStatusById( workId );
-        return workStatusLiveData;
-    }
+//    public static LiveData<WorkStatus> getWorkStatus(Task task){
+//        UUID workId = task.getWorkID();
+//        LiveData<WorkStatus> workStatusLiveData = WorkManager.getInstance().getStatusById( workId );
+//        return workStatusLiveData;
+//    }
 
     private static String getCategoryTag(Category category){
 
@@ -106,16 +111,15 @@ public class ReminderWorker extends Worker {
 
     /**
      * Annule toutes les plannifications appartenant à la catégorie donnée
-     * @param category
      * @return targetsNumber le nombre d'executions déplanifiées
      */
-    public static int unScheduleCategory(@NonNull Category category){
-        String categoryTag = getCategoryTag(category);
-
-        int targetsNumber = WorkManager.getInstance().getStatusesByTag(categoryTag).getValue().size();
-        WorkManager.getInstance().cancelAllWorkByTag(categoryTag);
-        return targetsNumber;
-    }
+//    public static int unScheduleCategory(@NonNull Category category){
+//        String categoryTag = getCategoryTag(category);
+//
+//        int targetsNumber = WorkManager.getInstance().getStatusesByTag(categoryTag).getValue().size();
+//        WorkManager.getInstance().cancelAllWorkByTag(categoryTag);
+//        return targetsNumber;
+//    }
 
     public static void unScheduleAll(){
         WorkManager.getInstance().cancelAllWork();

@@ -12,9 +12,9 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 
 import fr.kriszt.theo.remindwear.tasker.Task;
+import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
 import fr.kriszt.theo.remindwear.wear.PhoneDataService;
-import fr.kriszt.theo.remindwear.wear.WearListener_bak;
 import fr.kriszt.theo.remindwear.workers.SchedulerService;
 import fr.kriszt.theo.shared.Constants;
 
@@ -50,6 +50,7 @@ public class RemindNotification {
         addActions(task, builder, extender);
 
         builder.extend(extender);
+        builder.setAutoCancel(true);
 
         notification = builder.build();
 
@@ -77,9 +78,11 @@ public class RemindNotification {
 
         PendingIntent pendingPostponeIntent = PendingIntent.getService(context, taskId, postponeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        builder.addAction(new NotificationCompat.Action(
-                R.drawable.baseline_directions_run_24, "Track", sendMessagePendingIntent
-        ));
+        if (task.getCategory().getName().equals(Tasker.CATEGORY_SPORT_TAG)) {
+            builder.addAction(new NotificationCompat.Action(
+                    R.drawable.baseline_directions_run_24, "Track", sendMessagePendingIntent
+            ));
+        }
 
         builder.addAction(new NotificationCompat.Action(
                 R.drawable.ic_snooze, "Later", pendingPostponeIntent

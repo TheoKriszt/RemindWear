@@ -1,28 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.wear.widget.BoxInsetLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/wear_root" >
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/stepTextLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="Nombre de pas : "
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/stepTextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="9999"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintBottom_toBottomOf="@+id/stepTextLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/stepTextLabel" />
+
+        <TextView
+            android:id="@+id/timeTextLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Durée : "
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintStart_toStartOf="@+id/stepTextLabel"
+            app:layout_constraintTop_toBottomOf="@+id/stepTextLabel" />
+
+        <TextView
+            android:id="@+id/timeTextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00h 00m"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintBottom_toBottomOf="@+id/timeTextLabel"
+            app:layout_constraintEnd_toEndOf="@+id/stepTextValue"
+            app:layout_constraintTop_toTopOf="@+id/timeTextLabel" />
+
+        <TextView
+            android:id="@+id/speedTextLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Vitesse :"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintStart_toStartOf="@+id/timeTextLabel"
+            app:layout_constraintTop_toBottomOf="@+id/timeTextLabel" />
+
+        <TextView
+            android:id="@+id/speedTextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 km/h"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintBottom_toBottomOf="@+id/speedTextLabel"
+            app:layout_constraintEnd_toEndOf="@+id/timeTextValue"
+            app:layout_constraintTop_toTopOf="@+id/speedTextLabel" />
+
+        <TextView
+            android:id="@+id/distanceTextValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0 km"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintBottom_toBottomOf="@+id/distanceTextLabel"
+            app:layout_constraintEnd_toEndOf="@+id/speedTextValue"
+            app:layout_constraintTop_toTopOf="@+id/distanceTextLabel" />
+
+        <TextView
+            android:id="@+id/distanceTextLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Distance :"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            app:layout_constraintStart_toStartOf="@+id/timeTextLabel"
+            app:layout_constraintTop_toBottomOf="@+id/speedTextLabel" />
 
         <Button
             android:id="@+id/button"
-            android:layout_width="match_parent"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/dismiss_close"
             android:onClick="stopTracking"
-            android:text="Stop tracking" />
+            android:text="Stop tracking"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:id="@+id/stepText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nombre de pas : 0" />
-    </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.wear.widget.BoxInsetLayout>

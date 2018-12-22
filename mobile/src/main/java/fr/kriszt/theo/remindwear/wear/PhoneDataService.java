@@ -1,5 +1,6 @@
 package fr.kriszt.theo.remindwear.wear;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
@@ -26,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import androidx.annotation.Nullable;
 import fr.kriszt.theo.shared.Constants;
 
 /**
@@ -51,20 +51,35 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.w(TAG, "onStartCommand: " + intent.getAction());
+        Log.w(TAG, "PhoneDataService :: onStartCommand: " + intent.getAction());
         if (intent.getAction().equals(Constants.ACTION_LAUNCH_WEAR_APP)){
             Log.w(TAG, "onStartCommand: action " + Constants.ACTION_LAUNCH_WEAR_APP);
             onStartWearableActivityClick(null);
+//
+//            Set<String> extraKeys = intent.getExtras().keySet();
+//
+//            Log.w(TAG, "intent extras : ");
+//
+//            for (String k : extraKeys){
+//                Log.w(TAG, "key : " + k + ", value : " + intent.getExtras().get(k));
+//            }
+
+            int taskId = intent.getExtras().getInt(Constants.KEY_TASK_ID);
+
+            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+            notificationManager.cancel(taskId);
         }
 
         return super.onStartCommand(intent, flags, startId);
     }
 
-    @Nullable
+
     @android.support.annotation.Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Log.w(TAG, "onBind: ");
+
+
         Wearable.getDataClient(this).addListener(this);
         Wearable.getMessageClient(this).addListener(this);
         Wearable.getCapabilityClient(this)
@@ -99,7 +114,8 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        Log.w(TAG, "onMessageReceived: ");
+        Log.w(TAG, "onMessageReceived: " + messageEvent);
+        Log.w(TAG, "onMessageReceived: " + new String(messageEvent.getData()) );
         LOGD(
                 TAG,
                 "onMessageReceived() A message from watch was received:"

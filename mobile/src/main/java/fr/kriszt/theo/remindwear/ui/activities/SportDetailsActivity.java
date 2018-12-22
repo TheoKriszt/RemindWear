@@ -19,13 +19,13 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.util.ArrayList;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.tasker.Coordonate;
+import fr.kriszt.theo.remindwear.tasker.Coordinate;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 public class SportDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private ArrayList<Coordonate> listCoordonate;
+    private ArrayList<Coordinate> listCoordinate;
     private SportTask sTask;
 
     private GraphView graph;
@@ -45,14 +45,14 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
 
         int id = getIntent().getIntExtra("idSportTask", 0);
         sTask = tasker.getSportTaskByID(id);
-        listCoordonate = sTask.getListCoord();
+        listCoordinate = sTask.getListCoord();
 
         graph = (GraphView) findViewById(R.id.graph);
 
         ArrayList<DataPoint> listPoint = new ArrayList<>();
         //TODO attention ordonné la liste par x croissant
         for(int i=0; i<sTask.getListCoord().size(); i++){
-            listPoint.add(new DataPoint(i,sTask.getListCoord().get(i).getHeight()));
+            listPoint.add(new DataPoint(i,sTask.getListCoord().get(i).getAltitude()));
         }
 
         //TODO REMOVE
@@ -103,7 +103,7 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         mMap = googleMap;
 
         ArrayList<LatLng> listTracker = new ArrayList<>();
-        for(Coordonate c : sTask.getListCoord()){
+        for(Coordinate c : sTask.getListCoord()){
             listTracker.add(new LatLng(c.getLat(),c.getLng()));
         }
 

@@ -5,7 +5,7 @@ import java.util.Calendar;
 
 public class SportTask extends Task {
 
-    private ArrayList<Coordonate> listCoord = new ArrayList<>();
+    private ArrayList<Coordinate> listCoord = new ArrayList<>();
     private int steps;
     private int heart;
     private int distance;
@@ -30,8 +30,8 @@ public class SportTask extends Task {
         this(base, 0, 0, 0, 0);
     }
 
-    public void addCoord(Coordonate c){listCoord.add(c);}
-    public ArrayList<Coordonate> getListCoord() {return listCoord;}
+    public void addCoord(Coordinate c){listCoord.add(c);}
+    public ArrayList<Coordinate> getListCoord() {return listCoord;}
 
     public int getSteps() {return steps;}
     public void setSteps(int steps) {this.steps = steps;}
@@ -53,7 +53,7 @@ public class SportTask extends Task {
         setDistance(res);
     }
 
-    private double distance(Coordonate c1, Coordonate c2) {
+    private double distance(Coordinate c1, Coordinate c2) {
 
         final int R = 6371; // Radius of the earth
 
@@ -65,7 +65,7 @@ public class SportTask extends Task {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c * 1000; // convert to meters
 
-        double height = c1.getHeight() - c2.getHeight();
+        double height = c1.getAltitude() - c2.getAltitude();
 
         distance = Math.pow(distance, 2) + Math.pow(height, 2);
 

@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
@@ -37,17 +38,13 @@ import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
-import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import androidx.annotation.Nullable;
 import fr.kriszt.theo.shared.Constants;
-import fr.kriszt.theo.shared.DataLayerUtils;
 
 /** Listens to DataItems and Messages from the local node. */
 public class WearDataService extends Service implements
@@ -65,7 +62,6 @@ public class WearDataService extends Service implements
 
 
     @Nullable
-    @android.support.annotation.Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Log.w(TAG, "onBind: ");
@@ -156,7 +152,8 @@ public class WearDataService extends Service implements
     private void sendStopMessage(String nodeId){
         Task<Integer> sendMessageTask =
                 Wearable.getMessageClient(this)
-                        .sendMessage(nodeId, Constants.PHONE_PATH, null);
+                        .sendMessage(nodeId, Constants.PHONE_PATH, "hello ?".getBytes());
+        Log.w(TAG, "sendStopMessage: pending");
 
 
         sendMessageTask.addOnCompleteListener(

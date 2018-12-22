@@ -1,6 +1,7 @@
 package fr.kriszt.theo.remindwear.tasker;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.FileInputStream;
@@ -15,7 +16,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 
-import androidx.annotation.Nullable;
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.workers.ReminderWorker;
 
