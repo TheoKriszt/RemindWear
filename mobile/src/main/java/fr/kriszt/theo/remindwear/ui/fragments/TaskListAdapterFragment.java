@@ -57,7 +57,7 @@ public class TaskListAdapterFragment extends  RecyclerView.Adapter<TaskListAdapt
     }
 
     public TaskListAdapterFragment(Context context, List<Task> taskList) {
-        this.context =context;
+        this.context = context;
         this.taskList = taskList;
     }
 

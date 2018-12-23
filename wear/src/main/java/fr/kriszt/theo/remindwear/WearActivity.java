@@ -4,6 +4,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -101,24 +104,16 @@ public class WearActivity extends WearableActivity
 
     private static final String speedUnit = "km/h";
     private static final String distanceUnit = "km";
+    private static final String heartRateUnit = "BPM";
 
     private static final String TAG = "wear_activity";
 
     private SensorManager sensorManager;
 
-//    // bunch of location related apis
-//    private FusedLocationProviderClient mFusedLocationClient;
-//    private SettingsClient mSettingsClient;
-//    private LocationRequest mLocationRequest;
-//    private LocationSettingsRequest mLocationSettingsRequest;
-//    private LocationCallback mLocationCallback;
-//    private Location mCurrentLocation;
-//    // boolean flag to toggle the ui
-//    private Boolean mRequestingLocationUpdates;
 
     // Constantes parametres GPS
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
     private static final int REQUEST_CHECK_SETTINGS = 100;
 
     private GoogleApiClient mGoogleApiClient;
@@ -142,7 +137,6 @@ public class WearActivity extends WearableActivity
 
 
     private void updateValues() {
-//        currentSpeed = (float) (new Random().nextFloat()%10.0) * 10;
         if (coordinates == null) {
             currentSpeed = 0;
         } else {
@@ -162,15 +156,25 @@ public class WearActivity extends WearableActivity
 
     @SuppressLint("DefaultLocale")
     private void updateDisplay(){
-        distanceValue.setText(String.format("%.2f %s", totalDistance, distanceUnit));
-        speedValue.setText(String.format("%.2f %s", currentSpeed, speedUnit));
         long timeDiff = (System.currentTimeMillis() - startTime) / 1000; // secondes
         long hours = timeDiff / 3600;
         long minutes = timeDiff % 3600 / 60;
         long seconds = timeDiff % 60;
 
         timeValue.setText(String.format("%02dh : %02dm : %02ds", hours, minutes, seconds));
-        stepValue.setText(String.format("%d", stepsCount));
+
+        if (hasPodometer) {
+            stepValue.setText(String.format("%d", stepsCount));
+        }
+
+        if (hasGPS){
+            distanceValue.setText(String.format("%.2f %s", totalDistance, distanceUnit));
+            speedValue.setText(String.format("%.2f %s", currentSpeed, speedUnit));
+        }
+
+        if (hasCardiometer){
+            heartRateValue.setText(((heartRate > 0) ? heartRate : "???") + " " + heartRateUnit);
+        }
     }
 
     @Override
@@ -261,36 +265,29 @@ public class WearActivity extends WearableActivity
         hasGPS = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
         hasCardiometer = getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE);
 
-    }
+        if (hasCardiometer){
 
-//    private void initGPS() {
-//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        mSettingsClient = LocationServices.getSettingsClient(this);
-//
-//        mLocationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(LocationResult locationResult) {
-//                super.onLocationResult(locationResult);
-//                // location is received
-//                mCurrentLocation = locationResult.getLastLocation();
-//
-//                Log.w(TAG, "onLocationResult: " + mCurrentLocation);
-//                Log.w(TAG, "onLocationResult: GPS acquis ??");
-////                updateLocationUI();
-//            }
-//        };
-//
-//        mRequestingLocationUpdates = true;
-//
-//        mLocationRequest = new LocationRequest();
-//        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-//        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//
-//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-//        builder.addLocationRequest(mLocationRequest);
-//        mLocationSettingsRequest = builder.build();
-//    }
+            final Sensor heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+
+            sensorManager.registerListener(new SensorEventListener() {
+                @Override
+                public void onSensorChanged(SensorEvent sensorEvent) {
+                    if (sensorEvent.accuracy > SensorManager.SENSOR_STATUS_UNRELIABLE){
+                        heartRate = (int) sensorEvent.values[0];
+                    }else heartRate = -1;
+
+
+
+                }
+
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int i) {
+
+                }
+            }, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+    }
 
 
     public void askForGPSPermission() {
@@ -319,95 +316,6 @@ public class WearActivity extends WearableActivity
                 }).check();
     }
 
-    /**
-     * Starting location updates
-     * Check whether location settings are satisfied and then
-     * location updates will be requested
-     */
-//    private void startLocationUpdates() {
-//        Toast.makeText(this, "Start locating device", Toast.LENGTH_SHORT).show();
-//        Log.i(TAG, "startLocationUpdates: ");
-//        mSettingsClient
-//                .checkLocationSettings(mLocationSettingsRequest)
-//                .addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-//                    @SuppressLint("MissingPermission")
-//                    @Override
-//                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-//                        Log.i(TAG, "All location settings are satisfied.");
-//
-//                        Toast.makeText(getApplicationContext(), "Started location updates!", Toast.LENGTH_SHORT).show();
-//
-//                        //noinspection MissingPermission
-//                        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-//                                mLocationCallback, Looper.myLooper());
-//
-//
-////                        updateLocationUI();
-//                    }
-//                })
-//                .addOnFailureListener(this, new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.e(TAG, "onFailure: ", e);
-//                        int statusCode = ((ApiException) e).getStatusCode();
-//                        switch (statusCode) {
-//                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-//                                Log.i(TAG, "Location settings are not satisfied. Attempting to upgrade " +
-//                                        "location settings ");
-//                                try {
-//                                    // Show the dialog by calling startResolutionForResult(), and check the
-//                                    // result in onActivityResult().
-//                                    ResolvableApiException rae = (ResolvableApiException) e;
-//                                    rae.startResolutionForResult(WearActivity.this, REQUEST_CHECK_SETTINGS);
-//                                } catch (IntentSender.SendIntentException sie) {
-//                                    Log.i(TAG, "PendingIntent unable to execute request.");
-//                                }
-//                                break;
-//                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-//                                String errorMessage = "Location settings are inadequate, and cannot be " +
-//                                        "fixed here. Fix in Settings.";
-//                                Log.e(TAG, errorMessage);
-//
-//                                Toast.makeText(WearActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-//
-//                        }
-//
-////                        updateLocationUI();
-//                    }
-//                });
-//    }
-
-//    public void stopLocationUpdates() {
-//        // Removing location updates
-//        mFusedLocationClient
-//                .removeLocationUpdates(mLocationCallback)
-//                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        Toast.makeText(getApplicationContext(), "Location updates stopped!", Toast.LENGTH_SHORT).show();
-////                        toggleButtons();
-//                    }
-//                });
-//    }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//            // Check for the integer request code originally supplied to startResolutionForResult().
-//            case REQUEST_CHECK_SETTINGS:
-//                switch (resultCode) {
-//                    case Activity.RESULT_OK:
-//                        Log.e(TAG, "User agreed to make required location settings changes.");
-//                        // Nothing to do. startLocationupdates() gets called in onResume again.
-//                        break;
-//                    case Activity.RESULT_CANCELED:
-//                        Log.e(TAG, "User chose not to make required location settings changes.");
-//                        mRequestingLocationUpdates = false;
-//                        break;
-//                }
-//                break;
-//        }
-//    }
 
     @Override
     public void onResume() {
@@ -449,7 +357,7 @@ public class WearActivity extends WearableActivity
             @Override
             public void onLocationAvailability(LocationAvailability locationAvailability) {
                 super.onLocationAvailability(locationAvailability);
-                Log.w(TAG, "onLocationAvailability: " + locationAvailability);
+//                Log.w(TAG, "onLocationAvailability: " + locationAvailability);
             }
         };
 

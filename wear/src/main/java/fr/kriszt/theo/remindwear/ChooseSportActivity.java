@@ -1,19 +1,31 @@
 package fr.kriszt.theo.remindwear;
 
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.wear.widget.WearableLinearLayoutManager;
 import android.support.wear.widget.WearableRecyclerView;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import fr.kriszt.theo.remindwear.sensingStrategies.SensorUtils;
 
 public class ChooseSportActivity extends WearableActivity  {
 
 
 
     private static final String TAG = "sportChoose_activity";
-    private WearableRecyclerView mWearableRecyclerView;
+
+    private RecyclerViewAdapter mAdapter;
+    private List<SportTypeItem> myDataSet = new ArrayList<>();
+    private SensorManager sensorManager;
+
+    @BindView(R.id.recycler_launcher_view)
+    WearableRecyclerView mWearableRecyclerView;
 
 
     @Override
@@ -28,6 +40,18 @@ public class ChooseSportActivity extends WearableActivity  {
 
         mWearableRecyclerView.setLayoutManager(
                 new WearableLinearLayoutManager(this));
+
+        sensorManager = ((SensorManager)getSystemService(SENSOR_SERVICE));
+
+        boolean hasGPS = SensorUtils.isGPSAvailable(this);
+        boolean hasPodo = SensorUtils.isPodometerAvailable(sensorManager);
+        boolean hasCardio = SensorUtils.isHeartRateAvailable(this);
+
+        myDataSet.addAll(SportTypeItem.getAvailableSportTypes(this, hasGPS, hasPodo, hasCardio));
+
+        mAdapter = new RecyclerViewAdapter(myDataSet, this);
+        mWearableRecyclerView.setAdapter(mAdapter);
+
 
 
     }

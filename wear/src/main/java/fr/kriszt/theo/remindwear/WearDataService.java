@@ -129,7 +129,7 @@ public class WearDataService extends Service implements
 
         // Check to see if the message is to start an activity
         if (messageEvent.getPath().equals(START_ACTIVITY_PATH)) {
-            Intent startIntent = new Intent(this, WearActivity.class);
+            Intent startIntent = new Intent(this, ChooseSportActivity.class);
             startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(startIntent);
         }

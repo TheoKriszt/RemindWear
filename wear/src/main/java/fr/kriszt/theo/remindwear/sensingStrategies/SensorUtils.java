@@ -9,6 +9,8 @@ import android.support.v4.app.ActivityCompat;
 
 import java.util.List;
 
+import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerFactory;
+
 public class SensorUtils {
 
     private static List<Sensor> getAvailableSensors(SensorManager sm){
@@ -25,6 +27,30 @@ public class SensorUtils {
 
         return sensorTypes;
 
+    }
+
+    public static boolean isSensorAvailable(SensorManager sm, int sensorType){
+        for (Sensor s : getAvailableSensors(sm)){
+            if (s.getType() == sensorType) return true;
+        }
+        return false;
+    }
+
+    public static boolean isGPSAvailable(Context c){
+        return c.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
+    }
+
+    public static boolean isHeartRateAvailable(Context c){
+        return c.getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE);
+    }
+
+    public static boolean isPodometerAvailable(SensorManager sm){
+        try {
+            StepListenerFactory.getStepListener(sm);
+            return true;
+        } catch (UnavailableSensorException e) {
+            return false;
+        }
     }
 
     public static boolean checkPermissions(Context context, String permissionTag) {

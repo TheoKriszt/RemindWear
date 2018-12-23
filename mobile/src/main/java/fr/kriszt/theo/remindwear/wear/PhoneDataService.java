@@ -136,6 +136,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     /** Sends an RPC to start a fullscreen Activity on the wearable. */
     public void onStartWearableActivityClick(View view) {
         LOGD(TAG, "Generating RPC");
+        Log.w(TAG, "onStartWearableActivityClick: ");
 
         // Trigger an AsyncTask that will query for a list of connected nodes and send a
         // "start-activity" message to each connected node.
