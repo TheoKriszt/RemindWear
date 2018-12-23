@@ -128,7 +128,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
         String message = new String(payload);
 
-        Log.w(TAG, "PAYLOAD: \n" + message);
+//        Log.w(TAG, "PAYLOAD: \n" + message);
 
         DataSet dataSet = DataSet.fromJson(message);
 

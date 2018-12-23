@@ -55,15 +55,15 @@ import fr.kriszt.theo.shared.data.DataSet;
 public class WearDataService extends Service implements
         DataClient.OnDataChangedListener,
         MessageClient.OnMessageReceivedListener,
-        CapabilityClient.OnCapabilityChangedListener {
+        CapabilityClient.OnCapabilityChangedListener,
+BmService{
 
     private static final String TAG = "DataLayerService";
 
     private static final String START_ACTIVITY_PATH = "/start-activity";
     private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
     public static final String COUNT_PATH = "/count";
-    public static final String IMAGE_PATH = "/image";
-    public static final String IMAGE_KEY = "photo";
+    private static WearActivity observer;
     private DataSet dataset;
 
 
@@ -71,6 +71,8 @@ public class WearDataService extends Service implements
     @Override
     public IBinder onBind(Intent intent) {
         Log.w(TAG, "onBind: ");
+
+
         Wearable.getDataClient(this).addListener(this);
         Wearable.getMessageClient(this).addListener(this);
         Wearable.getCapabilityClient(this)
@@ -78,8 +80,13 @@ public class WearDataService extends Service implements
         return null;
     }
 
+    public static void setObserver(WearActivity observer) {
+        WearDataService.observer = observer;
+    }
+
     @Override
     public boolean onUnbind(Intent intent) {
+        Log.w(TAG, "onUnbind: ");
 
         Wearable.getDataClient(this).removeListener(this);
         Wearable.getMessageClient(this).removeListener(this);
@@ -95,6 +102,7 @@ public class WearDataService extends Service implements
     public void onDataChanged(DataEventBuffer dataEvents) {
         Log.d(TAG, "onDataChanged: " + dataEvents);
 
+
         // Loop through the events and send a message back to the node that created the data item.
         for (DataEvent event : dataEvents) {
             Uri uri = event.getDataItem().getUri();
@@ -106,6 +114,8 @@ public class WearDataService extends Service implements
                 String nodeId = uri.getHost();
                 // Set the data of the message to be the bytes of the Uri.
                 byte[] payload = uri.toString().getBytes();
+
+                final WearActivity lastWearActivity = WearActivity.lastInstance;
 
                 // Send the rpc
                 // Instantiates clients without member variables, as clients are inexpensive to
@@ -120,8 +130,15 @@ public class WearDataService extends Service implements
                             public void onComplete(Task<Integer> task) {
                                 if (task.isSuccessful()) {
                                     Log.d(TAG, "Message sent successfully");
+                                    if (observer != null){
+                                        lastWearActivity.setButton("Sent !", R.color.green);
+                                    }else Log.w(TAG, "onComplete: NULL last");
+
                                 } else {
                                     Log.d(TAG, "Message failed.");
+                                    if (observer != null){
+                                        lastWearActivity.setButton("Failed", R.color.red);
+                                    }
                                 }
                             }
                         });
@@ -180,6 +197,8 @@ public class WearDataService extends Service implements
 //        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Constants.PHONE_PATH);
 //        DataMap dataMap = putDataMapRequest.getDataMap();
 //        dataMap.putAsset(Constants.KEY_DATASET, new DataItemAsset());
+
+
 
         Task<Integer> sendMessageTask =
                 Wearable.getMessageClient(this)

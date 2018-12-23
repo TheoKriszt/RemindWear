@@ -1,5 +1,7 @@
 package fr.kriszt.theo.remindwear;
 
+import android.content.ComponentName;
+import android.widget.Button;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -13,7 +15,6 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.service.autofill.Dataset;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
@@ -50,13 +51,7 @@ import fr.kriszt.theo.shared.SportType;
 import fr.kriszt.theo.shared.data.DataPoint;
 import fr.kriszt.theo.shared.data.DataSet;
 
-/**
- * Simple activité wearable
- * L'intent peut diriger vers certaines vues ou fragemnts
- *
- * Si ouvert depuis les applis mobiles :
- *     propose de commencer un exercice
- */
+
 public class WearActivity extends WearableActivity
     implements
         GoogleApiClient.ConnectionCallbacks,
@@ -64,6 +59,7 @@ public class WearActivity extends WearableActivity
         LocationListener
 {
 
+    public static WearActivity lastInstance;
     private boolean hasGPS = false;
     private boolean hasPodometer = false;
     private boolean hasCardiometer = false;
@@ -95,6 +91,10 @@ public class WearActivity extends WearableActivity
     @BindView(R.id.heartRateIcon)
     ImageView heartRateIcon;
 
+    @BindView(R.id.button)
+    Button button;
+
+
     private StepListener stepListener;
 
     // infos a afficher
@@ -114,11 +114,9 @@ public class WearActivity extends WearableActivity
 
     private SensorManager sensorManager;
 
-
     // Constantes parametres GPS
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 2000;
-    private static final int REQUEST_CHECK_SETTINGS = 100;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationCallback locationCallback;
@@ -141,6 +139,18 @@ public class WearActivity extends WearableActivity
 
     private SportType sportType = SportType.SPORT_WALK;
     private DataSet dataSet;
+
+    // Pour communiquer avec le WearDataService
+//    BroadcastManager mLocalBroadcastManager;
+//    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            if(intent.getAction().equals("com.durga.action.close")){
+//                finish();
+//            }
+//        }
+//    };
 
 
     private void updateValues() {
@@ -193,9 +203,12 @@ public class WearActivity extends WearableActivity
         }
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lastInstance = this;
 
         getSportType();
         setContentView(R.layout.activity_wear);
@@ -218,7 +231,6 @@ public class WearActivity extends WearableActivity
         layoutUpdater = new Handler();
         timeStatusChecker.run(); // démarrer le màj du layout
 
-//        Todo : check permisisons
         boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (!hasGPSPermission){
@@ -280,8 +292,6 @@ public class WearActivity extends WearableActivity
     }
 
 
-
-
     public void stopTracking(View view){
 
         // Envoyer l'info d'arrêt vers le telephone
@@ -289,16 +299,23 @@ public class WearActivity extends WearableActivity
         stopIntent.setAction(Constants.ACTION_END_TRACK);
         stopIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-//        stopIntent.putExtra(Constants.KEY_DATASET, dataSet);
+
         String json = dataSet.toJson();
-
-//        Log.w(TAG, "stopTracking: JSON\n" + json);
-
         stopIntent.putExtra(Constants.KEY_DATASET, json);
-//        stopIntent.putExtra("testData", new DataPoint(coordinates, stepsCount, heartRate, totalDistance));
-        this.startService(stopIntent);
+
+        ComponentName componentName = this.startService(stopIntent);
+
+        WearDataService.setObserver(this);
+        setButton("Sending ...", R.color.grey);
+//        button.setText("Sending ...");
+//        button.setBackgroundTintList(getResources().getColorStateList(R.color.grey));
     }
 
+    public void setButton(String msg, int color) {
+
+        button.setText(msg);
+        button.setBackgroundTintList(getResources().getColorStateList(color));
+    }
 
     private void createSensors() {
         // Essayer de trouver un moyen d'obtenir un capteur de pas
@@ -336,7 +353,6 @@ public class WearActivity extends WearableActivity
         }
 
     }
-
 
     public void askForGPSPermission() {
         // Requesting ACCESS_FINE_LOCATION using Dexter library
@@ -376,6 +392,7 @@ public class WearActivity extends WearableActivity
 
     @Override
     public void onConnected(Bundle bundle) {
+        Log.w(TAG, "onConnected: ");
         final LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL_IN_MILLISECONDS)
@@ -458,9 +475,6 @@ public class WearActivity extends WearableActivity
 
     }
 
-
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -473,5 +487,7 @@ public class WearActivity extends WearableActivity
             LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
         }
         mGoogleApiClient.disconnect();
+        lastInstance = null;
+
     }
 }
