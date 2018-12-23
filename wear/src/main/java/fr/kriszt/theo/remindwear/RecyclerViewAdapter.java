@@ -43,7 +43,7 @@ public class RecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
 
-                    Log.w("Recycler type sport", "onClick: sur " + name.getText());
+//                    Log.w("Recycler type sport", "onClick: sur " + name.getText());
 
                     Intent startIntent = new Intent(view.getContext(), WearActivity.class);
                     startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

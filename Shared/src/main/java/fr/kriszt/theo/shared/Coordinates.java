@@ -1,6 +1,7 @@
 package fr.kriszt.theo.shared;
 
 import android.location.Location;
+import android.location.LocationManager;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -9,19 +10,20 @@ public class Coordinates implements Serializable {
 
     private final double MS_TO_KMH = 3.6;
 
-    private Location location = null;
+    private transient Location location = null;
     private long timestamp;
     private double speed;
     private double lat;
     private double lng;
-    private double h;
+    private double altitude;
 
     private Coordinates(double lat, double lng, double alt, double speed_ms){
         this.lat = lat;
         this.lng = lng;
-        this.h = alt;
+        this.altitude = alt;
         timestamp = new Date().getTime(); //now
         speed = speed_ms;
+
     }
 
     public Coordinates(Location location) {
@@ -35,9 +37,9 @@ public class Coordinates implements Serializable {
     public double getLng() {return lng;}
     public void setLng(double lng) {this.lng = lng;}
 
-    public double getAltitude() {return h;}
+    public double getAltitude() {return altitude;}
 
-    public void setAltitude(double altitude) {this.h = altitude;}
+    public void setAltitude(double altitude) {this.altitude = altitude;}
 
     public double getSpeedkmh() {
         return MS_TO_KMH * speed;
@@ -52,6 +54,13 @@ public class Coordinates implements Serializable {
     }
 
     public float distanceTo(Coordinates coordinates) {
+        if (location == null){
+            location = new Location(LocationManager.GPS_PROVIDER);
+            location.setLatitude(lat);
+            location.setLongitude(lng);
+            location.setAltitude(getAltitude());
+            location.setSpeed((float) getSpeedMS());
+        }
         return location.distanceTo(coordinates.location);
     }
 }

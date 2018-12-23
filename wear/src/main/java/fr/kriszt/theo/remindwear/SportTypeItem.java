@@ -5,10 +5,11 @@ import android.graphics.drawable.Drawable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
 import fr.kriszt.theo.shared.SportType;
 
-class SportTypeItem {
+public class SportTypeItem implements Serializable{
 
     public String name;
     public Drawable icon;
@@ -23,12 +24,12 @@ class SportTypeItem {
 
 
         if (hasPodometer){
-            items.add(new SportTypeItem("Marche", c.getDrawable(R.drawable.ic_directions_walk)));
+            items.add(new SportTypeItem(SportType.SPORT_WALK.getName(), c.getDrawable(SportType.SPORT_WALK.getIcon())));
         }
 
         if (hasGPS){
-            items.add(new SportTypeItem("Course", c.getDrawable(R.drawable.ic_directions_run)));
-            items.add(new SportTypeItem(SportType.SPORT_BIKE.getName(), c.getDrawable(R.drawable.ic_directions_bike)));
+            items.add(new SportTypeItem(SportType.SPORT_RUN.getName(), c.getDrawable(SportType.SPORT_RUN.getIcon())));
+            items.add(new SportTypeItem(SportType.SPORT_BIKE.getName(), c.getDrawable(SportType.SPORT_BIKE.getIcon())));
         }
 
         return items;

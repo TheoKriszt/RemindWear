@@ -29,14 +29,18 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItemAsset;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.Collection;
@@ -45,6 +49,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import fr.kriszt.theo.shared.Constants;
+import fr.kriszt.theo.shared.data.DataSet;
 
 /** Listens to DataItems and Messages from the local node. */
 public class WearDataService extends Service implements
@@ -59,6 +64,7 @@ public class WearDataService extends Service implements
     public static final String COUNT_PATH = "/count";
     public static final String IMAGE_PATH = "/image";
     public static final String IMAGE_KEY = "photo";
+    private DataSet dataset;
 
 
     @Nullable
@@ -127,6 +133,7 @@ public class WearDataService extends Service implements
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.d(TAG, "onMessageReceived: " + messageEvent);
 
+
         // Check to see if the message is to start an activity
         if (messageEvent.getPath().equals(START_ACTIVITY_PATH)) {
             Intent startIntent = new Intent(this, ChooseSportActivity.class);
@@ -140,6 +147,18 @@ public class WearDataService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(Constants.ACTION_END_TRACK)){
             Log.w(TAG, "onStartCommand: Fin du tracking");
+
+            if (intent.getExtras() != null){
+                String payload =  intent.getExtras().get(Constants.KEY_DATASET).toString();
+                dataset = DataSet.fromJson(payload);
+
+
+                if (dataset != null) {
+                    Log.w(TAG, "onStartCommand: Dataset de taille " + dataset.size());
+                }else Log.w(TAG, "onStartCommand: DataSet is null");
+            } else Log.w(TAG, "onStartCommand: Pas d'extras");
+
+
 //            Log.w(TAG, "onStartCommand: Fin du tracking, " + DataLayerUtils.getNodes(getApplicationContext()).size() + " noeuds trouves");
 
             new StopDispatcher().execute();
@@ -150,10 +169,21 @@ public class WearDataService extends Service implements
 
 
     private void sendStopMessage(String nodeId){
+
+//        byte[] payload = "hello ?".getBytes();
+
+        byte[] payload = dataset.toString().getBytes();
+
+
+//        Task<Integer> sendDataset =
+//        DataClient dataClient = Wearable.getDataClient(this);
+//        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Constants.PHONE_PATH);
+//        DataMap dataMap = putDataMapRequest.getDataMap();
+//        dataMap.putAsset(Constants.KEY_DATASET, new DataItemAsset());
+
         Task<Integer> sendMessageTask =
                 Wearable.getMessageClient(this)
-                        .sendMessage(nodeId, Constants.PHONE_PATH, "hello ?".getBytes());
-        Log.w(TAG, "sendStopMessage: pending");
+                        .sendMessage(nodeId, Constants.PHONE_PATH, payload);
 
 
         sendMessageTask.addOnCompleteListener(
@@ -161,12 +191,16 @@ public class WearDataService extends Service implements
                     @Override
                     public void onComplete(Task<Integer> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "Message sent successfully");
+                            Log.w(TAG, "Message sent successfully");
+                            // TODO : fermer
                         } else {
-                            Log.d(TAG, "Message failed.");
+                            Log.w(TAG, "Message failed.");
+                            // TOdo : réessayer / msg d'erreur
                         }
                     }
                 });
+
+
     }
 
 

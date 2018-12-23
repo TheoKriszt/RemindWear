@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import fr.kriszt.theo.shared.Constants;
+import fr.kriszt.theo.shared.data.DataSet;
 
 /**
  * Created by T.Kriszt on 08/10/2018.
@@ -79,6 +80,12 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     public IBinder onBind(Intent intent) {
         Log.w(TAG, "onBind: ");
 
+        if (intent.getExtras() != null){
+            for (String k : intent.getExtras().keySet()){
+                Log.w(TAG, "Extra: " + k +  " --> " + intent.getExtras().get(k));
+            }
+        }else Log.w(TAG, "onBind: intent extra are null");
+
 
         Wearable.getDataClient(this).addListener(this);
         Wearable.getMessageClient(this).addListener(this);
@@ -116,6 +123,19 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.w(TAG, "onMessageReceived: " + messageEvent);
         Log.w(TAG, "onMessageReceived: " + new String(messageEvent.getData()) );
+
+        byte[] payload = messageEvent.getData();
+
+        String message = new String(payload);
+
+        Log.w(TAG, "PAYLOAD: \n" + message);
+
+        DataSet dataSet = DataSet.fromJson(message);
+
+        Log.w(TAG, "onMessageReceived: Recu" + dataSet);
+
+
+//        dataSet = payload;
         LOGD(
                 TAG,
                 "onMessageReceived() A message from watch was received:"

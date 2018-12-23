@@ -1,4 +1,4 @@
-package fr.kriszt.theo.shared;
+package fr.kriszt.theo.shared.data;
 
 import android.content.Context;
 import android.support.annotation.WorkerThread;

@@ -13,6 +13,7 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.service.autofill.Dataset;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
@@ -45,6 +46,9 @@ import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListener;
 import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerFactory;
 import fr.kriszt.theo.shared.Constants;
 import fr.kriszt.theo.shared.Coordinates;
+import fr.kriszt.theo.shared.SportType;
+import fr.kriszt.theo.shared.data.DataPoint;
+import fr.kriszt.theo.shared.data.DataSet;
 
 /**
  * Simple activité wearable
@@ -113,7 +117,7 @@ public class WearActivity extends WearableActivity
 
     // Constantes parametres GPS
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 2000;
     private static final int REQUEST_CHECK_SETTINGS = 100;
 
     private GoogleApiClient mGoogleApiClient;
@@ -135,6 +139,9 @@ public class WearActivity extends WearableActivity
         }
     };
 
+    private SportType sportType = SportType.SPORT_WALK;
+    private DataSet dataSet;
+
 
     private void updateValues() {
         if (coordinates == null) {
@@ -152,6 +159,11 @@ public class WearActivity extends WearableActivity
         if (hasPodometer){
             stepsCount = stepListener.getSteps();
         }
+
+        DataPoint dataPoint = new DataPoint(coordinates, stepsCount, heartRate, totalDistance);
+        dataSet.addPoint(dataPoint);
+
+
     }
 
     @SuppressLint("DefaultLocale")
@@ -173,13 +185,19 @@ public class WearActivity extends WearableActivity
         }
 
         if (hasCardiometer){
-            heartRateValue.setText(((heartRate > 0) ? heartRate : "???") + " " + heartRateUnit);
+
+            heartRateValue.setText(heartRate + " " + heartRateUnit);
+
+        } else {
+            heartRateValue.setText("??? " + heartRateUnit);
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getSportType();
         setContentView(R.layout.activity_wear);
         ButterKnife.bind(this);
 
@@ -193,6 +211,9 @@ public class WearActivity extends WearableActivity
         createSensors();
 
         hideMissingSensors();
+        hideUnusedSensors();
+
+        dataSet = new DataSet(sportType, hasPodometer, hasGPS, hasCardiometer);
 
         layoutUpdater = new Handler();
         timeStatusChecker.run(); // démarrer le màj du layout
@@ -204,10 +225,23 @@ public class WearActivity extends WearableActivity
             Log.w(TAG, "onCreate: Asking for GPS access");
             askForGPSPermission();
         }
-//        else {
-//            Log.i(TAG, "onCreate: GPS access granted");
-//            startLocationUpdates();
-//        }
+    }
+
+    private void getSportType() {
+        Intent createIntent = getIntent();
+        Bundle extras = createIntent.getExtras();
+
+        if (extras != null){
+            String intendedSport = extras.getString(Constants.KEY_SPORT_TYPE);
+            if (intendedSport != null){
+                for (SportType st : SportType.values()){
+                    if (st.getName().equals(intendedSport)){
+                        sportType = st;
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     private void hideMissingSensors() {
@@ -230,24 +264,38 @@ public class WearActivity extends WearableActivity
         }
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//
-////        if (resultCode == Activity.RESULT_OK) {
-////            if (requestCode == REQUEST_OAUTH_REQUEST_CODE) {
-////                Log.w(TAG, "onActivityResult: requestCode OK");
-////                subscribe();
-////            }else Log.w(TAG, "onActivityResult: Received code " + requestCode);
-////        }
-//    }
+    private void hideUnusedSensors(){
+        switch (sportType){
+            case SPORT_BIKE:
+                break;
+            case SPORT_RUN:
+                break;
+            case SPORT_WALK:
+                speedValue.setVisibility(View.INVISIBLE);
+                distanceValue.setVisibility(View.INVISIBLE);
+                distanceIcon.setVisibility(View.INVISIBLE);
+                speedIcon.setVisibility(View.INVISIBLE);
+                break;
+        }
+    }
+
 
 
 
     public void stopTracking(View view){
 
         // Envoyer l'info d'arrêt vers le telephone
-        Intent stopIntent = new Intent(this, WearDataService.class);
+        Intent stopIntent = new Intent(getApplicationContext(), WearDataService.class);
         stopIntent.setAction(Constants.ACTION_END_TRACK);
+        stopIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+//        stopIntent.putExtra(Constants.KEY_DATASET, dataSet);
+        String json = dataSet.toJson();
+
+        Log.w(TAG, "stopTracking: JSON\n" + json);
+
+        stopIntent.putExtra(Constants.KEY_DATASET, json);
+//        stopIntent.putExtra("testData", new DataPoint(coordinates, stepsCount, heartRate, totalDistance));
         this.startService(stopIntent);
     }
 
@@ -350,14 +398,17 @@ public class WearActivity extends WearableActivity
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 Location lastLocation = locationResult.getLastLocation();
+//                Log.w(TAG, "onLocationResult: " + locationResult);
                 lastCoordinates = coordinates;
                 coordinates = new Coordinates(lastLocation);
+                updateValues();
+                updateDisplay();
             }
 
             @Override
             public void onLocationAvailability(LocationAvailability locationAvailability) {
                 super.onLocationAvailability(locationAvailability);
-//                Log.w(TAG, "onLocationAvailability: " + locationAvailability);
+                Log.w(TAG, "onLocationAvailability: " + locationAvailability);
             }
         };
 

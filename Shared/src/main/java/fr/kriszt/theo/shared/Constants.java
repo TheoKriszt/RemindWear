@@ -14,6 +14,7 @@ public class Constants {
     public static final String KEY_CONTENT = "CONTENT";
     public static final String KEY_TITLE = "TITLE";
     public static final String KEY_SPORT_TYPE = "SPORT_TYPE";
+    public static final String KEY_DATASET = "DATASET";
     public static final int  BOTH_ID = 4;
     public static final int PHONE_ID = 3;
     public static final int  WEAR_ID = 2;
