@@ -172,7 +172,7 @@ public class WearDataService extends Service implements
 
 //        byte[] payload = "hello ?".getBytes();
 
-        byte[] payload = dataset.toString().getBytes();
+        byte[] payload = dataset.toJson().getBytes();
 
 
 //        Task<Integer> sendDataset =

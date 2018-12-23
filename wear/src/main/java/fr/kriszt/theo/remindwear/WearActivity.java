@@ -292,7 +292,7 @@ public class WearActivity extends WearableActivity
 //        stopIntent.putExtra(Constants.KEY_DATASET, dataSet);
         String json = dataSet.toJson();
 
-        Log.w(TAG, "stopTracking: JSON\n" + json);
+//        Log.w(TAG, "stopTracking: JSON\n" + json);
 
         stopIntent.putExtra(Constants.KEY_DATASET, json);
 //        stopIntent.putExtra("testData", new DataPoint(coordinates, stepsCount, heartRate, totalDistance));

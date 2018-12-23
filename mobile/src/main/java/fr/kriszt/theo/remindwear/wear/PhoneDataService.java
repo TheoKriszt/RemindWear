@@ -210,10 +210,6 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
         return results;
     }
 
-    public void initiateStopTracking(){
-        new StopTrackingDispatcher().execute();
-    }
-
     public void sendStopTrackMessage(String node){
 
         Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, new byte[0]);
@@ -248,20 +244,6 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
             return null;
         }
     }
-
-
-    // SAMPLE : pour trouver les capabilities des wearables connectés
-    // https://developer.android.com/training/wearables/data-layer/messages
-//    private static final String
-//            VOICE_TRANSCRIPTION_CAPABILITY_NAME = "voice_transcription";
-//    ...
-//    private void setupVoiceTranscription() {
-//        CapabilityInfo capabilityInfo = Tasks.await(
-//                Wearable.getCapabilityClient(context).getCapability(
-//                        VOICE_TRANSCRIPTION_CAPABILITY_NAME, CapabilityClient.FILTER_REACHABLE));
-//        // capabilityInfo has the reachable nodes with the transcription capability
-//        updateTranscriptionCapability(capabilityInfo);
-//    }
 
 
 
