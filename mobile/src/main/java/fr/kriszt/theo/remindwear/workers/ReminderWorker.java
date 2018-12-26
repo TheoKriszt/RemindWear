@@ -85,6 +85,7 @@ public class ReminderWorker extends Worker {
 //        remainingSeconds /= 10; // accélérer les tests
         Log.w(TAG, "scheduleWorker: la tâche "+ task.getName() + " commencera dans " + remainingSeconds + " secondes");
 
+
         Data inputData = new Data.Builder().putInt(TASK_ID_KEY, task.getID()).build();
         OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(ReminderWorker.class)
                 .setInitialDelay(remainingSeconds, TimeUnit.SECONDS)
@@ -97,29 +98,12 @@ public class ReminderWorker extends Worker {
         task.setWorkID(work.getId());
     }
 
-//    public static LiveData<WorkStatus> getWorkStatus(Task task){
-//        UUID workId = task.getWorkID();
-//        LiveData<WorkStatus> workStatusLiveData = WorkManager.getInstance().getStatusById( workId );
-//        return workStatusLiveData;
-//    }
-
     private static String getCategoryTag(Category category){
 
         String categoryTag = category == null ? CATEGORY_NONE_TAG : category.getName();
         return workTag + "_" + categoryTag;
     }
 
-    /**
-     * Annule toutes les plannifications appartenant à la catégorie donnée
-     * @return targetsNumber le nombre d'executions déplanifiées
-     */
-//    public static int unScheduleCategory(@NonNull Category category){
-//        String categoryTag = getCategoryTag(category);
-//
-//        int targetsNumber = WorkManager.getInstance().getStatusesByTag(categoryTag).getValue().size();
-//        WorkManager.getInstance().cancelAllWorkByTag(categoryTag);
-//        return targetsNumber;
-//    }
 
     public static void unScheduleAll(){
         WorkManager.getInstance().cancelAllWork();

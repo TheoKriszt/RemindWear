@@ -1,6 +1,5 @@
 package fr.kriszt.theo.remindwear.sensingStrategies;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;

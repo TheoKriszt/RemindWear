@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
-import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -22,6 +22,8 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +45,8 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     private static final String START_ACTIVITY_PATH = "/start-activity";
 
+    private int taskId;
+
 
     @Override
     public void onCreate() {
@@ -52,10 +56,19 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        if (intent == null){
+            Log.e(TAG, "onStartCommand: intent is null, WTF ??");
+            return super.onStartCommand(intent, flags, startId);
+        }
         Log.w(TAG, "PhoneDataService :: onStartCommand: " + intent.getAction());
+
         if (intent.getAction().equals(Constants.ACTION_LAUNCH_WEAR_APP)){
+            int taskId = intent.getExtras().getInt(Constants.KEY_TASK_ID);
+            this.taskId = taskId;
+
             Log.w(TAG, "onStartCommand: action " + Constants.ACTION_LAUNCH_WEAR_APP);
-            onStartWearableActivityClick(null);
+//            onStartWearableActivityClick(null);
+            new StartWearableActivityTask().execute();
 //
 //            Set<String> extraKeys = intent.getExtras().keySet();
 //
@@ -65,7 +78,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 //                Log.w(TAG, "key : " + k + ", value : " + intent.getExtras().get(k));
 //            }
 
-            int taskId = intent.getExtras().getInt(Constants.KEY_TASK_ID);
+
 
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
             notificationManager.cancel(taskId);
@@ -80,11 +93,11 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     public IBinder onBind(Intent intent) {
         Log.w(TAG, "onBind: ");
 
-        if (intent.getExtras() != null){
-            for (String k : intent.getExtras().keySet()){
-                Log.w(TAG, "Extra: " + k +  " --> " + intent.getExtras().get(k));
-            }
-        }else Log.w(TAG, "onBind: intent extra are null");
+//        if (intent.getExtras() != null){
+//            for (String k : intent.getExtras().keySet()){
+//                Log.w(TAG, "Extra: " + k +  " --> " + intent.getExtras().get(k));
+//            }
+//        }else Log.w(TAG, "onBind: intent extra are null");
 
 
         Wearable.getDataClient(this).addListener(this);
@@ -106,7 +119,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        LOGD(TAG, "onDataChanged: " + dataEvents);
+        LOGD("onDataChanged: " + dataEvents);
 
         for (DataEvent event : dataEvents) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
@@ -127,59 +140,56 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
         byte[] payload = messageEvent.getData();
 
         String message = new String(payload);
-
-//        Log.w(TAG, "PAYLOAD: \n" + message);
-
         DataSet dataSet = DataSet.fromJson(message);
 
         Log.w(TAG, "onMessageReceived: Recu" + dataSet);
 
-
-//        dataSet = payload;
         LOGD(
-                TAG,
                 "onMessageReceived() A message from watch was received:"
                         + messageEvent.getRequestId()
                         + " "
                         + messageEvent.getPath());
 
 //        mDataItemListAdapter.add(new Event("Message from watch", messageEvent.toString()));
+
     }
 
     @Override
     public void onCapabilityChanged(final CapabilityInfo capabilityInfo) {
-        LOGD(TAG, "onCapabilityChanged: " + capabilityInfo);
+        LOGD("onCapabilityChanged: " + capabilityInfo);
 
 //        mDataItemListAdapter.add(new Event("onCapabilityChanged", capabilityInfo.toString()));
     }
 
-    /** Sends an RPC to start a fullscreen Activity on the wearable. */
-    public void onStartWearableActivityClick(View view) {
-        LOGD(TAG, "Generating RPC");
-        Log.w(TAG, "onStartWearableActivityClick: ");
-
-        // Trigger an AsyncTask that will query for a list of connected nodes and send a
-        // "start-activity" message to each connected node.
-        new StartWearableActivityTask().execute();
-    }
+//    /** Sends an RPC to start a fullscreen Activity on the wearable. */
+//    public void onStartWearableActivityClick(View view) {
+//        LOGD(TAG, "Generating RPC");
+//        Log.w(TAG, "onStartWearableActivityClick: ");
+//
+//        // Trigger an AsyncTask that will query for a list of connected nodes and send a
+//        // "start-activity" message to each connected node.
+//        new StartWearableActivityTask().execute();
+//    }
 
     @WorkerThread
     private void sendStartActivityMessage(String node) {
 
+
+//        byte[] taskIdPayload = ByteBuffer.allocate(4).putInt(taskId).array(); // taskId, en byte[]
+        byte[] taskIdPayload = BigInteger.valueOf(taskId).toByteArray();
+
         Task<Integer> sendMessageTask =
-                Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, new byte[0]);
+                Wearable.getMessageClient(this)
+                        .sendMessage(node, START_ACTIVITY_PATH, taskIdPayload);
 
         try {
             // Block on a task and get the result synchronously (because this is on a background
             // thread).
             Integer result = Tasks.await(sendMessageTask);
-            LOGD(TAG, "Message sent: " + result);
+            LOGD("Message sent: " + result);
 
-        } catch (ExecutionException exception) {
+        } catch (ExecutionException | InterruptedException exception) {
             Log.e(TAG, "Task failed: " + exception);
-
-        } catch (InterruptedException exception) {
-            Log.e(TAG, "Interrupt occurred: " + exception);
         }
     }
 
@@ -191,22 +201,19 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
                 Wearable.getNodeClient(getApplicationContext()).getConnectedNodes();
 
         try {
-            // Block on a task and get the result synchronously (because this is on a background
-            // thread).
             List<Node> nodes = Tasks.await(nodeListTask);
 
             for (Node node : nodes) {
                 results.add(node.getId());
             }
 
-        } catch (ExecutionException exception) {
+        } catch (ExecutionException | InterruptedException exception) {
             Log.e(TAG, "Task failed: " + exception);
 
-        } catch (InterruptedException exception) {
-            Log.e(TAG, "Interrupt occurred: " + exception);
         }
 
         Log.w(TAG, "getNodes: " + results.size() + " nodes found");
+
         return results;
     }
 
@@ -216,9 +223,9 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     }
 
     /** As simple wrapper around Log.d */
-    private static void LOGD(final String tag, String message) {
-        if (Log.isLoggable(tag, Log.DEBUG)) {
-            Log.d(tag, message);
+    private static void LOGD(String message) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, message);
         }
     }
 
@@ -227,9 +234,14 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
         @Override
         protected Void doInBackground(Void... args) {
             Collection<String> nodes = getNodes();
-            for (String node : nodes) {
-                sendStartActivityMessage(node);
+
+            if (nodes.size() > 0) {
+                for (String node : nodes) {
+                    sendStartActivityMessage(node);
+                }
+            } else {
             }
+            Toast.makeText(PhoneDataService.this, nodes.size() + " nodes found", Toast.LENGTH_SHORT).show();
             return null;
         }
     }

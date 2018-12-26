@@ -55,8 +55,7 @@ import fr.kriszt.theo.shared.data.DataSet;
 public class WearDataService extends Service implements
         DataClient.OnDataChangedListener,
         MessageClient.OnMessageReceivedListener,
-        CapabilityClient.OnCapabilityChangedListener,
-BmService{
+        CapabilityClient.OnCapabilityChangedListener {
 
     private static final String TAG = "DataLayerService";
 
@@ -132,6 +131,7 @@ BmService{
                                     Log.d(TAG, "Message sent successfully");
                                     if (observer != null){
                                         lastWearActivity.setButton("Sent !", R.color.green);
+                                        WearActivity.lastInstance.setButton("Sent ! ", R.color.green);
                                     }else Log.w(TAG, "onComplete: NULL last");
 
                                 } else {

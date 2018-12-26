@@ -1,7 +1,5 @@
 package fr.kriszt.theo.remindwear;
 
-import android.content.ComponentName;
-import android.widget.Button;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -20,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -139,6 +138,9 @@ public class WearActivity extends WearableActivity
 
     private SportType sportType = SportType.SPORT_WALK;
     private DataSet dataSet;
+    private boolean GPShasFix = false;
+    private Sensor  heartRateSensor;
+    private SensorEventListener heartRateSensorListener;
 
     // Pour communiquer avec le WearDataService
 //    BroadcastManager mLocalBroadcastManager;
@@ -160,11 +162,12 @@ public class WearActivity extends WearableActivity
             currentSpeed = (float) coordinates.getSpeedkmh();
         }
 
-        if (hasGPS){
-            if (lastCoordinates != null && coordinates != null){
+        if (hasGPS && GPShasFix){
+            if (lastCoordinates != null && coordinates != null && !coordinates.equals(lastCoordinates)){
                 totalDistance += lastCoordinates.distanceTo(coordinates) / 1000; // en km
+                lastCoordinates = null;
             }
-        }
+        } else coordinates = null;
 
         if (hasPodometer){
             stepsCount = stepListener.getSteps();
@@ -231,12 +234,14 @@ public class WearActivity extends WearableActivity
         layoutUpdater = new Handler();
         timeStatusChecker.run(); // démarrer le màj du layout
 
-        boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        askForGPSPermission();
 
-        if (!hasGPSPermission){
-            Log.w(TAG, "onCreate: Asking for GPS access");
-            askForGPSPermission();
-        }
+//        boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
+//
+//        if (!hasGPSPermission){
+//            Log.w(TAG, "onCreate: Asking for GPS access");
+//            askForGPSPermission();
+//        }
     }
 
     private void getSportType() {
@@ -294,6 +299,9 @@ public class WearActivity extends WearableActivity
 
     public void stopTracking(View view){
 
+        disableDisplayUpdate();
+        disableSensors();
+
         // Envoyer l'info d'arrêt vers le telephone
         Intent stopIntent = new Intent(getApplicationContext(), WearDataService.class);
         stopIntent.setAction(Constants.ACTION_END_TRACK);
@@ -303,7 +311,8 @@ public class WearActivity extends WearableActivity
         String json = dataSet.toJson();
         stopIntent.putExtra(Constants.KEY_DATASET, json);
 
-        ComponentName componentName = this.startService(stopIntent);
+//        ComponentName componentName = this.startService(stopIntent);
+
 
         WearDataService.setObserver(this);
         setButton("Sending ...", R.color.grey);
@@ -314,7 +323,8 @@ public class WearActivity extends WearableActivity
     public void setButton(String msg, int color) {
 
         button.setText(msg);
-        button.setBackgroundTintList(getResources().getColorStateList(color));
+//        button.setBackgroundColor(getResources().getColor(R.color.green));
+        button.setBackgroundTintList(getResources().getColorStateList(color, null));
     }
 
     private void createSensors() {
@@ -331,30 +341,40 @@ public class WearActivity extends WearableActivity
         hasCardiometer = getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE);
 
         if (hasCardiometer){
-
-            final Sensor heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-
-            sensorManager.registerListener(new SensorEventListener() {
-                @Override
-                public void onSensorChanged(SensorEvent sensorEvent) {
-                    if (sensorEvent.accuracy > SensorManager.SENSOR_STATUS_UNRELIABLE){
-                        heartRate = (int) sensorEvent.values[0];
-                    }else heartRate = -1;
-
-
-
-                }
-
-                @Override
-                public void onAccuracyChanged(Sensor sensor, int i) {
-
-                }
-            }, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            registerCardiometer();
         }
 
     }
 
+    private void registerCardiometer() {
+        this.heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+
+        this.heartRateSensorListener = new SensorEventListener()
+        {
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                if (sensorEvent.accuracy > SensorManager.SENSOR_STATUS_UNRELIABLE){
+                    heartRate = (int) sensorEvent.values[0];
+                }else heartRate = -1;
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
+
+        sensorManager.registerListener(this.heartRateSensorListener, this.heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
     public void askForGPSPermission() {
+
+        boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (hasGPSPermission){
+            Log.w(TAG, "GPS permission already granted");
+            return;
+        }
         // Requesting ACCESS_FINE_LOCATION using Dexter library
         Dexter.withActivity(this)
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -385,9 +405,6 @@ public class WearActivity extends WearableActivity
     public void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
-//        if (mRequestingLocationUpdates && SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-//            startLocationUpdates();
-//        }
     }
 
     @Override
@@ -418,14 +435,20 @@ public class WearActivity extends WearableActivity
 //                Log.w(TAG, "onLocationResult: " + locationResult);
                 lastCoordinates = coordinates;
                 coordinates = new Coordinates(lastLocation);
-                updateValues();
-                updateDisplay();
+                Log.w(TAG, "onLocationResult: " + coordinates.getLat() + "; "+coordinates.getLng());
+
+//                if (GPShasFix){
+//                    updateValues();
+//                    updateDisplay();
+//                }
+
             }
 
             @Override
             public void onLocationAvailability(LocationAvailability locationAvailability) {
                 super.onLocationAvailability(locationAvailability);
                 Log.w(TAG, "onLocationAvailability: " + locationAvailability);
+                GPShasFix = locationAvailability.isLocationAvailable();
             }
         };
 
@@ -475,19 +498,27 @@ public class WearActivity extends WearableActivity
 
     }
 
+    private void disableSensors(){
+        stepListener.unregisterSensor(); // Capteur de pas
+
+        sensorManager.registerListener(heartRateSensorListener, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        if (mGoogleApiClient.isConnected()) { // GPS
+            LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
+        }
+        mGoogleApiClient.disconnect();
+    }
+
+    private void disableDisplayUpdate(){
+        layoutUpdater.removeCallbacks(timeStatusChecker);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy: ");
-        layoutUpdater.removeCallbacks(timeStatusChecker);
-        // TODO :  unregister listeners
-        stepListener.unregisterSensor(); // Capteur de pas
-//        stopLocationUpdates(); // Position GPS
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
-        }
-        mGoogleApiClient.disconnect();
+        disableDisplayUpdate();
+        disableSensors();
         lastInstance = null;
-
     }
 }

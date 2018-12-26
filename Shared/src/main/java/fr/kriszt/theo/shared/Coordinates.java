@@ -2,12 +2,14 @@ package fr.kriszt.theo.shared;
 
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.Date;
 
 public class Coordinates implements Serializable {
 
+    private static final String TAG = "Coordinates";
     private final double MS_TO_KMH = 3.6;
 
     private transient Location location = null;
@@ -61,6 +63,17 @@ public class Coordinates implements Serializable {
             location.setAltitude(getAltitude());
             location.setSpeed((float) getSpeedMS());
         }
+
         return location.distanceTo(coordinates.location);
+    }
+
+    @Override
+    public String toString(){
+        return "Lat="+lat+", Lon="+lng+", speed="+getSpeedkmh();
+    }
+
+    @Override
+    public boolean equals(Object o){
+        return o instanceof Coordinates && ((Coordinates) o).lat == lat && ((Coordinates) o).lng == lng;
     }
 }

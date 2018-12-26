@@ -87,7 +87,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         time_picker_hour = findViewById(R.id.time_picker_hour);
         time_picker_hour.setMinValue(0);
         time_picker_hour.setMaxValue(23);
-        time_picker_hour.setValue(forTimePicker.get(Calendar.HOUR));
+        time_picker_hour.setValue(forTimePicker.get(Calendar.HOUR_OF_DAY));
 
         time_picker_min = findViewById(R.id.time_picker_min);
         time_picker_min.setMinValue(0);

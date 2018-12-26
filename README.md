@@ -11,6 +11,7 @@
 
 -----------------
 ## TODO :
+[ ] Relire le sujet et vérifier que tous les points ont été traités
 [ ] Ajout de tâches à la voix
 [ ] Transfert des données vers le mobile
 [ ] Affichage des données (suivi sportif), côté téléphone
