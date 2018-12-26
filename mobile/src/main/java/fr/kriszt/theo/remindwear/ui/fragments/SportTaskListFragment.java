@@ -16,13 +16,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
+import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.shared.SportType;
+import fr.kriszt.theo.shared.data.DataSet;
 
 
 public class SportTaskListFragment extends Fragment {
@@ -67,7 +71,15 @@ public class SportTaskListFragment extends Fragment {
         //TODO REMOVE
         tasker.unserializeLists();
         if(Tasker.getInstance(getContext()).getListSportTasks().size() <= 0){
-            SportTask s = new SportTask("e","d", new Category("n", 0, 0),
+            Category sport = Tasker.getInstance(getContext()).getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
+            Calendar calendar = new GregorianCalendar();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            Task referer = new Task("Tâche de test", "Une petite description", sport, calendar, 0, hour, minute);
+            DataSet dataSet = new DataSet(SportType.SPORT_BIKE, true, true, true);
+
+
+            SportTask s = new SportTask("Test","Desc. de test", sport,
                     new GregorianCalendar(), 30,23, 12, new Boolean[]{},
                     50, 60, 364, 4005);
             Tasker.getInstance(getContext()).addSportTask(s);

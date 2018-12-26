@@ -102,7 +102,8 @@ public class RemindNotification {
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setColor(task.getCategory().getColor())
 //                        .setColor(context.getResources().getColor(R.color.colorPrimaryDark))
-                        .setStyle( bigText );
+                        .setStyle( bigText )
+                        .setVibrate(new long[] { 200, 200, 200, 200, 200 });
 //                        .setStyle( new NotificationCompat.BigTextStyle().bigText(bigText));
 
 

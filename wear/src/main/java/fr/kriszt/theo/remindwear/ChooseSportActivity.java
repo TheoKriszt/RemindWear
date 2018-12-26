@@ -13,6 +13,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fr.kriszt.theo.remindwear.sensingStrategies.SensorUtils;
+import fr.kriszt.theo.shared.Constants;
 
 public class ChooseSportActivity extends WearableActivity  {
 
@@ -31,6 +32,16 @@ public class ChooseSportActivity extends WearableActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Integer taskId = null;
+
+        if (getIntent().getExtras() != null &&
+                getIntent().getExtras().getString(Constants.KEY_TASK_ID) != null ){
+            taskId = Integer.parseInt(getIntent().getExtras().getString(Constants.KEY_TASK_ID));
+        }
+
+        Log.w(TAG, "onCreate: TaskId = " + taskId);
+
         setContentView(R.layout.activity_choose_sport);
         ButterKnife.bind(this);
 
@@ -49,41 +60,15 @@ public class ChooseSportActivity extends WearableActivity  {
 
         myDataSet.addAll(SportTypeItem.getAvailableSportTypes(this, hasGPS, hasPodo, hasCardio));
 
-        mAdapter = new RecyclerViewAdapter(myDataSet, this);
+        mAdapter = new RecyclerViewAdapter(myDataSet, this, taskId);
         mWearableRecyclerView.setAdapter(mAdapter);
-
-
-
     }
-
-//    @Override
-//    public void onLayoutFinished(View child, RecyclerView parent) {
-//
-//        // Figure out % progress from top to bottom
-//        float centerOffset = ((float) child.getHeight() / 2.0f) / (float) parent.getHeight();
-//        float yRelativeToCenterOffset = (child.getY() / parent.getHeight()) + centerOffset;
-//
-//        // Normalize for center
-//        mProgressToCenter = Math.abs(0.5f - yRelativeToCenterOffset);
-//        // Adjust to the maximum scale
-//        mProgressToCenter = Math.min(mProgressToCenter, MAX_ICON_PROGRESS);
-//
-//        child.setScaleX(1 - mProgressToCenter);
-//        child.setScaleY(1 - mProgressToCenter);
-//    }
-
-
-
 
     @Override
     public void onResume() {
         super.onResume();
 
     }
-
-
-
-
 
     @Override
     public void onDestroy() {

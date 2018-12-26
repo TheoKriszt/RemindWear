@@ -1,5 +1,7 @@
 package fr.kriszt.theo.shared.data;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 import java.util.Date;
@@ -10,10 +12,12 @@ import fr.kriszt.theo.shared.SportType;
 
 public class DataSet implements Serializable {
 
+    private static final String TAG = DataSet.class.getSimpleName();
     private final boolean hasPodometer;
     private final boolean hasCardiometer;
     private final boolean hasGPS;
     private final SportType sportType;
+    private Integer taskId = null;
 
     private HashMap<Long, DataPoint> dataPoints = new HashMap<>();
 
@@ -22,6 +26,13 @@ public class DataSet implements Serializable {
         this.hasPodometer = hasPodometer;
         this.hasCardiometer = hasCardiometer;
         this.hasGPS = hasGPS;
+    }
+
+    public DataSet(SportType sportType, boolean hasPodometer, boolean hasGPS, boolean hasCardiometer, String taskId) {
+        this(sportType, hasPodometer, hasGPS, hasCardiometer);
+        if (taskId != null){
+            this.taskId = Integer.parseInt(taskId);
+        }else Log.w(TAG, "DataSet: impossible de parser un ID de tâche nulle !");
     }
 
     public HashMap<Long, DataPoint> getPoints(){
@@ -48,7 +59,10 @@ public class DataSet implements Serializable {
 
     @Override
     public String toString(){
-        String res = "DataSet ("+ sportType+") : [" + size() + " dataPoints] podo="+hasPodometer+", cardio="+hasCardiometer+", GPS="+hasGPS;
+        String res = "DataSet";
+        res+= taskId == null ? "" : " for task ID="+taskId;
+
+        res += " ("+ sportType+") : [" + size() + " dataPoints] podo="+hasPodometer+", cardio="+hasCardiometer+", GPS="+hasGPS;
 
 
         return res;

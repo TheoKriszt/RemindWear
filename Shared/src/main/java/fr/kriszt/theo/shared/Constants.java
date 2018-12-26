@@ -22,6 +22,7 @@ public class Constants {
     public static final String BOTH_PATH = "/both";
     public static final String PHONE_PATH = "/phone";
     public static final String WEAR_PATH = "/watch";
+    public static final String START_ACTIVITY_PATH = "/start-activity";
     public static final String ACTION_UPDATE_UI = "fr.kriszt.theo.updateui";
 
     private Constants() {};

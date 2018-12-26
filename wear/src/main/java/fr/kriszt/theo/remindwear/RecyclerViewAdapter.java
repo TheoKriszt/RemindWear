@@ -22,16 +22,19 @@ public class RecyclerViewAdapter
         extends WearableRecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private final Context context;
+    private final Integer taskId;
     private List<SportTypeItem> mListSportTypes;
 
-    public RecyclerViewAdapter(List<SportTypeItem> mListSportTypes,  Context c) {
+    public RecyclerViewAdapter(List<SportTypeItem> mListSportTypes, Context c, Integer taskId) {
         this.mListSportTypes = mListSportTypes;
 
         this.context = c;
 
+        this.taskId = taskId;
+
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         private TextView name;
         private ImageView icon;
 
@@ -43,11 +46,12 @@ public class RecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
 
-//                    Log.w("Recycler type sport", "onClick: sur " + name.getText());
+                    Log.w("RecyclerView on clic", "Task ID = " + RecyclerViewAdapter.this.taskId);
 
                     Intent startIntent = new Intent(view.getContext(), WearActivity.class);
                     startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startIntent.putExtra(Constants.KEY_SPORT_TYPE, name.getText().toString());
+                    startIntent.putExtra(Constants.KEY_TASK_ID, RecyclerViewAdapter.this.taskId);
 
                     view.getContext().startActivity(startIntent);
                 }

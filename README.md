@@ -13,11 +13,11 @@
 ## TODO :
 [ ] Relire le sujet et vérifier que tous les points ont été traités
 [ ] Ajout de tâches à la voix
-[ ] Transfert des données vers le mobile
+[x] Transfert des données vers le mobile
 [ ] Affichage des données (suivi sportif), côté téléphone
-[ ] Selection du type de sport
+[x] Selection du type de sport
 
 ### Tests à faire
-[ ] Tester l'affichage de la montre sur vraie Wear, virer les background bleus
+[] Tester l'affichage de la montre sur vraie Wear
 [ ] Vérifier le podomètre "classique" sur une vraie montre
 

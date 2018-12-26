@@ -43,7 +43,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     private static final String TAG = "PhoneDataService";
 
-    private static final String START_ACTIVITY_PATH = "/start-activity";
+//    private static final String START_ACTIVITY_PATH = "/start-activity";
 
     private int taskId;
 
@@ -93,13 +93,6 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     public IBinder onBind(Intent intent) {
         Log.w(TAG, "onBind: ");
 
-//        if (intent.getExtras() != null){
-//            for (String k : intent.getExtras().keySet()){
-//                Log.w(TAG, "Extra: " + k +  " --> " + intent.getExtras().get(k));
-//            }
-//        }else Log.w(TAG, "onBind: intent extra are null");
-
-
         Wearable.getDataClient(this).addListener(this);
         Wearable.getMessageClient(this).addListener(this);
         Wearable.getCapabilityClient(this)
@@ -119,30 +112,30 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        LOGD("onDataChanged: " + dataEvents);
-
-        for (DataEvent event : dataEvents) {
-            if (event.getType() == DataEvent.TYPE_CHANGED) {
-//                mDataItemListAdapter.add(
-//                        new Event("DataItem Changed", event.getDataItem().toString()));
-            } else if (event.getType() == DataEvent.TYPE_DELETED) {
-//                mDataItemListAdapter.add(
-//                        new Event("DataItem Deleted", event.getDataItem().toString()));
-            }
-        }
+//        LOGD("onDataChanged: " + dataEvents);
+//
+//        for (DataEvent event : dataEvents) {
+//            if (event.getType() == DataEvent.TYPE_CHANGED) {
+////                mDataItemListAdapter.add(
+////                        new Event("DataItem Changed", event.getDataItem().toString()));
+//            } else if (event.getType() == DataEvent.TYPE_DELETED) {
+////                mDataItemListAdapter.add(
+////                        new Event("DataItem Deleted", event.getDataItem().toString()));
+//            }
+//        }
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        Log.w(TAG, "onMessageReceived: " + messageEvent);
-        Log.w(TAG, "onMessageReceived: " + new String(messageEvent.getData()) );
+//        Log.w(TAG, "onMessageReceived: " + messageEvent);
+//        Log.w(TAG, "onMessageReceived: " + new String(messageEvent.getData()) );
 
         byte[] payload = messageEvent.getData();
 
         String message = new String(payload);
         DataSet dataSet = DataSet.fromJson(message);
 
-        Log.w(TAG, "onMessageReceived: Recu" + dataSet);
+        Log.w(TAG, "onMessageReceived: Recu " + dataSet);
 
         LOGD(
                 "onMessageReceived() A message from watch was received:"
@@ -158,29 +151,22 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     public void onCapabilityChanged(final CapabilityInfo capabilityInfo) {
         LOGD("onCapabilityChanged: " + capabilityInfo);
 
-//        mDataItemListAdapter.add(new Event("onCapabilityChanged", capabilityInfo.toString()));
     }
 
-//    /** Sends an RPC to start a fullscreen Activity on the wearable. */
-//    public void onStartWearableActivityClick(View view) {
-//        LOGD(TAG, "Generating RPC");
-//        Log.w(TAG, "onStartWearableActivityClick: ");
-//
-//        // Trigger an AsyncTask that will query for a list of connected nodes and send a
-//        // "start-activity" message to each connected node.
-//        new StartWearableActivityTask().execute();
-//    }
 
     @WorkerThread
     private void sendStartActivityMessage(String node) {
 
 
 //        byte[] taskIdPayload = ByteBuffer.allocate(4).putInt(taskId).array(); // taskId, en byte[]
-        byte[] taskIdPayload = BigInteger.valueOf(taskId).toByteArray();
+//        byte[] taskIdPayload = BigInteger.valueOf(taskId).toByteArray();
+        byte[] taskIdPayload = (taskId+"").getBytes();
+
+        Log.w(TAG, "sendStartActivityMessage: Task Id is " + taskId);
 
         Task<Integer> sendMessageTask =
                 Wearable.getMessageClient(this)
-                        .sendMessage(node, START_ACTIVITY_PATH, taskIdPayload);
+                        .sendMessage(node, Constants.START_ACTIVITY_PATH, taskIdPayload);
 
         try {
             // Block on a task and get the result synchronously (because this is on a background
@@ -219,7 +205,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     public void sendStopTrackMessage(String node){
 
-        Wearable.getMessageClient(this).sendMessage(node, START_ACTIVITY_PATH, new byte[0]);
+        Wearable.getMessageClient(this).sendMessage(node, Constants.START_ACTIVITY_PATH, new byte[0]);
     }
 
     /** As simple wrapper around Log.d */
@@ -239,23 +225,21 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
                 for (String node : nodes) {
                     sendStartActivityMessage(node);
                 }
-            } else {
-            }
-            Toast.makeText(PhoneDataService.this, nodes.size() + " nodes found", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-    }
-
-    private class StopTrackingDispatcher extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... args) {
-            for (String node : getNodes()) {
-                sendStopTrackMessage(node);
             }
             return null;
         }
     }
+
+//    private class StopTrackingDispatcher extends AsyncTask<Void, Void, Void> {
+//
+//        @Override
+//        protected Void doInBackground(Void... args) {
+//            for (String node : getNodes()) {
+//                sendStopTrackMessage(node);
+//            }
+//            return null;
+//        }
+//    }
 
 
 
