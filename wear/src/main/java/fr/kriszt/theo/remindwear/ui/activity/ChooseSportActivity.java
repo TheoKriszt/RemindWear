@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear;
+package fr.kriszt.theo.remindwear.ui.activity;
 
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -12,7 +12,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import fr.kriszt.theo.remindwear.sensingStrategies.SensorUtils;
+import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.sensors.SensorUtils;
+import fr.kriszt.theo.remindwear.ui.RecyclerViewAdapter;
+import fr.kriszt.theo.remindwear.ui.SportTypeItem;
 import fr.kriszt.theo.shared.Constants;
 
 public class ChooseSportActivity extends WearableActivity  {
@@ -26,7 +29,7 @@ public class ChooseSportActivity extends WearableActivity  {
     private SensorManager sensorManager;
 
     @BindView(R.id.recycler_launcher_view)
-    WearableRecyclerView mWearableRecyclerView;
+    public WearableRecyclerView mWearableRecyclerView;
 
 
     @Override

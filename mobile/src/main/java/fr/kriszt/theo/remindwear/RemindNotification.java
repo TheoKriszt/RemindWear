@@ -13,8 +13,9 @@ import android.text.Html;
 
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.remindwear.ui.activities.TasksActivity;
 import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
-import fr.kriszt.theo.remindwear.wear.PhoneDataService;
+import fr.kriszt.theo.remindwear.data.PhoneDataService;
 import fr.kriszt.theo.remindwear.workers.SchedulerService;
 import fr.kriszt.theo.shared.Constants;
 
@@ -30,7 +31,7 @@ public class RemindNotification {
 
     public RemindNotification(Task task, Context c){
         title = task.getName();
-        content = "Commence à " + task.getTimeHour() + "h" + task.getTimeMinutes();
+        content = String.format("Commence à %02dh%02d", task.getTimeHour(), task.getTimeMinutes());
         taskId = task.getID();
         context = c;
 //        bigText = "Rappel : " + task.getName() + " à " + task.getTimeHour() + "h" + task.getTimeMinutes()

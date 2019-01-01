@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear.wear;
+package fr.kriszt.theo.remindwear.data;
 
 import android.app.NotificationManager;
 import android.app.Service;
@@ -8,29 +8,31 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.DataClient;
-import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import fr.kriszt.theo.remindwear.tasker.Category;
+import fr.kriszt.theo.remindwear.tasker.SportTask;
+import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.shared.Constants;
-import fr.kriszt.theo.shared.data.DataSet;
+import fr.kriszt.theo.shared.data.SportDataPoint;
+import fr.kriszt.theo.shared.data.SportDataSet;
 
 /**
  * Created by T.Kriszt on 08/10/2018.
@@ -58,30 +60,29 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
         if (intent == null){
             Log.e(TAG, "onStartCommand: intent is null, WTF ??");
-            return super.onStartCommand(intent, flags, startId);
+            return super.onStartCommand(null, flags, startId);
         }
-        Log.w(TAG, "PhoneDataService :: onStartCommand: " + intent.getAction());
+//        Log.w(TAG, "PhoneDataService :: onStartCommand: " + intent.getAction());
 
         if (intent.getAction().equals(Constants.ACTION_LAUNCH_WEAR_APP)){
-            int taskId = intent.getExtras().getInt(Constants.KEY_TASK_ID);
-            this.taskId = taskId;
+            int refererId = intent.getExtras().getInt(Constants.KEY_TASK_ID); // ID de la tâche d'origine
+            Tasker tasker = Tasker.getInstance(getApplicationContext());
 
-            Log.w(TAG, "onStartCommand: action " + Constants.ACTION_LAUNCH_WEAR_APP);
-//            onStartWearableActivityClick(null);
+            tasker.unserializeLists();
+            fr.kriszt.theo.remindwear.tasker.Task referer = tasker.getTaskByID(refererId);
+
+            int sportTaskId = refererId; // l'Id de la SportTask prend le même valeur que l'ID de la tâche qui l'a créée
+
+            tasker.addSportTask(new SportTask(referer));
+
+            tasker.serializeLists();
+
+            this.taskId = refererId;
+
             new StartWearableActivityTask().execute();
-//
-//            Set<String> extraKeys = intent.getExtras().keySet();
-//
-//            Log.w(TAG, "intent extras : ");
-//
-//            for (String k : extraKeys){
-//                Log.w(TAG, "key : " + k + ", value : " + intent.getExtras().get(k));
-//            }
-
-
 
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
-            notificationManager.cancel(taskId);
+            notificationManager.cancel(refererId);
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -92,6 +93,12 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     @Override
     public IBinder onBind(Intent intent) {
         Log.w(TAG, "onBind: ");
+
+        if (intent.getExtras() != null){
+            for (String k : intent.getExtras().keySet()){
+                Log.w(TAG, "onBind: intent key : " + k + " ==> " + intent.getExtras().get(k));
+            }
+        }
 
         Wearable.getDataClient(this).addListener(this);
         Wearable.getMessageClient(this).addListener(this);
@@ -112,54 +119,60 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-//        LOGD("onDataChanged: " + dataEvents);
-//
-//        for (DataEvent event : dataEvents) {
-//            if (event.getType() == DataEvent.TYPE_CHANGED) {
-////                mDataItemListAdapter.add(
-////                        new Event("DataItem Changed", event.getDataItem().toString()));
-//            } else if (event.getType() == DataEvent.TYPE_DELETED) {
-////                mDataItemListAdapter.add(
-////                        new Event("DataItem Deleted", event.getDataItem().toString()));
-//            }
-//        }
     }
 
+    /**
+     * Appelé quand la montre renvoie des données après un tracking sportif
+     * @param messageEvent, dont la payload contient le JSON qui decrit le dataSet du tracking sportif
+     */
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-//        Log.w(TAG, "onMessageReceived: " + messageEvent);
-//        Log.w(TAG, "onMessageReceived: " + new String(messageEvent.getData()) );
-
         byte[] payload = messageEvent.getData();
 
         String message = new String(payload);
-        DataSet dataSet = DataSet.fromJson(message);
+        SportDataSet sportDataSet = SportDataSet.fromJson(message);
 
-        Log.w(TAG, "onMessageReceived: Recu " + dataSet);
+        Log.w(TAG, "onMessageReceived: Recu " + sportDataSet);
+        Log.w(TAG, "onMessageReceived: DataPoints : ");
+//        for (SportDataPoint dp : sportDataSet.getPoints().values()){
+////            Log.w(TAG, "onMessageReceived: DataPoint " + dp);
+////            if (dp.coords == null){
+////                Log.w(TAG, "onMessageReceived: Coords are null, WTF ??");
+////
+////            }else {
+////                Log.w(TAG, dp.coords.toString());
+////            }
+//        }
 
-        LOGD(
-                "onMessageReceived() A message from watch was received:"
-                        + messageEvent.getRequestId()
-                        + " "
-                        + messageEvent.getPath());
+        Tasker tasker = Tasker.getInstance(getApplicationContext());
 
-//        mDataItemListAdapter.add(new Event("Message from watch", messageEvent.toString()));
+        SportTask sportTask = tasker.getSportTaskByID(sportDataSet.getTaskId());
+        if (sportTask == null){
+            // TODO
+            Log.w(TAG, "onMessageReceived: TODO : créer une sportTask a la volee");
+            Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
+            Calendar cal = new GregorianCalendar();
+            fr.kriszt.theo.remindwear.tasker.Task nullReferer = new fr.kriszt.theo.remindwear.tasker.Task("Sport libre : " + sportDataSet.getSportType().getName(), "", sport, cal, 0, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+            sportTask = new SportTask(nullReferer);
+            tasker.addSportTask(sportTask);
+            tasker.serializeLists();
+            sportTask.setDataset(sportDataSet);
+        }else {
+            sportTask.setDataset(sportDataSet);
+        }
+        tasker.serializeLists();
 
     }
 
     @Override
     public void onCapabilityChanged(final CapabilityInfo capabilityInfo) {
-        LOGD("onCapabilityChanged: " + capabilityInfo);
+//        LOGD("onCapabilityChanged: " + capabilityInfo);
 
     }
 
 
     @WorkerThread
     private void sendStartActivityMessage(String node) {
-
-
-//        byte[] taskIdPayload = ByteBuffer.allocate(4).putInt(taskId).array(); // taskId, en byte[]
-//        byte[] taskIdPayload = BigInteger.valueOf(taskId).toByteArray();
         byte[] taskIdPayload = (taskId+"").getBytes();
 
         Log.w(TAG, "sendStartActivityMessage: Task Id is " + taskId);
@@ -169,10 +182,8 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
                         .sendMessage(node, Constants.START_ACTIVITY_PATH, taskIdPayload);
 
         try {
-            // Block on a task and get the result synchronously (because this is on a background
-            // thread).
             Integer result = Tasks.await(sendMessageTask);
-            LOGD("Message sent: " + result);
+            Log.d(TAG, "sendStartActivityMessage: Message sent : " + result);
 
         } catch (ExecutionException | InterruptedException exception) {
             Log.e(TAG, "Task failed: " + exception);
@@ -180,7 +191,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
     }
 
     @WorkerThread
-    private Collection<String> getNodes() {
+    private Collection<String> getNodes(){
         HashSet<String> results = new HashSet<>();
 
         Task<List<Node>> nodeListTask =
@@ -203,17 +214,11 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
         return results;
     }
 
-    public void sendStopTrackMessage(String node){
+//    public void sendStopTrackMessage(String node){
+//
+//        Wearable.getMessageClient(this).sendMessage(node, Constants.START_ACTIVITY_PATH, new byte[0]);
+//    }
 
-        Wearable.getMessageClient(this).sendMessage(node, Constants.START_ACTIVITY_PATH, new byte[0]);
-    }
-
-    /** As simple wrapper around Log.d */
-    private static void LOGD(String message) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, message);
-        }
-    }
 
     private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
 
@@ -229,20 +234,4 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
             return null;
         }
     }
-
-//    private class StopTrackingDispatcher extends AsyncTask<Void, Void, Void> {
-//
-//        @Override
-//        protected Void doInBackground(Void... args) {
-//            for (String node : getNodes()) {
-//                sendStopTrackMessage(node);
-//            }
-//            return null;
-//        }
-//    }
-
-
-
-
-
 }

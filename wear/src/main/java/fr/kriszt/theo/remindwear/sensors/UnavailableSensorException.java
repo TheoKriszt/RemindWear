@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear.sensingStrategies;
+package fr.kriszt.theo.remindwear.sensors;
 
 public class UnavailableSensorException extends Exception {
 

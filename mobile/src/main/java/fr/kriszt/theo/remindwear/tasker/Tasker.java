@@ -3,6 +3,7 @@ package fr.kriszt.theo.remindwear.tasker;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,11 +20,13 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
 import fr.kriszt.theo.remindwear.workers.ReminderWorker;
 
 public class Tasker {
 
-    @SuppressLint("StaticFieldLeak")
+	private static final String TAG = Tasker.class.getSimpleName();
+	@SuppressLint("StaticFieldLeak")
     private static Tasker INSTANCE = null;
 
 	private ArrayList<Category> listCategories = new ArrayList<>();
@@ -32,7 +36,7 @@ public class Tasker {
 
 	public static final String CATEGORY_NONE_TAG = "Aucune";
 	public static final String CATEGORY_SPORT_TAG = "Sport";
-
+    private SportTaskListFragment observer = null;
 
 
     public static synchronized Tasker getInstance(@Nullable Context context)
@@ -77,9 +81,9 @@ public class Tasker {
 
 	public Boolean addTask(Task t) {
 
-        if (t instanceof SportTask){
-            return addSportTask((SportTask) t);
-        }
+//        if (t instanceof SportTask){
+//            return addSportTask((SportTask) t);
+//        }
 
 		for(Task x : listTasks) {
 			if(x.toString().equals(t.toString())) {
@@ -108,7 +112,7 @@ public class Tasker {
 	}
 
 	public Boolean addSportTask(SportTask t) {
-		for(Task x : listSportTasks) {
+		for(SportTask x : listSportTasks) {
 			if(x.toString().equals(t.toString())) {
 				return false;
 			}
@@ -147,6 +151,10 @@ public class Tasker {
 		serializeList(listTasks, "Task.txt");
 		serializeList(listSportTasks, "SportTask.txt");
 
+		if (observer != null){
+		    observer.updateRecyclerView();
+        }
+
 	}
 
     @SuppressWarnings("unchecked")
@@ -171,6 +179,7 @@ public class Tasker {
     @SuppressWarnings("unchecked")
     private void unserializeListCategories() {
 		ArrayList<Category> list = new ArrayList<>();
+
         try {
             FileInputStream fis = context.openFileInput("Category.txt");
             ObjectInputStream is = new ObjectInputStream(fis);
@@ -179,6 +188,9 @@ public class Tasker {
             fis.close();
 
         }catch (Exception e){
+			Log.w(TAG, "unserializeListCategories:  fishiers dispos : " + Arrays.toString(context.fileList())
+            );
+			context.fileList();
             serializeLists();
             try{
                 FileInputStream fis = context.openFileInput("Category.txt");
@@ -256,6 +268,7 @@ public class Tasker {
 			}
 		}
 		for(Integer i : deletes) {
+//            Log.w(TAG, "garbageCollectOld: Removing old task " + i);
 			removeTaskByID(i);
 		}
 		serializeLists();
@@ -288,15 +301,19 @@ public class Tasker {
 
     public void sportSort(final Boolean growing) {
         unserializeLists();
-        Collections.sort(listSportTasks, new Comparator<Task>() {
+//        Log.w(TAG, "sportSort: Je trie une liste de " + listSportTasks.size() + " sporttasks");
+        for (SportTask s : listSportTasks){
+            Log.w(TAG, "\t" + s);
+        }
+        Collections.sort(listSportTasks, new Comparator<SportTask>() {
             @Override
-            public int compare(Task o1, Task o2) {
+            public int compare(SportTask o1, SportTask o2) {
                 int res = 1;
                 if(growing){
                     res *= -1;
                 }
-                Calendar o1deb = o1.getNextDate();
-                Calendar o2deb = o2.getNextDate();
+                Calendar o1deb = o1.getFirstDate();
+                Calendar o2deb = o2.getFirstDate();
 
                 if (o1deb.after(o2deb)) {
                     return res*-1;
@@ -337,12 +354,15 @@ public class Tasker {
         seq = seq.toUpperCase();
         for(SportTask t : listSportTasks){
             SimpleDateFormat format = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
-            String dateFormated = format.format(t.getNextDate().getTime());
-            if(t.getName().toUpperCase().contains(seq)) {
+            String dateFormated = format.format(t.getFirstDate().getTime());
+//            Task referer= Tasker.getInstance(context).getTaskByID(t.getID());
+
+
+            if(t.getName() != null && t.getName().toUpperCase().contains(seq)) {
                 res.add(t);
-            }else if(t.getCategory().getName().toUpperCase().contains(seq)){
+            }else if(t.getCategory() != null && t.getCategory().getName().toUpperCase().contains(seq)){
                 res.add(t);
-            }else if(t.getDescription().toUpperCase().contains(seq)){
+            }else if(t.getDescription() != null && t.getDescription().toUpperCase().contains(seq)){
                 res.add(t);
             }else if(dateFormated.toUpperCase().contains(seq)){
                 res.add(t);
@@ -420,14 +440,29 @@ public class Tasker {
     	return null;
 	}
 
-    public SportTask getSportTaskByID(int id){
-        for(SportTask t : listSportTasks){
-            if( t.getID() ==  id) {
-                return t;
-            }
-        }
-        return null;
-    }
+//    public SportTask getSportTaskByIDAndStart(Integer id, long startTime){
+//        Log.w(TAG, "getSportTaskByIDAndStart: Recherche de la tache d'ID " + id + ", demarree a " + startTime );
+//        for(SportTask t : listSportTasks){
+//			Log.w(TAG, "getSportTaskByIDAndStart: " + t.getName() + " " + t.getID());
+//            if(t.getID().equals(id)) {
+//                return t;
+//            }
+//        }
+//        return null;
+//    }
+	public SportTask getSportTaskByID(Integer taskId) {
+//		Log.w(TAG, "getSportTaskByID: Recherche de la sportTask avec l'ID " + taskId);
+
+		for(SportTask t : listSportTasks){
+			if(t.getID().equals(taskId)) {
+//				Log.w(TAG, "getSportTaskByID FOUND: " + t.getName() + " " + t.getID());
+				return t;
+			}
+		}
+		Log.w(TAG, "getSportTaskByID: 404, NOT FOUND");
+		return null;
+	}
+
 
 	public Category getCategoryByID(int id){
 		for(Category c : listCategories){
@@ -447,14 +482,19 @@ public class Tasker {
 		return null;
 	}
 
-    public ArrayList<Task> getTasksByCategory(Category c){
-        ArrayList<Task> matches = new ArrayList<>();
-        for (Task t : getListTasks()){
-            if (t.getCategory().equals(c)){
-                matches.add(t);
-            }
-        }
-        return matches;
+    public void addObserver(SportTaskListFragment sportTaskListFragment) {
+        this.observer = sportTaskListFragment;
     }
+
+//    public ArrayList<Task> getTasksByCategory(Category c){
+//        ArrayList<Task> matches = new ArrayList<>();
+//        for (Task t : getListTasks()){
+//            if (t.getCategory().equals(c)){
+//                matches.add(t);
+//            }
+//        }
+//        return matches;
+//    }
+
 
 }

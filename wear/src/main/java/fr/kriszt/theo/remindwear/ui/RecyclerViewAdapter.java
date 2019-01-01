@@ -1,11 +1,9 @@
-package fr.kriszt.theo.remindwear;
+package fr.kriszt.theo.remindwear.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.WearableRecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +12,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.ui.activity.WearActivity;
 import fr.kriszt.theo.shared.Constants;
-import fr.kriszt.theo.shared.SportType;
 
 
 public class RecyclerViewAdapter
@@ -46,10 +45,13 @@ public class RecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
 
-                    Log.w("RecyclerView on clic", "Task ID = " + RecyclerViewAdapter.this.taskId);
+//                    Log.w("RecyclerView on clic", "Task ID = " + RecyclerViewAdapter.this.taskId);
+
 
                     Intent startIntent = new Intent(view.getContext(), WearActivity.class);
                     startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                     startIntent.putExtra(Constants.KEY_SPORT_TYPE, name.getText().toString());
                     startIntent.putExtra(Constants.KEY_TASK_ID, RecyclerViewAdapter.this.taskId);
 

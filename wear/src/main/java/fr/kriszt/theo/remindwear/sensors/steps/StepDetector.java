@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear.sensingStrategies.steps;
+package fr.kriszt.theo.remindwear.sensors.steps;
 
 public class StepDetector {
 

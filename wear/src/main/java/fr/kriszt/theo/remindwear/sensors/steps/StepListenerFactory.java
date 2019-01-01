@@ -1,15 +1,15 @@
-package fr.kriszt.theo.remindwear.sensingStrategies.steps;
+package fr.kriszt.theo.remindwear.sensors.steps;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import fr.kriszt.theo.remindwear.sensingStrategies.SensorUtils;
-import fr.kriszt.theo.remindwear.sensingStrategies.UnavailableSensorException;
-import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerImpl.AccelerationStepListener;
-import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerImpl.BuiltinStepCounterListener;
-import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerImpl.BuiltinStepDetectorListener;
+import fr.kriszt.theo.remindwear.sensors.SensorUtils;
+import fr.kriszt.theo.remindwear.sensors.UnavailableSensorException;
+import fr.kriszt.theo.remindwear.sensors.steps.StepListenerImpl.AccelerationStepListener;
+import fr.kriszt.theo.remindwear.sensors.steps.StepListenerImpl.BuiltinStepCounterListener;
+import fr.kriszt.theo.remindwear.sensors.steps.StepListenerImpl.BuiltinStepDetectorListener;
 
 public class StepListenerFactory {
 

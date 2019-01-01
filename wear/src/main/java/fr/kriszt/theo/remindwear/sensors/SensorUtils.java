@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear.sensingStrategies;
+package fr.kriszt.theo.remindwear.sensors;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -8,7 +8,7 @@ import android.support.v4.app.ActivityCompat;
 
 import java.util.List;
 
-import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerFactory;
+import fr.kriszt.theo.remindwear.sensors.steps.StepListenerFactory;
 
 public class SensorUtils {
 

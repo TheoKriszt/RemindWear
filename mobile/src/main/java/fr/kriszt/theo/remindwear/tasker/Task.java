@@ -157,7 +157,7 @@ Task implements Serializable {
         return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
     }
 
-	public long getDuration(TimeUnit timeUnit){
+	public long getRemainingTime(TimeUnit timeUnit){
 		Calendar cal = getNextDate();
 		cal.set(Calendar.HOUR, getTimeMinutes());
 		cal.set(Calendar.MINUTE, getTimeMinutes());

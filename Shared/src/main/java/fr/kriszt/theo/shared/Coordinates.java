@@ -19,7 +19,7 @@ public class Coordinates implements Serializable {
     private double lng;
     private double altitude;
 
-    private Coordinates(double lat, double lng, double alt, double speed_ms){
+    public Coordinates(double lat, double lng, double alt, double speed_ms){
         this.lat = lat;
         this.lng = lng;
         this.altitude = alt;
@@ -63,6 +63,7 @@ public class Coordinates implements Serializable {
             location.setAltitude(getAltitude());
             location.setSpeed((float) getSpeedMS());
         }
+
 
         return location.distanceTo(coordinates.location);
     }

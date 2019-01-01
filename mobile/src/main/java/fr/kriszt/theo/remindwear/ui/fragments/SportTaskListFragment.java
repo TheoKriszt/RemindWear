@@ -1,6 +1,7 @@
 package fr.kriszt.theo.remindwear.ui.fragments;
 
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +27,15 @@ import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.shared.Coordinates;
 import fr.kriszt.theo.shared.SportType;
-import fr.kriszt.theo.shared.data.DataSet;
+import fr.kriszt.theo.shared.data.SportDataPoint;
+import fr.kriszt.theo.shared.data.SportDataSet;
 
 
 public class SportTaskListFragment extends Fragment {
 
+    private static final String TAG = SportTaskListFragment.class.getSimpleName();
     View rootView;
     private String userSearch = "";
     private Boolean growing = true;
@@ -52,6 +57,7 @@ public class SportTaskListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView =  inflater.inflate(R.layout.fragment_sport_list, container, false);
         tasker  = Tasker.getInstance(getContext());
+        tasker.addObserver(this);
         return rootView;
 
     }
@@ -59,33 +65,49 @@ public class SportTaskListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Tasker myTasker = Tasker.getInstance(getContext());
 
         tasksSportList = new ArrayList<>();
-        tasker.unserializeLists();
-        tasker.garbageCollectOld();
-        tasker.serializeLists();
-        tasker.sportSort(true);
+        myTasker.unserializeLists();
+        myTasker.garbageCollectOld();
+        myTasker.serializeLists();
 
-        tasksSportList = Tasker.getInstance(getContext()).getListSportTasks();
+
+        tasksSportList = myTasker.getListSportTasks();
 
         //TODO REMOVE
-        tasker.unserializeLists();
-        if(Tasker.getInstance(getContext()).getListSportTasks().size() <= 0){
-            Category sport = Tasker.getInstance(getContext()).getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
-            Calendar calendar = new GregorianCalendar();
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
-            Task referer = new Task("Tâche de test", "Une petite description", sport, calendar, 0, hour, minute);
-            DataSet dataSet = new DataSet(SportType.SPORT_BIKE, true, true, true);
+        myTasker.unserializeLists();
+//        if(myTasker.getListSportTasks().isEmpty()){
+//            Category sport = myTasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
+//            Calendar calendar = new GregorianCalendar();
+//            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//            int minute = calendar.get(Calendar.MINUTE);
+//            Task referer = new Task("Tâche de test", "Une petite description", sport, calendar, 0, hour, minute);
+//
+//            SportDataSet sportDataSet = new SportDataSet(SportType.SPORT_BIKE, true, true, true);
+//
+//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42, 1.83, 100, 20), 5, 75, 0.22f));
+//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42.1, 1.83, 110, 30), 10, 60, 0.44f));
+//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42, 1.84, 120, 20), 15, 63, 0.66f));
+//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42.1, 1.83, 110, 10), 25, 115, 1.24f));
+//
+//            myTasker.addTask(referer);
+//
+//            SportTask s = new SportTask(referer);
+//            s.setDataset(sportDataSet);
+//
+//            myTasker.addSportTask(s);
+//            Log.w(TAG, "onViewCreated: CREATED Sport Task : " + s);
+//
+//            tasksSportList.add(s);
+//        }
 
+        myTasker.sportSort(false);
+        myTasker.serializeLists();
 
-            SportTask s = new SportTask("Test","Desc. de test", sport,
-                    new GregorianCalendar(), 30,23, 12, new Boolean[]{},
-                    50, 60, 364, 4005);
-            Tasker.getInstance(getContext()).addSportTask(s);
-            tasksSportList.add(s);
-        }
-        tasker.serializeLists();
+//        Log.w(TAG, "onViewCreated: on arrete de deconner");
+//        Log.w(TAG, "onViewCreated: nb Taches normales " + myTasker.getListTasks().size());
+//        Log.w(TAG, "onViewCreated: nb Taches Sport    " + myTasker.getListSportTasks().size());
 
         sportList = rootView.findViewById(R.id.sportList);
         tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
@@ -95,7 +117,7 @@ public class SportTaskListFragment extends Fragment {
         sportList.setItemAnimator(new DefaultItemAnimator());
         sportList.setAdapter(tasksSportAdapter);
 
-        searchBar = (EditText) rootView.findViewById(R.id.searchBar);
+        searchBar = rootView.findViewById(R.id.searchBar);
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -111,7 +133,7 @@ public class SportTaskListFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
 
-        upper = (ImageView) rootView.findViewById(R.id.upper);
+        upper = rootView.findViewById(R.id.upper);
         upper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,8 +146,8 @@ public class SportTaskListFragment extends Fragment {
             }
         });
 
-        lower = (ImageView) rootView.findViewById(R.id.lower);
-        lower = (ImageView) rootView.findViewById(R.id.lower);
+        lower = rootView.findViewById(R.id.lower);
+        lower = rootView.findViewById(R.id.lower);
         lower.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,7 +176,7 @@ public class SportTaskListFragment extends Fragment {
             }
         });
 
-        close = (ImageView) rootView.findViewById(R.id.close);
+        close = rootView.findViewById(R.id.close);
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,6 +195,7 @@ public class SportTaskListFragment extends Fragment {
     }
 
     public void updateRecyclerView(){
+        Log.w(TAG, "updateRecyclerView: ");
         sportList = rootView.findViewById(R.id.sportList);
         tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());

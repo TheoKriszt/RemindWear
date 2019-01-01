@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear;
+package fr.kriszt.theo.remindwear.ui;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

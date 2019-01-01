@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear.sensingStrategies.steps;
+package fr.kriszt.theo.remindwear.sensors.steps;
 
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;

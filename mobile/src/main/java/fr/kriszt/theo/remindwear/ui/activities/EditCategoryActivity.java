@@ -84,13 +84,13 @@ public class EditCategoryActivity extends AppCompatActivity {
         listIcons.add(R.drawable.ic_base_15);
         listIcons.add(R.drawable.ic_base_17);
 
-        cardView = (CardView) findViewById(R.id.cardView);
+        cardView = findViewById(R.id.cardView);
         cardView.setVisibility(View.VISIBLE);
 
-        textView = (TextView) findViewById(R.id.textView);
+        textView = findViewById(R.id.textView);
         textView.setText("Modifier une catégorie");
 
-        cancel = (ImageView) findViewById(R.id.cancel);
+        cancel = findViewById(R.id.cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,7 +98,7 @@ public class EditCategoryActivity extends AppCompatActivity {
             }
         });
 
-        validate = (ImageView) findViewById(R.id.validate);
+        validate = findViewById(R.id.validate);
         validate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,7 +106,7 @@ public class EditCategoryActivity extends AppCompatActivity {
             }
         });
 
-        title = (EditText) findViewById(R.id.name);
+        title = findViewById(R.id.name);
         title.setText(category.getName());
         int resPositionCategory = 0;
         ArrayList<Integer> listC = listIcons;
@@ -116,13 +116,13 @@ public class EditCategoryActivity extends AppCompatActivity {
                 break;
             }
         }
-        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner = findViewById(R.id.spinner);
         spinner.setAdapter(new NewAdapter(listIcons));
         spinner.setSelection(resPositionCategory);
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         //TODO set colorpicker
-        colorPickerView = (ColorPickerView) findViewById(R.id.colorPickerView);
+        colorPickerView = findViewById(R.id.colorPickerView);
         colorPickerView.setColorListener(new ColorListener() {
             @Override
             public void onColorSelected(ColorEnvelope colorEnvelope) {
@@ -130,10 +130,10 @@ public class EditCategoryActivity extends AppCompatActivity {
             }
         });
 
-        colorView  = (ImageView) findViewById(R.id.colorView);
+        colorView  = findViewById(R.id.colorView);
         colorView.setBackgroundColor(category.getColor());
 
-        submit = (Button) findViewById(R.id.submit);
+        submit = findViewById(R.id.submit);
         submit.setVisibility(View.GONE);
 
     }
@@ -201,7 +201,7 @@ public class EditCategoryActivity extends AppCompatActivity {
         ImageView itemIcon;
 
         public ViewHolder(View view) {
-            itemIcon = (ImageView) view.findViewById(R.id.icon);
+            itemIcon = view.findViewById(R.id.icon);
         }
     }
 }

@@ -1,4 +1,4 @@
-package fr.kriszt.theo.remindwear;
+package fr.kriszt.theo.remindwear.ui.activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
 import fr.kriszt.theo.remindwear.ui.fragments.TaskListFragment;
 
@@ -39,7 +41,7 @@ public class TasksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
        /* Intent intent = getIntent();

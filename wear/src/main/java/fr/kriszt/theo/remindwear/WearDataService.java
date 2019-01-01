@@ -29,28 +29,24 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.DataClient;
-import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItemAsset;
-import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import fr.kriszt.theo.remindwear.ui.activity.ChooseSportActivity;
+import fr.kriszt.theo.remindwear.ui.activity.WearActivity;
 import fr.kriszt.theo.shared.Constants;
-import fr.kriszt.theo.shared.data.DataSet;
+import fr.kriszt.theo.shared.data.SportDataSet;
 
 /** Listens to DataItems and Messages from the local node. */
 public class   WearDataService extends Service implements
@@ -60,11 +56,11 @@ public class   WearDataService extends Service implements
 
     private static final String TAG = "WearDataService";
 
-//    private static final String START_ACTIVITY_PATH = "/start-activity";
-    private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
-    public static final String COUNT_PATH = "/count";
-    private static WearActivity observer;
-    private DataSet dataset;
+////    private static final String START_ACTIVITY_PATH = "/start-activity";
+//    private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
+//    public static final String COUNT_PATH = "/count";
+//    private static WearActivity observer;
+    private SportDataSet dataset;
 
 
     @Nullable
@@ -80,13 +76,13 @@ public class   WearDataService extends Service implements
         return null;
     }
 
-    public static void setObserver(WearActivity observer) {
-        WearDataService.observer = observer;
-    }
+//    public static void setObserver(WearActivity observer) {
+////        WearDataService.observer = observer;
+//    }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.w(TAG, "onUnbind: ");
+//        Log.w(TAG, "onUnbind: ");
 
         Wearable.getDataClient(this).removeListener(this);
         Wearable.getMessageClient(this).removeListener(this);
@@ -100,61 +96,15 @@ public class   WearDataService extends Service implements
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        Log.w(TAG, "onDataChanged: " + dataEvents);
+//        Log.w(TAG, "onDataChanged: " + dataEvents);
 
-        // Loop through the events and send a message back to the node that created the data item.
-//        for (DataEvent event : dataEvents) {
-//            Uri uri = event.getDataItem().getUri();
-//            String path = uri.getPath();
-//
-//            if (COUNT_PATH.equals(path)) {
-//                // Get the node id of the node that created the data item from the host portion of
-//                // the uri.
-//                String nodeId = uri.getHost();
-//                // Set the data of the message to be the bytes of the Uri.
-//                byte[] payload = uri.toString().getBytes();
-//
-//                final WearActivity lastWearActivity = WearActivity.lastInstance;
-//
-//                // Send the rpc
-//                // Instantiates clients without member variables, as clients are inexpensive to
-//                // create. (They are cached and shared between GoogleApi instances.)
-//                Task<Integer> sendMessageTask =
-//                        Wearable.getMessageClient(this)
-//                                .sendMessage(nodeId, DATA_ITEM_RECEIVED_PATH, payload);
-//
-//                sendMessageTask.addOnCompleteListener(
-//                        new OnCompleteListener<Integer>() {
-//                            @Override
-//                            public void onComplete(Task<Integer> task) {
-//                                if (task.isSuccessful()) {
-//                                    Log.w(TAG, "Message sent successfully");
-//                                    Log.w(TAG, "onComplete: observer = " + observer);
-//                                    Log.w(TAG, "onComplete: lastInstance = " + WearActivity.lastInstance);
-//                                    if (observer != null){
-//                                        lastWearActivity.setButton("Sent !", R.color.green);
-//                                        WearActivity.lastInstance.setButton("Sent ! ", R.color.green);
-//                                    }else {
-//                                        Log.w(TAG, "onComplete: NULL last");
-//                                    }
-//
-//                                } else {
-//                                    Log.d(TAG, "Message failed.");
-//                                    if (observer != null){
-//                                        lastWearActivity.setButton("Failed", R.color.red);
-//                                    }
-//                                }
-//                            }
-//                        });
-//            }
-//        }
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
 //        Log.w(TAG, "onMessageReceived: " + messageEvent);
         String taskId = new String(messageEvent.getData()).replace("Data", "");
-        Log.w(TAG, "onMessageReceived: TaskID : " + taskId);
+//        Log.w(TAG, "onMessageReceived: TaskID : " + taskId);
 //        byte[] taskIdPayload = BigInteger.valueOf(taskId).toByteArray();
 
 
@@ -173,19 +123,23 @@ public class   WearDataService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.w(TAG, "onStartCommand: " + intent.getAction());
+//        Log.w(TAG, "onStartCommand: " + intent.getAction());
 
-        if (intent.getAction().equals(Constants.ACTION_END_TRACK)){
-            Log.w(TAG, "onStartCommand: Fin du tracking");
+        if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_END_TRACK)){
+//            Log.w(TAG, "onStartCommand: Fin du tracking");
 
             if (intent.getExtras() != null){
                 String payload =  intent.getExtras().get(Constants.KEY_DATASET).toString();
-                dataset = DataSet.fromJson(payload);
+                dataset = SportDataSet.fromJson(payload);
 
 
-                if (dataset != null) {
-                    Log.w(TAG, "onStartCommand: Dataset de taille " + dataset.size());
-                }else Log.w(TAG, "onStartCommand: DataSet is null");
+
+//                if (dataset != null) {
+//                    Log.w(TAG, "onStartCommand: Dataset de taille " + dataset.size());
+//                }else {
+//                    Log.w(TAG, "onStartCommand: SportDataSet is null");
+//                }
+
             } else Log.w(TAG, "onStartCommand: Pas d'extras");
 
 
@@ -200,6 +154,7 @@ public class   WearDataService extends Service implements
 
     private void sendStopMessage(String nodeId){
         byte[] payload = dataset.toJson().getBytes();
+        Log.w(TAG, "sendStopMessage: Sending payload : " + dataset);
         final String buttonText = WearActivity.lastInstance.getButtonText();
         final boolean firstTry = buttonText.startsWith("Stop");
 
@@ -213,7 +168,6 @@ public class   WearDataService extends Service implements
                 Wearable.getMessageClient(this)
                         .sendMessage(nodeId, Constants.PHONE_PATH, payload);
 
-
         sendMessageTask.addOnCompleteListener(
                 new OnCompleteListener<Integer>() {
                     @Override
@@ -221,15 +175,9 @@ public class   WearDataService extends Service implements
                         if (task.isSuccessful()) {
 
                             if (!firstTry){
-
                                 WearActivity.lastInstance.setButton("Sent !", R.color.green);
                             }
-
-//                            else {
-//
-//                            }
                         } else {
-                            Log.w(TAG, "Message failed.");
                             WearActivity.lastInstance.setButton("Failed !", R.color.dark_red);
                         }
                     }
@@ -241,7 +189,6 @@ public class   WearDataService extends Service implements
 
     @Override
     public void onCapabilityChanged(@NonNull CapabilityInfo capabilityInfo) {
-        Log.w(TAG, "onCapabilityChanged: ");
     }
 
     private class StopDispatcher extends AsyncTask<Void, Void, Void> {
@@ -264,8 +211,6 @@ public class   WearDataService extends Service implements
                 Wearable.getNodeClient(getApplicationContext()).getConnectedNodes();
 
         try {
-            // Block on a task and get the result synchronously (because this is on a background
-            // thread).
             List<Node> nodes = Tasks.await(nodeListTask);
 
             for (Node node : nodes) {
@@ -278,8 +223,6 @@ public class   WearDataService extends Service implements
         } catch (InterruptedException exception) {
             Log.e(TAG, "Interrupt occurred: " + exception);
         }
-
-        Log.w(TAG, "getNodes: " + results.size() + " nodes found");
         return results;
     }
 

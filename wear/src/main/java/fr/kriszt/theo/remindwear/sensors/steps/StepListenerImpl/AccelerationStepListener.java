@@ -1,9 +1,9 @@
-package fr.kriszt.theo.remindwear.sensingStrategies.steps.StepListenerImpl;
+package fr.kriszt.theo.remindwear.sensors.steps.StepListenerImpl;
 
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
-import fr.kriszt.theo.remindwear.sensingStrategies.steps.StepDetector;
+import fr.kriszt.theo.remindwear.sensors.steps.StepDetector;
 
 public class AccelerationStepListener extends AbstractStepListener {
 
