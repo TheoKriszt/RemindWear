@@ -12,9 +12,10 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 
 import fr.kriszt.theo.remindwear.tasker.Task;
+import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.remindwear.ui.activities.TasksActivity;
 import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
-import fr.kriszt.theo.remindwear.wear.PhoneDataService;
-import fr.kriszt.theo.remindwear.wear.WearListener_bak;
+import fr.kriszt.theo.remindwear.data.PhoneDataService;
 import fr.kriszt.theo.remindwear.workers.SchedulerService;
 import fr.kriszt.theo.shared.Constants;
 
@@ -30,7 +31,7 @@ public class RemindNotification {
 
     public RemindNotification(Task task, Context c){
         title = task.getName();
-        content = "Commence à " + task.getTimeHour() + "h" + task.getTimeMinutes();
+        content = String.format("Commence à %02dh%02d", task.getTimeHour(), task.getTimeMinutes());
         taskId = task.getID();
         context = c;
 //        bigText = "Rappel : " + task.getName() + " à " + task.getTimeHour() + "h" + task.getTimeMinutes()
@@ -50,6 +51,7 @@ public class RemindNotification {
         addActions(task, builder, extender);
 
         builder.extend(extender);
+        builder.setAutoCancel(true);
 
         notification = builder.build();
 
@@ -77,9 +79,11 @@ public class RemindNotification {
 
         PendingIntent pendingPostponeIntent = PendingIntent.getService(context, taskId, postponeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        builder.addAction(new NotificationCompat.Action(
-                R.drawable.baseline_directions_run_24, "Track", sendMessagePendingIntent
-        ));
+        if (task.getCategory().getName().equals(Tasker.CATEGORY_SPORT_TAG)) {
+            builder.addAction(new NotificationCompat.Action(
+                    R.drawable.baseline_directions_run_24, "Track", sendMessagePendingIntent
+            ));
+        }
 
         builder.addAction(new NotificationCompat.Action(
                 R.drawable.ic_snooze, "Later", pendingPostponeIntent
@@ -99,7 +103,8 @@ public class RemindNotification {
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setColor(task.getCategory().getColor())
 //                        .setColor(context.getResources().getColor(R.color.colorPrimaryDark))
-                        .setStyle( bigText );
+                        .setStyle( bigText )
+                        .setVibrate(new long[] { 200, 200, 200, 200, 200 });
 //                        .setStyle( new NotificationCompat.BigTextStyle().bigText(bigText));
 
 

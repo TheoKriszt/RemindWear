@@ -100,6 +100,10 @@ Task implements Serializable {
 
 	public String toString() {
 		String r = "";
+		String[] daysOfWeek = {"lun", "mar", "mer", "jeu", "ven", "sam", "dim"};
+		for (int i = 0; i < this.repete.length; i++){
+			r+= daysOfWeek[i] + "=" + this.repete[i] + ", ";
+		}
 		for(Boolean x : this.repete) {					
 			r+="\n\t\t"+x;
 		}
@@ -108,7 +112,7 @@ Task implements Serializable {
                 + "\n\t"+name
 				+ "\n\t"+description
 				+ "\n\t"+category
-				+ "\n\t"+dateDeb
+				+ "\n\t"+dateDeb.get(Calendar.HOUR_OF_DAY) + "h " + dateDeb.get(Calendar.MINUTE)
 				+ "\n\t"+warningBefore
                 + "\n\t"+timeHour
                 + "\n\t"+timeMinutes
@@ -153,7 +157,7 @@ Task implements Serializable {
         return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
     }
 
-	public long getDuration(TimeUnit timeUnit){
+	public long getRemainingTime(TimeUnit timeUnit){
 		Calendar cal = getNextDate();
 		cal.set(Calendar.HOUR, getTimeMinutes());
 		cal.set(Calendar.MINUTE, getTimeMinutes());

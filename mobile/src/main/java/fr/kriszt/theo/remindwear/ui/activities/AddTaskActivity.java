@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.TasksActivity;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
@@ -60,6 +58,10 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private ImageView addCategory;
     private ImageView editCategory;
 
+    public AddTaskActivity() {
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,21 +72,21 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         tasker = Tasker.getInstance(this);
         Category categoryTemp = tasker.getListCategories().get(0);
 
-        name = (EditText) findViewById(R.id.name);
-        description = (EditText) findViewById(R.id.description);
+        name = findViewById(R.id.name);
+        description = findViewById(R.id.description);
 
         Calendar forTimePicker = new GregorianCalendar();
-        forTimePicker.add(Calendar.MINUTE, 5);
+        forTimePicker.add(Calendar.MINUTE, 1);
+//        forTimePicker.add(Calendar.MINUTE, 5);
 
         calendar = new GregorianCalendar();
-        calendar.add(Calendar.DAY_OF_MONTH, -20);
 
-        time_picker_hour = (NumberPicker) findViewById(R.id.time_picker_hour);
+        time_picker_hour = findViewById(R.id.time_picker_hour);
         time_picker_hour.setMinValue(0);
         time_picker_hour.setMaxValue(23);
-        time_picker_hour.setValue(forTimePicker.get(Calendar.HOUR));
+        time_picker_hour.setValue(forTimePicker.get(Calendar.HOUR_OF_DAY));
 
-        time_picker_min = (NumberPicker) findViewById(R.id.time_picker_min);
+        time_picker_min = findViewById(R.id.time_picker_min);
         time_picker_min.setMinValue(0);
         time_picker_min.setMaxValue(59);
         time_picker_min.setValue(forTimePicker.get(Calendar.MINUTE));
@@ -104,7 +106,8 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         preventBefore = (NumberPicker) findViewById(R.id.preventBefore);
         preventBefore.setMinValue(0);
         preventBefore.setMaxValue(18);
-        preventBefore.setValue(6);
+        preventBefore.setValue(0);
+//        preventBefore.setValue(6);
         String[] minuteValues = new String[19];
         for (int i = 0; i < minuteValues.length; i++) {
             String number = "";
@@ -117,7 +120,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         }
         preventBefore.setDisplayedValues(minuteValues);
 
-        addCategory  = (ImageView) findViewById(R.id.addCategory);
+        addCategory  = findViewById(R.id.addCategory);
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,7 +129,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
-        editCategory  = (ImageView) findViewById(R.id.editCategory);
+        editCategory  = findViewById(R.id.editCategory);
         editCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,7 +145,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             editCategory.setVisibility(View.VISIBLE);
         }
 
-        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner = findViewById(R.id.spinner);
         spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -162,14 +165,18 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
         });
 
-        calendarView = (CalendarView) findViewById(R.id.calendar);
+        calendarView = findViewById(R.id.calendar);
+        Calendar today = new GregorianCalendar();
+        calendarView.setMinDate(today.getTime().getTime());
+        calendarView.setDate(today.getTime().getTime() + 1000);
+
         calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
                 calendar = new GregorianCalendar( year, month, dayOfMonth ,time_picker_hour.getValue(),time_picker_min.getValue());
             }
         });
-        layout_repete = (LinearLayout) findViewById(R.id.layout_repete);
-        checkBox = (CheckBox) findViewById(R.id.checkBox);
+        layout_repete = findViewById(R.id.layout_repete);
+        checkBox = findViewById(R.id.checkBox);
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
@@ -183,15 +190,15 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
-        checkBoxMonday = (CheckBox) findViewById(R.id.checkBoxMonday);
-        checkBoxTuesday = (CheckBox) findViewById(R.id.checkBoxTuesday);
-        checkBoxWednesday = (CheckBox) findViewById(R.id.checkBoxWednesday);
-        checkBoxThursday = (CheckBox) findViewById(R.id.checkBoxThursday);
-        checkBoxFriday = (CheckBox) findViewById(R.id.checkBoxFriday);
-        checkBoxSaturday = (CheckBox) findViewById(R.id.checkBoxSaturday);
-        checkBoxSunday = (CheckBox) findViewById(R.id.checkBoxSunday);
+        checkBoxMonday = findViewById(R.id.checkBoxMonday);
+        checkBoxTuesday = findViewById(R.id.checkBoxTuesday);
+        checkBoxFriday = findViewById(R.id.checkBoxFriday);
+        checkBoxWednesday = findViewById(R.id.checkBoxWednesday);
+        checkBoxThursday = findViewById(R.id.checkBoxThursday);
+        checkBoxSaturday = findViewById(R.id.checkBoxSaturday);
+        checkBoxSunday = findViewById(R.id.checkBoxSunday);
 
-        submit = (Button) findViewById(R.id.submit);
+        submit = findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -232,6 +239,8 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     return;
                 }else{
                     Calendar c = new GregorianCalendar();
+                    c.add(Calendar.MINUTE, -60);
+
                     if(calendar.before(c)){
                         Toast.makeText(getApplicationContext(), "Ajoutez une date a partir d'aujourd'hui", Toast.LENGTH_LONG).show();
                         return;
@@ -335,9 +344,9 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         LinearLayout itemLayout;
 
         public ViewHolder(View view) {
-            itemName = (TextView)view.findViewById(R.id.name);
-            itemIcon = (ImageView) view.findViewById(R.id.icon);
-            itemLayout = (LinearLayout) view.findViewById(R.id.changeColor);
+            itemName = view.findViewById(R.id.name);
+            itemIcon = view.findViewById(R.id.icon);
+            itemLayout = view.findViewById(R.id.changeColor);
         }
     }
 

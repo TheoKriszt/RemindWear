@@ -23,18 +23,23 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import fr.kriszt.theo.remindwear.R;
+import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.remindwear.ui.activities.AddTaskActivity;
 
 public class TaskListFragment extends Fragment {
 
+    private static final String TAG = TaskListFragment.class.getSimpleName();
     private View rootView;
     private String userSearch = "";
     private Boolean growing = true;
@@ -70,6 +75,25 @@ public class TaskListFragment extends Fragment {
 
         tasksList = new ArrayList<>();
         tasker.unserializeLists();
+
+
+        if (tasker.getListTasks().isEmpty()){
+            Log.w(TAG, "onViewCreated: Tâche de test");
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.add(Calendar.MINUTE, 1);
+            int timeHour = cal.get(Calendar.HOUR_OF_DAY);
+            int timeMinutes= cal.get(Calendar.MINUTE);
+            Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
+            Task testTask = new Task("Tâche de test", "Créée pour l'exemple", sport, cal, 0, timeHour, timeMinutes);
+            tasker.addTask(testTask);
+
+            Toast.makeText(getContext(), "La tâche d'exemple commencera dans " + -testTask.getRemainingTime(TimeUnit.SECONDS) + " secondes", Toast.LENGTH_SHORT).show();
+            tasker.serializeLists();
+        }
+//        else {
+//            Log.w(TAG, "onViewCreated: Tâches présentes:  " + tasker.getListTasks().size());
+//        }
+
         tasker.garbageCollectOld();
         tasker.serializeLists();
         tasker.sort(true);
@@ -83,7 +107,7 @@ public class TaskListFragment extends Fragment {
         tasks.setItemAnimator(new DefaultItemAnimator());
         tasks.setAdapter(tasksAdapter);
 
-        addButton = (FloatingActionButton) rootView.findViewById(R.id.addButton);
+        addButton = rootView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

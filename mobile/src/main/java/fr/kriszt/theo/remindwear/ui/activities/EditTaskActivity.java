@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +24,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.TasksActivity;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
@@ -85,13 +82,13 @@ public class EditTaskActivity extends AppCompatActivity {
         calendar =new GregorianCalendar(task.getNextDate().get(Calendar.YEAR), task.getNextDate().get(Calendar.MONTH),
                 task.getNextDate().get(Calendar.DAY_OF_MONTH), task.getTimeHour(), task.getTimeMinutes());
 
-        cardView = (CardView) findViewById(R.id.cardView);
+        cardView = findViewById(R.id.cardView);
         cardView.setVisibility(View.VISIBLE);
 
-        textView = (TextView) findViewById(R.id.textView);
+        textView = findViewById(R.id.textView);
         textView.setText("Modifier une tâche");
 
-        cancel = (ImageView) findViewById(R.id.cancel);
+        cancel = findViewById(R.id.cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,7 +96,7 @@ public class EditTaskActivity extends AppCompatActivity {
             }
         });
 
-        validate = (ImageView) findViewById(R.id.validate);
+        validate = findViewById(R.id.validate);
         validate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,18 +104,18 @@ public class EditTaskActivity extends AppCompatActivity {
             }
         });
 
-        name = (EditText) findViewById(R.id.name);
+        name = findViewById(R.id.name);
         name.setText(task.getName());
 
-        description = (EditText) findViewById(R.id.description);
+        description = findViewById(R.id.description);
         description.setText(task.getDescription());
 
-        time_picker_hour = (NumberPicker) findViewById(R.id.time_picker_hour);
+        time_picker_hour = findViewById(R.id.time_picker_hour);
         time_picker_hour.setMinValue(0);
         time_picker_hour.setMaxValue(23);
         time_picker_hour.setValue(task.getTimeHour());
 
-        time_picker_min = (NumberPicker) findViewById(R.id.time_picker_min);
+        time_picker_min = findViewById(R.id.time_picker_min);
         time_picker_min.setMinValue(0);
         time_picker_min.setMaxValue(59);
         time_picker_min.setValue(task.getTimeMinutes());
@@ -136,7 +133,7 @@ public class EditTaskActivity extends AppCompatActivity {
             }
         });
 
-        preventBefore = (NumberPicker) findViewById(R.id.preventBefore);
+        preventBefore = findViewById(R.id.preventBefore);
         preventBefore.setMinValue(0);
         preventBefore.setMaxValue(18);
         preventBefore.setValue(task.getWarningBefore()/5);
@@ -148,8 +145,8 @@ public class EditTaskActivity extends AppCompatActivity {
         preventBefore.setDisplayedValues(minuteValues);
 
 
-        editCategory  = (ImageView) findViewById(R.id.editCategory);
-        addCategory  = (ImageView) findViewById(R.id.addCategory);
+        editCategory  = findViewById(R.id.editCategory);
+        addCategory  = findViewById(R.id.addCategory);
         if(task.getCategory().getName().equals(Tasker.CATEGORY_NONE_TAG) ||
                 task.getCategory().getName().equals(Tasker.CATEGORY_SPORT_TAG)){
             editCategory.setVisibility(View.GONE);
@@ -181,7 +178,7 @@ public class EditTaskActivity extends AppCompatActivity {
                 break;
             }
         }
-        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner = findViewById(R.id.spinner);
         spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         spinner.setSelection(resPositionCategory);
@@ -202,7 +199,7 @@ public class EditTaskActivity extends AppCompatActivity {
 
         });
 
-        calendarView = (CalendarView) findViewById(R.id.calendar);
+        calendarView = findViewById(R.id.calendar);
         calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
                 calendar = new GregorianCalendar( year, month, dayOfMonth, time_picker_hour.getValue(), time_picker_min.getValue() );
@@ -213,8 +210,8 @@ public class EditTaskActivity extends AppCompatActivity {
         }
 
 
-        layout_repete = (LinearLayout) findViewById(R.id.layout_repete);
-        checkBox = (CheckBox) findViewById(R.id.checkBox);
+        layout_repete = findViewById(R.id.layout_repete);
+        checkBox = findViewById(R.id.checkBox);
         if(task.getDateDeb() == null){
             layout_repete.setVisibility(View.VISIBLE);
             checkBox.setChecked(true);
@@ -237,22 +234,22 @@ public class EditTaskActivity extends AppCompatActivity {
             }
         });
 
-        checkBoxMonday = (CheckBox) findViewById(R.id.checkBoxMonday);
+        checkBoxMonday = findViewById(R.id.checkBoxMonday);
         checkBoxMonday.setChecked(task.getRepete()[0]);
-        checkBoxTuesday = (CheckBox) findViewById(R.id.checkBoxTuesday);
+        checkBoxTuesday = findViewById(R.id.checkBoxTuesday);
         checkBoxTuesday.setChecked(task.getRepete()[1]);
-        checkBoxWednesday = (CheckBox) findViewById(R.id.checkBoxWednesday);
+        checkBoxWednesday = findViewById(R.id.checkBoxWednesday);
         checkBoxWednesday.setChecked(task.getRepete()[2]);
-        checkBoxThursday = (CheckBox) findViewById(R.id.checkBoxThursday);
+        checkBoxThursday = findViewById(R.id.checkBoxThursday);
         checkBoxThursday.setChecked(task.getRepete()[3]);
-        checkBoxFriday = (CheckBox) findViewById(R.id.checkBoxFriday);
+        checkBoxFriday = findViewById(R.id.checkBoxFriday);
         checkBoxFriday.setChecked(task.getRepete()[4]);
-        checkBoxSaturday = (CheckBox) findViewById(R.id.checkBoxSaturday);
+        checkBoxSaturday = findViewById(R.id.checkBoxSaturday);
         checkBoxSaturday.setChecked(task.getRepete()[5]);
-        checkBoxSunday = (CheckBox) findViewById(R.id.checkBoxSunday);
+        checkBoxSunday = findViewById(R.id.checkBoxSunday);
         checkBoxSunday.setChecked(task.getRepete()[6]);
 
-        submit = (Button) findViewById(R.id.submit);
+        submit = findViewById(R.id.submit);
         submit.setText("   Supprimer   ");
         submit.setTextColor(getApplication().getResources().getColor(R.color.colorRed));
         submit.setOnClickListener(new View.OnClickListener() {
@@ -395,9 +392,9 @@ public class EditTaskActivity extends AppCompatActivity {
         LinearLayout itemLayout;
 
         public ViewHolder(View view) {
-            itemName = (TextView)view.findViewById(R.id.name);
-            itemIcon = (ImageView) view.findViewById(R.id.icon);
-            itemLayout = (LinearLayout) view.findViewById(R.id.changeColor);
+            itemName = view.findViewById(R.id.name);
+            itemIcon = view.findViewById(R.id.icon);
+            itemLayout = view.findViewById(R.id.changeColor);
         }
     }
 

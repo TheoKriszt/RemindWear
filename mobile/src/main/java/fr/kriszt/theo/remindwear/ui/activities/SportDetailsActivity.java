@@ -2,7 +2,11 @@ package fr.kriszt.theo.remindwear.ui.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,15 +21,20 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.tasker.Coordonate;
+import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
+import fr.kriszt.theo.shared.Coordinates;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.shared.SportType;
+import fr.kriszt.theo.shared.data.SportDataSet;
 
 public class SportDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private ArrayList<Coordonate> listCoordonate;
+    private static final String TAG = SportDetailsActivity.class.getSimpleName();
+    private List<Coordinates> listCoordinate;
     private SportTask sTask;
 
     private GraphView graph;
@@ -35,6 +44,7 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
     private TextView distance;
     private TextView duration;
     private Tasker tasker;
+    private CardView stepsCard, heartCard, distanceCard, durationCard, mapCard, elevationCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,26 +53,25 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         tasker = Tasker.getInstance(this);
 
 
-        int id = getIntent().getIntExtra("idSportTask", 0);
+        int id = getIntent().getIntExtra("idSportTask", -1);
+//        long startTime = getIntent().getLongExtra("startTime+", -1);
+        Log.w(TAG, "onCreate: SportTask ID = " + id);
         sTask = tasker.getSportTaskByID(id);
-        listCoordonate = sTask.getListCoord();
+        listCoordinate = sTask.getListCoord();
 
-        graph = (GraphView) findViewById(R.id.graph);
+        graph = findViewById(R.id.graph);
 
         ArrayList<DataPoint> listPoint = new ArrayList<>();
         //TODO attention ordonné la liste par x croissant
-        for(int i=0; i<sTask.getListCoord().size(); i++){
-            listPoint.add(new DataPoint(i,sTask.getListCoord().get(i).getHeight()));
+        int i = 0;
+        for (Coordinates c : sTask.getListCoord()){
+            if (c != null){
+                listPoint.add(new DataPoint(i++, c.getAltitude()));
+            }
         }
-
-        //TODO REMOVE
-        listPoint.add(new DataPoint(1.3, 200));
-        listPoint.add(new DataPoint(2, 250));
-        listPoint.add(new DataPoint(3.5, 300));
-        listPoint.add(new DataPoint(4, 650));
-        listPoint.add(new DataPoint(5, 498));
-        listPoint.add(new DataPoint(32, 200));
-
+//        for(int i=0; i<sTask.getListCoord().size(); i++){
+//            listPoint.add(new DataPoint(i,sTask.getListCoord().get(i).getAltitude()));
+//        }
 
         DataPoint[] simpleArray = new DataPoint[ listPoint.size() ];
         listPoint.toArray( simpleArray );
@@ -77,24 +86,55 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         mapFragment.getMapAsync(this);
 
 
-        String res = "";
-        steps = (TextView) findViewById(R.id.steps);
+        String res;
+        steps = findViewById(R.id.steps);
         res = String.valueOf(sTask.getSteps());
         steps.setText(res);
 
-        heart = (TextView) findViewById(R.id.heart);
+        heart = findViewById(R.id.heart);
         res = String.valueOf(sTask.getHeart());
         heart.setText(res);
 
-        distance = (TextView) findViewById(R.id.distance);
-        sTask.caculateDistance();
-        res = String.valueOf(sTask.getDistance());
+        distance = findViewById(R.id.distance);
+//        sTask.caculateDistance();
+        res = String.valueOf(String.format("%.2f", sTask.getDistance()));
         distance.setText(res);
 
-        duration = (TextView) findViewById(R.id.duration);
+        duration = findViewById(R.id.duration);
         long s = sTask.getDuration();
-        res = String.format("%d : %02d : %02d", s / 3600, (s % 3600) / 60, (s % 60));
+        res = String.format("%02d : %02d : %02d", s / 3600, (s % 3600) / 60, (s % 60));
         duration.setText(res);
+
+        hideUnusedFields(sTask.getDataset());
+
+    }
+
+    private void hideUnusedFields(SportDataSet dataset) {
+        stepsCard = findViewById(R.id.stepsCard);
+        heartCard = findViewById(R.id.heartCard);
+        distanceCard = findViewById(R.id.distanceCard);
+        durationCard = findViewById(R.id.durationCard);
+        mapCard = findViewById(R.id.mapCard);
+        elevationCard = findViewById(R.id.elevationCard);
+
+//        Toast.makeText(this, "Type : " + dataset.getSportType(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Has Podo : " + dataset.hasPodometer(), Toast.LENGTH_SHORT).show();
+
+        if (dataset.getSportType() == SportType.SPORT_BIKE ||
+                !dataset.hasPodometer()){
+            stepsCard.setVisibility(View.GONE);
+        }
+
+        if (!dataset.hasCardiometer()){
+            heartCard.setVisibility(View.GONE);
+        }
+
+        if (dataset.getSportType() == SportType.SPORT_WALK ||
+                !dataset.hasGPS()){
+            distanceCard.setVisibility(View.GONE);
+            mapCard.setVisibility(View.GONE);
+            elevationCard.setVisibility(View.GONE);
+        }
 
     }
 
@@ -103,17 +143,13 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         mMap = googleMap;
 
         ArrayList<LatLng> listTracker = new ArrayList<>();
-        for(Coordonate c : sTask.getListCoord()){
-            listTracker.add(new LatLng(c.getLat(),c.getLng()));
+        for(Coordinates c : sTask.getListCoord()){
+            if (c != null) {
+                listTracker.add(new LatLng(c.getLat(),c.getLng()));
+            }
         }
 
-        //TODO REMOVE
-        listTracker.add(new LatLng(-35.016, 143.321));
-        listTracker.add(new LatLng(-34.747, 145.592));
-        listTracker.add(new LatLng(-34.364, 147.891));
-        listTracker.add(new LatLng(-33.501, 150.217));
-        listTracker.add(new LatLng(-32.306, 149.248));
-        listTracker.add(new LatLng(-32.491, 147.309));
+//        //TODO REMO-ew LatLng(-32.491, 147.309));
 
         double minLat = 200;
         double maxLat = -200;
@@ -142,5 +178,11 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(avg, 6));
         }
 
+    }
+
+    public void onDelete(View view) {
+        tasker.removeSportTask(sTask);
+        tasker.serializeLists();
+        finish();
     }
 }

@@ -1,8 +1,8 @@
 package fr.kriszt.theo.remindwear.tasker;
 
-import java.io.Serializable;
+import android.support.annotation.Nullable;
 
-import androidx.annotation.Nullable;
+import java.io.Serializable;
 
 public class Category implements Serializable {
 
@@ -30,12 +30,9 @@ public class Category implements Serializable {
 	public int getColor() {return color;}
 	public void setColor(int color) {this.color = color;}
 
+	@Override
 	public String toString() {
-		return " [ "
-				+ "\n\t"+name
-				+ "\n\t"+icon
-				+ "\n\t"+color
-				+ "\n] ";
+		return "Category \""+name+"\" : color="+color+", icon="+icon;
 	}
 
 	@Override

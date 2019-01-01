@@ -1,80 +1,127 @@
 package fr.kriszt.theo.remindwear.tasker;
 
+import android.content.Context;
+import android.util.Log;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
-public class SportTask extends Task {
+import fr.kriszt.theo.shared.Coordinates;
+import fr.kriszt.theo.shared.data.SportDataSet;
 
-    private ArrayList<Coordonate> listCoord = new ArrayList<>();
-    private int steps;
-    private int heart;
-    private int distance;
-    private long duration;
+public class SportTask implements Serializable{
+    private static final String TAG = SportTask.class.getSimpleName();
 
-    public SportTask(String name, String description, Category category, Calendar dateDeb,
-                     int warningBefore, int timeHour, int timeMinutes, Boolean[] repete,
-                     int steps, int heart, int distance, long duration) {
-        super(name, description, category, dateDeb, warningBefore, timeHour, timeMinutes, repete);
-        this.distance = distance;
-        this.steps = steps;
-        this.heart = heart;
-        this.duration = duration;
+//    private ArrayList<Coordinates> listCoord = new ArrayList<>();
+//    private int steps;
+//    private int heart;
+//    private int distance;
+//    private long duration;
+
+    private SportDataSet sportDataSet;
+    private Integer taskId = null;
+    private Task referer = null;
+
+//    public SportTask(SportDataSet d){
+//        this.sportDataSet = d;
+//    }
+
+//    public SportTask(SportDataSet d, Integer tId){
+//        this(d);
+//        taskId = tId;
+//    }
+
+    public SportTask(Task referer) {
+        this.referer = referer;
+        this.taskId = referer.getID();
     }
 
-    public SportTask(Task base, int steps, int heart, int distance, long duration){
-        this(base.getName(), base.getDescription(), base.getCategory(), base.getDateDeb(), base.getWarningBefore(), base.getTimeHour(), base.getTimeMinutes(), base.getRepete(),
-        steps, heart, distance, duration);
-    }
+    public static void bindTasks(List<SportTask> taskSportList, Context context) {
+//        Log.w(TAG, "bindTasks: ");
+        Tasker tasker = Tasker.getInstance(context);
 
-    public SportTask(Task base){
-        this(base, 0, 0, 0, 0);
-    }
-
-    public void addCoord(Coordonate c){listCoord.add(c);}
-    public ArrayList<Coordonate> getListCoord() {return listCoord;}
-
-    public int getSteps() {return steps;}
-    public void setSteps(int steps) {this.steps = steps;}
-
-    public int getHeart() {return heart;}
-    public void setHeart(int heart) {this.heart = heart;}
-
-    public int getDistance() {return distance;}
-    public void setDistance(int distance) {this.distance = distance;}
-
-    //TODO a tester
-    public void caculateDistance(){
-        int res = 0;
-        for(int i=0;i<listCoord.size();i++){
-            if(i!=0){
-                res += distance(listCoord.get(i-1),listCoord.get(i));
+        for (SportTask st : taskSportList){
+            if (st.taskId != null) {
+                Task referer = tasker.getTaskByID(st.taskId);
+                st.setTask(referer);
             }
+
         }
-        setDistance(res);
     }
 
-    private double distance(Coordonate c1, Coordonate c2) {
-
-        final int R = 6371; // Radius of the earth
-
-        double latDistance = Math.toRadians(c2.getLat() - c1.getLat());
-        double lonDistance = Math.toRadians(c2.getLng() - c1.getLng());
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(c1.getLat())) * Math.cos(Math.toRadians(c2.getLat()))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c * 1000; // convert to meters
-
-        double height = c1.getHeight() - c2.getHeight();
-
-        distance = Math.pow(distance, 2) + Math.pow(height, 2);
-
-        return Math.sqrt(distance);
+    public List<Coordinates> getListCoord() {
+        if (sportDataSet != null) {
+            return sportDataSet.getCoordinates();
+        }else return new ArrayList<>();
     }
 
-    public long getDuration() {return duration;}
-    public void setDurationSecondes(long duration) {
-        this.duration = duration;
+
+    public Calendar getFirstDate(){
+        if (sportDataSet != null) {
+            return sportDataSet.getCreationDate();
+        }else return null;
     }
+    public int getSteps() {return sportDataSet.stepsCount();}
+//    public void setSteps(int steps) {this.steps = steps;}
+
+    public float getHeart() {return sportDataSet.avgHeartRate();}
+//    public void setHeart(int heart) {this.heart = heart;}
+
+    public float getDistance() {return sportDataSet.getDistance();}
+//    public void setDistance(int distance) {this.distance = distance;}
+
+    public long getDuration() {return sportDataSet.getDuration();}
+
+    public Integer getID() {
+        if (referer != null){
+            return referer.getID();
+        }
+        return taskId;//sportDataSet.getTaskId();
+    }
+
+    public Category getCategory() {
+        if (this.referer != null){
+            return referer.getCategory();
+        }else return null;
+    }
+
+    public String getName() {
+        if (this.referer != null){
+            return referer.getName();
+        }else return null;
+
+    }
+
+    public String getDescription() {
+        if (this.referer != null){
+            return referer.getDescription();
+        }else return null;
+
+    }
+
+    public void setTask(Task referer) {
+        this.referer = referer;
+    }
+
+    public void setDataset(SportDataSet sportDataSet) {
+        this.sportDataSet = sportDataSet;
+    }
+
+    public SportDataSet getDataset() {
+        return  sportDataSet;
+    }
+
+
+    @Override
+    public String toString(){
+        String res = "SportTask, ID="+taskId+", DataSet="+sportDataSet;
+        return res;
+    }
+
+//    public void setDurationSecondes(long duration) {
+//        this.duration = duration;
+//    }
 
 }

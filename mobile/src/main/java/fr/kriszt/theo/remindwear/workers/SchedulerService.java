@@ -1,5 +1,6 @@
 package fr.kriszt.theo.remindwear.workers;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,9 +9,7 @@ import android.util.Log;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.Nullable;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 
@@ -47,12 +46,14 @@ public class SchedulerService extends Service {
             Bundle extras = intent.getExtras();
 
             if (extras != null){
-//                for (String k : extras.keySet()){
-//                    Log.w(TAG, "found key " + k + " = " + extras.get(k));
-//                }
+                for (String k : extras.keySet()){
+                    Log.w(TAG, "found key " + k + " = " + extras.get(k)); // TODO : pareil pour Later ou Track
+                }
 
                 Task task = (Task) extras.getSerializable(TASK_TAG);
                 postponeTask(task);
+
+
 
 
             }else {
@@ -98,7 +99,6 @@ public class SchedulerService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    @Nullable
     @android.support.annotation.Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -113,6 +113,10 @@ public class SchedulerService extends Service {
     private void postponeTask(Task task) {
 
         Log.i(TAG, "postponeTask: La tâche " + task.getName() + " est reportée à dans "+ POSTPONE_TIME_MINUTES +" minutes");
+
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+        notificationManager.cancel(task.getID());
+
         Task alteredTask = tasker.getTaskByID(task.getID()); // get actual tasker's Task, not just a copy
 
         Calendar calendar = new GregorianCalendar();

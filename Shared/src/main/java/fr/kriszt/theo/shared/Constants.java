@@ -13,6 +13,8 @@ public class Constants {
     public static final String KEY_TASK_ID = "TASK_ID"; // TODO : move identifiers in Notifications
     public static final String KEY_CONTENT = "CONTENT";
     public static final String KEY_TITLE = "TITLE";
+    public static final String KEY_SPORT_TYPE = "SPORT_TYPE";
+    public static final String KEY_DATASET = "DATASET";
     public static final int  BOTH_ID = 4;
     public static final int PHONE_ID = 3;
     public static final int  WEAR_ID = 2;
@@ -20,6 +22,9 @@ public class Constants {
     public static final String BOTH_PATH = "/both";
     public static final String PHONE_PATH = "/phone";
     public static final String WEAR_PATH = "/watch";
+    public static final String START_ACTIVITY_PATH = "/start-activity";
+    public static final String ACTION_UPDATE_UI = "fr.kriszt.theo.updateui";
+    public static final String KEY_COLOR = "COLOR";
 
     private Constants() {};
 }

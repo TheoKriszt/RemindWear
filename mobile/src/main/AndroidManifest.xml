@@ -8,17 +8,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality. 
-    -->
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
-    <!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> -->
-    <!-- TODO : reschedule after restart ? -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_todolist"
@@ -27,60 +20,36 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <service android:name=".workers.SchedulerService"/>
-        <service android:name=".wear.WearListener_bak">
-            <intent-filter>
-                <!-- listeners receive events that match the action and data filters -->
-                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-                <!-- filters by Constants.WEAR_PATH ' /watch') -->
-                <data android:scheme="wear" android:host="*" android:pathPrefix="/watch"/>
-            </intent-filter>
-            <intent-filter>
-                <action
-                    android:name="com.example.android.wearable.wearable.synchronizednotifications.DISMISS" />
-            </intent-filter>
-        </service>
+        <service android:name=".workers.SchedulerService" />
+
         <activity
-            android:name=".TasksActivity"
+            android:name=".ui.activities.TasksActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".NotificationTestingActivity"
-            android:label="Notificator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!-- <activity -->
+        <!-- android:name=".ui.activities.GooglePlayServicesActivity" -->
+        <!-- android:label="WearSensorTest"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
         <activity android:name=".ui.activities.EditTaskActivity" />
-        <activity android:name=".ui.activities.AddTaskActivity" />
+        <activity android:name=".ui.activities.AddTaskActivity"
+            android:label="fitness">
+            <intent-filter>
+                <!--<category android:name="android.intent.category.VOICE" />-->
+                <action android:name="android.intent.action.INSERT_OR_EDIT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
 
-        <!-- <receiver android:name=".jobs.RebootReceiver" android:enabled="true" android:exported="false" android:permission="android.permission.RECEIVE_BOOT_COMPLETED"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
-        <!-- <category android:name="android.intent.category.HOME" /> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
-        <!-- <receiver -->
-        <!-- android:name=".jobs.AddReceiver" -->
-        <!-- android:exported="false"> -->
-        <!-- &lt;!&ndash; Creation du singleton createur de jobs au démarrage de l'appli &ndash;&gt; -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="com.evernote.android.job.ADD_JOB_CREATOR"/> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
-        <!-- <service -->
-        <!-- android:name=".utils.SchedulerJobService" -->
-        <!-- android:label="Scheduler service" -->
-        <!-- android:permission="android.permission.BIND_JOB_SERVICE" > -->
-        <!-- </service> -->
-
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.activities.AddCategoryActivity"
             android:label="@string/title_activity_add_category"
@@ -92,11 +61,15 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <service android:name=".wear.PhoneDataService">
+        <!-- Echange de messages Mobile <==> Montre -->
+        <service android:name=".data.PhoneDataService">
             <intent-filter>
-
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-                <data android:scheme="wear" android:host="*" android:pathPrefix="/phone"/>
+
+                <data
+                    android:host="*"
+                    android:pathPrefix="/phone"
+                    android:scheme="wear" />
             </intent-filter>
         </service>
 

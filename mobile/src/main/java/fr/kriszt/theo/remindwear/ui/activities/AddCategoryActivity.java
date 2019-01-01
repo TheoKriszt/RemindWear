@@ -65,22 +65,22 @@ public class AddCategoryActivity extends AppCompatActivity {
         listIcons.add(R.drawable.ic_base_20);
 
 
-        title = (EditText) findViewById(R.id.name);
+        title = findViewById(R.id.name);
 
-        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner = findViewById(R.id.spinner);
         spinner.setAdapter(new NewAdapter(listIcons));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        colorPickerView = (ColorPickerView) findViewById(R.id.colorPickerView);
+        colorPickerView = findViewById(R.id.colorPickerView);
         colorPickerView.setColorListener(new ColorListener() {
             @Override
             public void onColorSelected(ColorEnvelope colorEnvelope) {
-                ImageView colorView  = (ImageView) findViewById(R.id.colorView);
+                ImageView colorView  = findViewById(R.id.colorView);
                 colorView.setBackgroundColor(colorEnvelope.getColor());
             }
         });
 
-        submit = (Button) findViewById(R.id.submit);
+        submit = findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,7 +158,7 @@ private class ViewHolder {
     ImageView itemIcon;
 
     public ViewHolder(View view) {
-        itemIcon = (ImageView) view.findViewById(R.id.icon);
+        itemIcon = view.findViewById(R.id.icon);
     }
 }
 
