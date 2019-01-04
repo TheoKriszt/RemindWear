@@ -25,6 +25,11 @@ public class Constants {
     public static final String START_ACTIVITY_PATH = "/start-activity";
     public static final String ACTION_UPDATE_UI = "fr.kriszt.theo.updateui";
     public static final String KEY_COLOR = "COLOR";
+    public static final String KEY_CATEGORY = "CAT";
+    public static final String KEY_SUBJECT = "SUB";
+    public static final String KEY_DATE = "DATE";
+    public static final String KEY_MINUTES = "MINUTES";
+    public static final String KEY_HOUR = "HOUR";
 
     private Constants() {};
 }

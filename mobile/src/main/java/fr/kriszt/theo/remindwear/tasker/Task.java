@@ -15,6 +15,7 @@ public class
 Task implements Serializable {
 		
 	private static final long serialVersionUID = 1L;
+    private static final String TAG = Task.class.getSimpleName();
     private int ID;
     private UUID workID;
     private String name;
@@ -125,6 +126,7 @@ Task implements Serializable {
 
 	public Calendar getNextDate(){
 		if(dateDeb == null){
+//            Log.w(TAG, "getNextDate: DATEDEB is NULL");
 			Calendar now = new GregorianCalendar();
             int day=0;
             int first = 0;
@@ -137,16 +139,23 @@ Task implements Serializable {
                     break;
                 }
             }
-            Log.e("ddddddddddddddddddDAY", String.valueOf(day));
-            Log.e("ffffffffffffffffirst", String.valueOf(first));
+//            Log.e("ddddddddddddddddddDAY", String.valueOf(day));
+//            Log.e("" +
+//					"ffffffffffffffffirst", String.valueOf(first));
             if(day == 0){
                 day = first + 7;
             }
             Calendar c = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), getTimeHour(), getTimeMinutes());
             c.add(Calendar.DAY_OF_MONTH, day+2 - now.get(Calendar.DAY_OF_WEEK));
-            Log.e("ccccccccccccccccccccc", String.valueOf(c.get(Calendar.DAY_OF_MONTH)));
+//            Log.e("ccccccccccccccccccccc", String.valueOf(c.get(Calendar.DAY_OF_MONTH)));
+            Calendar oneWeekBefore = (Calendar) c.clone();
+            oneWeekBefore.add(Calendar.WEEK_OF_YEAR, -1);
+            if (oneWeekBefore.after(new GregorianCalendar())){
+                c = oneWeekBefore;
+            }
 			return c;
 		}else{
+//            Log.w(TAG, "getNextDate: DATEDEB NOT NULL");
             Calendar c = new GregorianCalendar(dateDeb.get(Calendar.YEAR), dateDeb.get(Calendar.MONTH), dateDeb.get(Calendar.DAY_OF_MONTH), getTimeHour(), getTimeMinutes());
             return c;
 		}
@@ -158,14 +167,23 @@ Task implements Serializable {
     }
 
 	public long getRemainingTime(TimeUnit timeUnit){
+//        Log.w(TAG, "getRemainingTime: ");
 		Calendar cal = getNextDate();
+//        Log.w(TAG, "next calendar  is  " + cal);
+//        Date todate = new Date(cal.getTimeInMillis());
+//        Log.w(TAG, "next date is  " + todate);
 		cal.set(Calendar.HOUR, getTimeMinutes());
 		cal.set(Calendar.MINUTE, getTimeMinutes());
 		cal.add(Calendar.MINUTE, -1 * getWarningBefore());
-		//cal.roll(Calendar.MINUTE, getWarningBefore());
+
 	    Date mDate  = getNextDate().getTime();
         /*mDate.setHours(getTimeHour());
 	    mDate.setMinutes(getTimeMinutes());*/
+
+//        Log.w(TAG, "getRemainingTime: " + mDate);
+//        Log.w(TAG, "getRemainingNOW : " + new Date(new GregorianCalendar().getTimeInMillis()));
+
+
         return getDateDiff(mDate,new Date(),timeUnit);
     }
 

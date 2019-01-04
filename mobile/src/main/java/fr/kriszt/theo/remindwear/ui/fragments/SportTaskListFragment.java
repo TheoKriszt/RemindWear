@@ -74,42 +74,16 @@ public class SportTaskListFragment extends Fragment {
 
 
         tasksSportList = myTasker.getListSportTasks();
+//        Log.w(TAG, "onViewCreated: Jai retrouvé " + tasksSportList.size() + " activites sportives");
 
-        //TODO REMOVE
-        myTasker.unserializeLists();
-//        if(myTasker.getListSportTasks().isEmpty()){
-//            Category sport = myTasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
-//            Calendar calendar = new GregorianCalendar();
-//            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-//            int minute = calendar.get(Calendar.MINUTE);
-//            Task referer = new Task("Tâche de test", "Une petite description", sport, calendar, 0, hour, minute);
-//
-//            SportDataSet sportDataSet = new SportDataSet(SportType.SPORT_BIKE, true, true, true);
-//
-//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42, 1.83, 100, 20), 5, 75, 0.22f));
-//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42.1, 1.83, 110, 30), 10, 60, 0.44f));
-//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42, 1.84, 120, 20), 15, 63, 0.66f));
-//            sportDataSet.addPoint(new SportDataPoint(new Coordinates(42.1, 1.83, 110, 10), 25, 115, 1.24f));
-//
-//            myTasker.addTask(referer);
-//
-//            SportTask s = new SportTask(referer);
-//            s.setDataset(sportDataSet);
-//
-//            myTasker.addSportTask(s);
-//            Log.w(TAG, "onViewCreated: CREATED Sport Task : " + s);
-//
-//            tasksSportList.add(s);
-//        }
+
+//        myTasker.unserializeLists();
+
 
         myTasker.sportSort(false);
         myTasker.serializeLists();
 
-//        Log.w(TAG, "onViewCreated: on arrete de deconner");
-//        Log.w(TAG, "onViewCreated: nb Taches normales " + myTasker.getListTasks().size());
-//        Log.w(TAG, "onViewCreated: nb Taches Sport    " + myTasker.getListSportTasks().size());
-
-        sportList = rootView.findViewById(R.id.sportList);
+         sportList = rootView.findViewById(R.id.sportList);
         tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
@@ -195,18 +169,30 @@ public class SportTaskListFragment extends Fragment {
     }
 
     public void updateRecyclerView(){
-        Log.w(TAG, "updateRecyclerView: ");
+//        Log.w(TAG, "updateRecyclerView: ");
         sportList = rootView.findViewById(R.id.sportList);
+        tasker.unserializeLists();
+        tasksSportList = tasker.getListSportTasks();
+
         tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         sportList.setLayoutManager(mLayoutManager);
         sportList.setItemAnimator(new DefaultItemAnimator());
         sportList.setAdapter(tasksSportAdapter);
+
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume(){
+        Log.w(TAG, "onResume: ");
+        updateRecyclerView();
+        super.onResume();
     }
 
 }

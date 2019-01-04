@@ -62,7 +62,6 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         graph = findViewById(R.id.graph);
 
         ArrayList<DataPoint> listPoint = new ArrayList<>();
-        //TODO attention ordonné la liste par x croissant
         int i = 0;
         for (Coordinates c : sTask.getListCoord()){
             if (c != null){
@@ -183,6 +182,7 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
     public void onDelete(View view) {
         tasker.removeSportTask(sTask);
         tasker.serializeLists();
+        tasker.unserializeLists();
         finish();
     }
 }

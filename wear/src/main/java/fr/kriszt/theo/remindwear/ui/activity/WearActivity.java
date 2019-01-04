@@ -437,7 +437,7 @@ public class WearActivity extends WearableActivity
                 Location lastLocation = locationResult.getLastLocation();
                 lastCoordinates = coordinates;
                 coordinates = new Coordinates(lastLocation);
-                Log.w(TAG, "onLocationResult: " + coordinates.getLat() + "; "+coordinates.getLng());
+//                Log.w(TAG, "onLocationResult: " + coordinates.getLat() + "; "+coordinates.getLng());
             }
 
             @Override

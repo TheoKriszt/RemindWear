@@ -81,22 +81,9 @@ public class SportTaskListAdapterFragment extends RecyclerView.Adapter<SportTask
 //            icon = p.getDataset().getSportType().getIcon();
             SportType sportType = p.getDataset().getSportType();
             icon = sportType.getIcon();
-//            switch (sportType){
-//                case SPORT_WALK:
-//                    icon =
-////                    icon = R.drawable.ic_directions_walk;
-//                    break;
-//                case SPORT_BIKE:
-//                    break;
-//                case SPORT_RUN:
-//                    break;
-//            }
         }
         holder.icon.setImageResource(icon);
         holder.icon.setColorFilter(Color.BLACK);
-
-//        holder.icon.setBackground( context.getResources().getDrawable(icon, null) );
-//        holder.icon.setImageResource(context.getResources().getDrawable(icon, null));
 
         holder.name.setText(p.getName());
 
@@ -105,7 +92,6 @@ public class SportTaskListAdapterFragment extends RecyclerView.Adapter<SportTask
             public void onClick(View view) {
                 final Intent myIntent = new Intent(view.getContext(), SportDetailsActivity.class);
                 myIntent.putExtra("idSportTask", fTask.getID());
-//                myIntent.putExtra("startTime", fTask.getFirstDate().getTimeInMillis());
                 context.startActivity(myIntent);
             }
         });
@@ -153,6 +139,11 @@ public class SportTaskListAdapterFragment extends RecyclerView.Adapter<SportTask
     public int getItemCount() {
         return taskSportList.size();
     }
+
+    public void updateView(){
+        Log.w(TAG, "updateView: //////////////////////// I should update !!");
+    }
+
 
 
 

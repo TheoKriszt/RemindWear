@@ -23,7 +23,7 @@ public class SchedulerService extends Service {
 
     public static final String TAG = "SHEDULER_SERVICE";
 
-    public static final int POSTPONE_TIME_MINUTES = 10;
+    public static final int POSTPONE_TIME_MINUTES = 60;
 
     public static final String TASK_TAG = "TASK_ID";
     private Tasker tasker;
@@ -60,38 +60,6 @@ public class SchedulerService extends Service {
                 Log.w(TAG, "onStartCommand: Les extras sont NULL");
             }
 
-
-
-
-//            Log.w(TAG, "onStartCommand: SER : "  + task);
-//            String test = intent.getStringExtra("TEST");
-//            String taskId = extras.get(TASK_TAG).toString();
-//
-//            Log.w(TAG, "onStartCommand: WTF");
-//            Log.w(TAG, "onStartCommand: test : " + test);
-//            Log.w(TAG, "onStartCommand: taskId: " + taskId);
-//
-
-
-
-
-//            Task task = (Task) intent.getExtras().get("TASK");
-//            Log.w(TAG, "onStartCommand: Message recu : " + intent.getExtras().get("TEST"));
-//
-////            Object value = intent.getExtras().get(TASK_TAG);
-//
-////            Log.w(TAG, "onStartCommand: VALUE :: " + value.toString());
-//            int taskId = intent.getIntExtra(TASK_TAG, -1);
-//
-//            Log.w(TAG, "onStartCommand: TaskId : " + taskId);
-//
-//            if (task != null){
-//                Log.w(TAG, "onStartCommand: Tâche récupéree : " + task.toString());
-//                postponeTask(task);
-//
-//            }else {
-//                Log.w(TAG, "Error : cannot find Task with ID " + taskId);
-//            }
         }
 
 
