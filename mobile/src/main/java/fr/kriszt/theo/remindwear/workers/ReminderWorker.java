@@ -76,6 +76,8 @@ public class ReminderWorker extends Worker {
             WorkManager.getInstance().cancelWorkById(task.getWorkID());
         }
 
+        if (!task.getIsActivatedNotification()) return; // ne pas dérange
+
         long remainingSeconds = task.getRemainingTime(TimeUnit.SECONDS) * -1; // dateDiff donne une valeur négative si dans le futur
 //        remainingSeconds /= 10; // accélérer les tests
         Log.w(TAG, "scheduleWorker: la tâche "+ task.getName() + " commencera dans " + remainingSeconds + " secondes");

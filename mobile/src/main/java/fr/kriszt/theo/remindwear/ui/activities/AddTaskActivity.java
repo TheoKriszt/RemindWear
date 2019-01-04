@@ -23,12 +23,14 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.shared.Constants;
 
 public class AddTaskActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -205,6 +207,37 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                 submitAction();
             }
         });
+
+        if (getIntent().getExtras()!= null && getIntent().getExtras().get(Constants.KEY_SUBJECT) != null){
+            setValuesFromIntent(getIntent().getExtras());
+        }
+
+    }
+
+    private void setValuesFromIntent(Bundle extras) {
+        String what, cat;
+        int hour, minutes;
+        long timeMillis = extras.getLong(Constants.KEY_DATE);
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(timeMillis);
+        calendarView.setDate(timeMillis);
+
+
+        cat = extras.getString(Constants.KEY_CATEGORY);
+        what = extras.getString(Constants.KEY_SUBJECT);
+        minutes = extras.getInt(Constants.KEY_MINUTES);
+        hour = extras.getInt(Constants.KEY_HOUR);
+
+
+        if (tasker.getCategoryByName(cat) != null){
+            category = tasker.getCategoryByName(cat);
+            spinner.setSelection(tasker.getListCategories().indexOf(category));
+        }
+
+        time_picker_hour.setValue((hour));
+        time_picker_min.setValue((minutes));
+
+        name.setText(what);
 
     }
 

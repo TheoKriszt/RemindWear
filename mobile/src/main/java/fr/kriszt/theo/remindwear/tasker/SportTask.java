@@ -35,7 +35,9 @@ public class SportTask implements Serializable{
 
     public SportTask(Task referer) {
         this.referer = referer;
-        this.taskId = referer.getID();
+        if (referer != null) {
+            this.taskId = referer.getID();
+        }
     }
 
     public static void bindTasks(List<SportTask> taskSportList, Context context) {

@@ -22,6 +22,7 @@ import java.util.Locale;
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
 import fr.kriszt.theo.remindwear.workers.ReminderWorker;
+import fr.kriszt.theo.remindwear.workers.SchedulerService;
 
 public class Tasker {
 
@@ -95,21 +96,24 @@ public class Tasker {
 		return true;
 	}
 
-	public ArrayList<SportTask> getListSportTasks() {return listSportTasks;}
-	public void setListSportTasks(ArrayList<SportTask> listSportTasks) {this.listSportTasks = listSportTasks;}
+	public ArrayList<SportTask> getListSportTasks() {
+
+        return listSportTasks;
+    }
+//	public void setListSportTasks(ArrayList<SportTask> listSportTasks) {this.listSportTasks = listSportTasks;}
 	public void removeSportTask(SportTask t) {listSportTasks.remove(t);}
-	public void removeSportTaskByID(int id){
-		int temp =-1;
-		for (int i =0; i < listSportTasks.size(); i++){
-			if(listSportTasks.get(i).getID() == id){
-				temp = i;
-				break;
-			}
-		}
-		if (temp != -1){
-			listSportTasks.remove(temp);
-		}
-	}
+//	public void removeSportTaskByID(int id){
+//		int temp =-1;
+//		for (int i =0; i < listSportTasks.size(); i++){
+//			if(listSportTasks.get(i).getID() == id){
+//				temp = i;
+//				break;
+//			}
+//		}
+//		if (temp != -1){
+//			listSportTasks.remove(temp);
+//		}
+//	}
 
 	public Boolean addSportTask(SportTask t) {
 		for(SportTask x : listSportTasks) {
@@ -143,6 +147,7 @@ public class Tasker {
 
     public void changeWithSaveIsActivatedNotification(Task t) {
         t.setIsActivatedNotification(!t.getIsActivatedNotification());
+        ReminderWorker.scheduleWorker(t);
 	    serializeLists();
     }
 
@@ -271,6 +276,20 @@ public class Tasker {
 //            Log.w(TAG, "garbageCollectOld: Removing old task " + i);
 			removeTaskByID(i);
 		}
+
+		ArrayList<SportTask> stDeletes = new ArrayList<>();
+		for (SportTask st : listSportTasks){
+//            Log.w(TAG, "garbageCollectOld: essai avec " + st);
+		    if (st == null ||  st.getDataset() == null){
+		        stDeletes.add(st);
+            }
+        }
+
+        for (SportTask st : stDeletes){
+		    removeSportTask(st);
+        }
+
+
 		serializeLists();
 	}
 	
@@ -302,9 +321,9 @@ public class Tasker {
     public void sportSort(final Boolean growing) {
         unserializeLists();
 //        Log.w(TAG, "sportSort: Je trie une liste de " + listSportTasks.size() + " sporttasks");
-        for (SportTask s : listSportTasks){
-            Log.w(TAG, "\t" + s);
-        }
+//        for (SportTask s : listSportTasks){
+//            Log.w(TAG, "\t" + s);
+//        }
         Collections.sort(listSportTasks, new Comparator<SportTask>() {
             @Override
             public int compare(SportTask o1, SportTask o2) {
@@ -314,6 +333,7 @@ public class Tasker {
                 }
                 Calendar o1deb = o1.getFirstDate();
                 Calendar o2deb = o2.getFirstDate();
+                if (o1deb == null || o2deb == null) return 0;
 
                 if (o1deb.after(o2deb)) {
                     return res*-1;
@@ -454,7 +474,7 @@ public class Tasker {
 //		Log.w(TAG, "getSportTaskByID: Recherche de la sportTask avec l'ID " + taskId);
 
 		for(SportTask t : listSportTasks){
-			if(t.getID().equals(taskId)) {
+			if(t != null && t.getID() != null && t.getID().equals(taskId)) {
 //				Log.w(TAG, "getSportTaskByID FOUND: " + t.getName() + " " + t.getID());
 				return t;
 			}
@@ -474,8 +494,11 @@ public class Tasker {
 	}
 
 	public Category getCategoryByName(String catName){
+	    if (catName == null) return null;
+//        Log.w(TAG, "getCategoryByName: recherche de la cat " + catName);
     	for (Category c : listCategories){
-    		if (c.getName().equals(catName)){
+//            Log.w(TAG, "getCategoryByName: compare avec " + c.getName());
+    		if (c.getName().toLowerCase().equals(catName.toLowerCase())){
     			return c;
 			}
 		}

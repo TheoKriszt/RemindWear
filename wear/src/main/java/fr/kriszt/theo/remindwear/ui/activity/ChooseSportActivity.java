@@ -1,5 +1,6 @@
 package fr.kriszt.theo.remindwear.ui.activity;
 
+import android.content.Intent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.wear.widget.WearableLinearLayoutManager;
@@ -7,7 +8,10 @@ import android.support.wear.widget.WearableRecyclerView;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -17,6 +21,7 @@ import fr.kriszt.theo.remindwear.sensors.SensorUtils;
 import fr.kriszt.theo.remindwear.ui.RecyclerViewAdapter;
 import fr.kriszt.theo.remindwear.ui.SportTypeItem;
 import fr.kriszt.theo.shared.Constants;
+import fr.kriszt.theo.shared.SportType;
 
 public class ChooseSportActivity extends WearableActivity  {
 
@@ -27,6 +32,7 @@ public class ChooseSportActivity extends WearableActivity  {
     private RecyclerViewAdapter mAdapter;
     private List<SportTypeItem> myDataSet = new ArrayList<>();
     private SensorManager sensorManager;
+    private String sportType;
 
     @BindView(R.id.recycler_launcher_view)
     public WearableRecyclerView mWearableRecyclerView;
@@ -38,9 +44,33 @@ public class ChooseSportActivity extends WearableActivity  {
 
         Integer taskId = null;
 
-        if (getIntent().getExtras() != null &&
-                getIntent().getExtras().getString(Constants.KEY_TASK_ID) != null ){
-            taskId = Integer.parseInt(getIntent().getExtras().getString(Constants.KEY_TASK_ID));
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().getString(Constants.KEY_TASK_ID) != null){
+                String params = getIntent().getExtras().getString(Constants.KEY_TASK_ID);
+                HashMap<String, String> map = new Gson().fromJson(params, HashMap.class);
+                Log.w(TAG, "onCreate: PARAMS " + map.keySet());
+                if (map.containsKey(Constants.KEY_TASK_ID)) {
+                    taskId = Integer.parseInt(map.get(Constants.KEY_TASK_ID));
+                }
+
+                if (map.containsKey(Constants.KEY_SPORT_TYPE)) {
+//                    Log.w(TAG, "onCreate: Sport Type :: " + map.get(Constants.KEY_SPORT_TYPE));
+                    sportType = map.get(Constants.KEY_SPORT_TYPE);
+                    Log.w(TAG, "onCreate: Sport Type :: " + sportType);
+                }else Log.w(TAG, "onCreate: No SportType provided");
+            }
+
+        }
+
+        if (sportType != null){
+            Intent startIntent = new Intent(this, WearActivity.class);
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+            startIntent.putExtra(Constants.KEY_SPORT_TYPE, sportType);
+            startIntent.putExtra(Constants.KEY_TASK_ID, taskId);
+
+            startActivity(startIntent);
         }
 
         Log.w(TAG, "onCreate: TaskId = " + taskId);
@@ -65,6 +95,8 @@ public class ChooseSportActivity extends WearableActivity  {
 
         mAdapter = new RecyclerViewAdapter(myDataSet, this, taskId);
         mWearableRecyclerView.setAdapter(mAdapter);
+
+
     }
 
     @Override

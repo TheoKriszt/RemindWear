@@ -2,10 +2,8 @@ package fr.kriszt.theo.remindwear.ui.fragments;
 
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -15,14 +13,11 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -33,9 +28,14 @@ import java.util.concurrent.TimeUnit;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
+import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.remindwear.ui.activities.AddTaskActivity;
+import fr.kriszt.theo.remindwear.voice.VoiceUtils;
+import fr.kriszt.theo.shared.SportType;
+
+import static android.app.Activity.RESULT_OK;
 
 public class TaskListFragment extends Fragment {
 
@@ -45,6 +45,7 @@ public class TaskListFragment extends Fragment {
     private Boolean growing = true;
 
     private FloatingActionButton addButton;
+    private FloatingActionButton voiceButton;
 
     private List<Task> tasksList;
     private RecyclerView tasks;
@@ -77,19 +78,20 @@ public class TaskListFragment extends Fragment {
         tasker.unserializeLists();
 
 
-        if (tasker.getListTasks().isEmpty()){
-            Log.w(TAG, "onViewCreated: Tâche de test");
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.add(Calendar.MINUTE, 1);
-            int timeHour = cal.get(Calendar.HOUR_OF_DAY);
-            int timeMinutes= cal.get(Calendar.MINUTE);
-            Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
-            Task testTask = new Task("Tâche de test", "Créée pour l'exemple", sport, cal, 0, timeHour, timeMinutes);
-            tasker.addTask(testTask);
 
-            Toast.makeText(getContext(), "La tâche d'exemple commencera dans " + -testTask.getRemainingTime(TimeUnit.SECONDS) + " secondes", Toast.LENGTH_SHORT).show();
-            tasker.serializeLists();
-        }
+//        if (tasker.getListTasks().isEmpty()){
+//            Log.w(TAG, "onViewCreated: Tâche de test");
+//            GregorianCalendar cal = new GregorianCalendar();
+//            cal.add(Calendar.MINUTE, 1);
+//            int timeHour = cal.get(Calendar.HOUR_OF_DAY);
+//            int timeMinutes= cal.get(Calendar.MINUTE);
+//            Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
+//            Task testTask = new Task("Tâche de test", "Créée pour l'exemple", sport, cal, 0, timeHour, timeMinutes);
+//            tasker.addTask(testTask);
+//
+//            Toast.makeText(getContext(), "La tâche d'exemple commencera dans " + -testTask.getRemainingTime(TimeUnit.SECONDS) + " secondes", Toast.LENGTH_SHORT).show();
+//            tasker.serializeLists();
+//        }
 //        else {
 //            Log.w(TAG, "onViewCreated: Tâches présentes:  " + tasker.getListTasks().size());
 //        }
@@ -106,6 +108,17 @@ public class TaskListFragment extends Fragment {
         tasks.setLayoutManager(mLayoutManager);
         tasks.setItemAnimator(new DefaultItemAnimator());
         tasks.setAdapter(tasksAdapter);
+
+        voiceButton = rootView.findViewById(R.id.voiceButton);
+        voiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.w(TAG, "onClick: Clic sur bouton voix");
+
+                VoiceUtils.startSpeechRecognizer(TaskListFragment.this);
+
+            }
+        });
 
         addButton = rootView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -204,6 +217,14 @@ public class TaskListFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Intent intent = VoiceUtils.getRecognizedSpeech(requestCode, resultCode, data, this.getContext());
+
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 

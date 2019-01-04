@@ -19,18 +19,22 @@ import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
+import com.google.gson.Gson;
 
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.shared.Constants;
+import fr.kriszt.theo.shared.SportType;
 import fr.kriszt.theo.shared.data.SportDataPoint;
 import fr.kriszt.theo.shared.data.SportDataSet;
 
@@ -48,6 +52,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 //    private static final String START_ACTIVITY_PATH = "/start-activity";
 
     private int taskId;
+    private SportType sportType;
 
 
     @Override
@@ -65,13 +70,18 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 //        Log.w(TAG, "PhoneDataService :: onStartCommand: " + intent.getAction());
 
         if (intent.getAction().equals(Constants.ACTION_LAUNCH_WEAR_APP)){
+
+            if (intent.getExtras().get(Constants.KEY_SPORT_TYPE) != null) {
+                sportType = (SportType) intent.getExtras().get(Constants.KEY_SPORT_TYPE);
+            }
+
             int refererId = intent.getExtras().getInt(Constants.KEY_TASK_ID); // ID de la tâche d'origine
             Tasker tasker = Tasker.getInstance(getApplicationContext());
 
+
+
             tasker.unserializeLists();
             fr.kriszt.theo.remindwear.tasker.Task referer = tasker.getTaskByID(refererId);
-
-            int sportTaskId = refererId; // l'Id de la SportTask prend le même valeur que l'ID de la tâche qui l'a créée
 
             tasker.addSportTask(new SportTask(referer));
 
@@ -146,7 +156,12 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
         Tasker tasker = Tasker.getInstance(getApplicationContext());
 
-        SportTask sportTask = tasker.getSportTaskByID(sportDataSet.getTaskId());
+
+        SportTask sportTask  = null;
+        if (sportDataSet.getTaskId() != null) {
+            sportTask = tasker.getSportTaskByID(sportDataSet.getTaskId());
+        }
+
         if (sportTask == null){
             // TODO
             Log.w(TAG, "onMessageReceived: TODO : créer une sportTask a la volee");
@@ -155,8 +170,8 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
             fr.kriszt.theo.remindwear.tasker.Task nullReferer = new fr.kriszt.theo.remindwear.tasker.Task("Sport libre : " + sportDataSet.getSportType().getName(), "", sport, cal, 0, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
             sportTask = new SportTask(nullReferer);
             tasker.addSportTask(sportTask);
-            tasker.serializeLists();
             sportTask.setDataset(sportDataSet);
+            tasker.serializeLists();
         }else {
             sportTask.setDataset(sportDataSet);
         }
@@ -173,13 +188,22 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 
     @WorkerThread
     private void sendStartActivityMessage(String node) {
-        byte[] taskIdPayload = (taskId+"").getBytes();
 
-        Log.w(TAG, "sendStartActivityMessage: Task Id is " + taskId);
+        Map<String, String> params = new HashMap<>();
+        params.put(Constants.KEY_TASK_ID, String.valueOf(taskId));
+        if (sportType != null) {
+            params.put(Constants.KEY_SPORT_TYPE, sportType.getName());
+        }
+
+        String payload = new Gson().toJson(params);
+
+
+        Log.w(TAG, "sendStartActivityMessage: PAYLOAD : " + payload);
+//        Log.w(TAG, "sendStartActivityMessage: Task Id is " + taskId);
 
         Task<Integer> sendMessageTask =
                 Wearable.getMessageClient(this)
-                        .sendMessage(node, Constants.START_ACTIVITY_PATH, taskIdPayload);
+                        .sendMessage(node, Constants.START_ACTIVITY_PATH, payload.getBytes());
 
         try {
             Integer result = Tasks.await(sendMessageTask);

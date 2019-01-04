@@ -37,10 +37,13 @@ import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
+import com.google.gson.Gson;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import fr.kriszt.theo.remindwear.ui.activity.ChooseSportActivity;
@@ -103,6 +106,14 @@ public class   WearDataService extends Service implements
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
 //        Log.w(TAG, "onMessageReceived: " + messageEvent);
+
+        String source = new String(messageEvent.getData());
+        HashMap params = new Gson().fromJson( source, HashMap.class );
+//        Log.w(TAG, "onMessageReceived: PARAMS" + params.keySet());
+//        for (Object k : params.keySet()){
+//            Log.w(TAG, "onMessageReceived: key " + k + " :-> " + params.get(k));
+//        }
+
         String taskId = new String(messageEvent.getData()).replace("Data", "");
 //        Log.w(TAG, "onMessageReceived: TaskID : " + taskId);
 //        byte[] taskIdPayload = BigInteger.valueOf(taskId).toByteArray();
@@ -116,7 +127,7 @@ public class   WearDataService extends Service implements
 
             startActivity(startIntent);
         }else {
-            Log.w(TAG, "onMessageReceived: " + messageEvent.getPath());
+//            Log.w(TAG, "onMessageReceived: " + messageEvent.getPath());
         }
     }
 
@@ -140,7 +151,9 @@ public class   WearDataService extends Service implements
 //                    Log.w(TAG, "onStartCommand: SportDataSet is null");
 //                }
 
-            } else Log.w(TAG, "onStartCommand: Pas d'extras");
+            } else {
+//                Log.w(TAG, "onStartCommand: Pas d'extras");
+            }
 
 
 //            Log.w(TAG, "onStartCommand: Fin du tracking, " + DataLayerUtils.getNodes(getApplicationContext()).size() + " noeuds trouves");
