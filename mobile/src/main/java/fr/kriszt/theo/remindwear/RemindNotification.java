@@ -5,8 +5,9 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
@@ -46,9 +47,9 @@ public class RemindNotification {
 
 
         NotificationCompat.Builder builder = build(task);
-        NotificationCompat.WearableExtender extender = buildExtender(task);
+        NotificationCompat.WearableExtender extender = new NotificationCompat.WearableExtender();
 
-        addActions(task, builder, extender);
+        addActions(task, builder);
 
         builder.extend(extender);
         builder.setAutoCancel(true);
@@ -59,13 +60,13 @@ public class RemindNotification {
 
     }
 
-    private void addActions(Task task, NotificationCompat.Builder builder, NotificationCompat.WearableExtender extender) {
+    private void addActions(Task task, NotificationCompat.Builder builder) {
         // Ajouter l'action START TRACKING pour la catégorie sport
 
         Intent trackingIntent = new Intent(context, TasksActivity.class);
         trackingIntent.putExtra(TasksActivity.FRAGMENT_TO_LAUNCH, SportTaskListFragment.class.getName());
         trackingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingTrackingIntent = PendingIntent.getActivity(context, 0, trackingIntent, 0);
+//        PendingIntent pendingTrackingIntent = PendingIntent.getActivity(context, 0, trackingIntent, 0);
 
         Intent sendMessageIntent = new Intent(context, PhoneDataService.class);
         sendMessageIntent.setAction(Constants.ACTION_LAUNCH_WEAR_APP);
@@ -86,38 +87,28 @@ public class RemindNotification {
         }
 
         builder.addAction(new NotificationCompat.Action(
-                R.drawable.ic_snooze, "Later", pendingPostponeIntent
+                R.drawable.ic_snooze, "+10 min", pendingPostponeIntent
         ));
 
     }
 
     private NotificationCompat.Builder build(Task task){
         int categoryIcon = task.getCategory().getIcon();
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(context, notification_channel)
-                        .setSmallIcon(categoryIcon)
-                        .setContentTitle(title)
-                        .setContentText(content)
-//                        .setContentIntent(pendingIntent)
-                        .setAutoCancel(true)  // flag so the notification is automatically dismissed when a user clicks on it
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setColor(task.getCategory().getColor())
-//                        .setColor(context.getResources().getColor(R.color.colorPrimaryDark))
-                        .setStyle( bigText )
-                        .setVibrate(new long[] { 200, 200, 200, 200, 200 });
-//                        .setStyle( new NotificationCompat.BigTextStyle().bigText(bigText));
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-
-
-        return builder;
+        return new NotificationCompat.Builder(context, notification_channel)
+                .setSmallIcon(categoryIcon)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setAutoCancel(true)  // flag so the notification is automatically dismissed when a user clicks on it
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setColor(task.getCategory().getColor())
+                .setStyle( bigText )
+                .setVibrate(new long[] { 200, 200, 200, 200, 1000 })
+                .setSound(alarmSound);
     }
 
-    private NotificationCompat.WearableExtender buildExtender(Task task) {
-        return new NotificationCompat.WearableExtender();
-
-    }
-
-    public void show(@Nullable PendingIntent pendingIntent){
+    public void show(){
         //trigger the notification
         NotificationManagerCompat notificationManager =
                 NotificationManagerCompat.from(context);

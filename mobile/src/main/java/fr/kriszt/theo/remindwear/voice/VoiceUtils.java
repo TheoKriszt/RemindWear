@@ -122,7 +122,7 @@ public class VoiceUtils {
 //        Log.w(TAG, "parseRemindIntent: groupCount is " + fullMatcher.groupCount());
         if (!fullMatcher.find()) {
             // Todo : non reconnu
-            Toast.makeText(context, "Demande non reconnue", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Demande de rappel non reconnue", Toast.LENGTH_SHORT).show();
 //            Log.w(TAG, "parseRemindIntent: non reconnu :");
 
 

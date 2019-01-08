@@ -47,7 +47,7 @@ public class SchedulerService extends Service {
 
             if (extras != null){
                 for (String k : extras.keySet()){
-                    Log.w(TAG, "found key " + k + " = " + extras.get(k)); // TODO : pareil pour Later ou Track
+                    Log.w(TAG, "found key " + k + " = " + extras.get(k));
                 }
 
                 Task task = (Task) extras.getSerializable(TASK_TAG);
@@ -61,8 +61,6 @@ public class SchedulerService extends Service {
             }
 
         }
-
-
 
         return super.onStartCommand(intent, flags, startId);
     }

@@ -47,7 +47,7 @@ public class ReminderWorker extends Worker {
             Log.w(TAG, "doWork: Tâche identifiée : " + task.getName());
 
 
-            new RemindNotification(task, getApplicationContext()).show(null);
+            new RemindNotification(task, getApplicationContext()).show();
 
 
             if (task.getDateDeb() == null){ // tâche récurrente
@@ -80,7 +80,14 @@ public class ReminderWorker extends Worker {
 
         long remainingSeconds = task.getRemainingTime(TimeUnit.SECONDS) * -1; // dateDiff donne une valeur négative si dans le futur
 //        remainingSeconds /= 10; // accélérer les tests
+        long remainingWithWarningBefore = remainingSeconds - task.getWarningBeforeSeconds();
         Log.w(TAG, "scheduleWorker: la tâche "+ task.getName() + " commencera dans " + remainingSeconds + " secondes");
+
+        Log.w(TAG, "scheduleWorker: avec le warningBefore, commencerait à " + remainingWithWarningBefore);
+
+        if (remainingWithWarningBefore > 0){
+            remainingSeconds = remainingWithWarningBefore;
+        }
 
 
         Data inputData = new Data.Builder().putInt(TASK_ID_KEY, task.getID()).build();
@@ -102,9 +109,9 @@ public class ReminderWorker extends Worker {
     }
 
 
-    public static void unScheduleAll(){
-        WorkManager.getInstance().cancelAllWork();
-    }
+//    public static void unScheduleAll(){
+//        WorkManager.getInstance().cancelAllWork();
+//    }
 
 
 }

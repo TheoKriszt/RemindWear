@@ -44,7 +44,9 @@ heure :
 
  Exemples :
  > rappelle-moi dans la catégorie course d acheter du beurre demain à 16h
+
  > ajoute un rappel aller chercher ma convocation le 29 janvier à midi
+
  > ajoute une tâche soutenance de mobile demain à 9h50
 
 
@@ -62,4 +64,9 @@ heure :
 - [ ] Tester l'affichage de la montre sur vraie Wear
 - [ ] Vérifier le podomètre "classique" sur une vraie montre
 - [ ] Vérifier le podomètre "émulé" sur une vraie montre (et ajuster le threshold)
+
+### Bugfix
+- [ ] En créant une catégorie, elle ne s'affiche qu'après être retourné par l'accueil
+- [x] Le getDuration ne prend pas en compte le warningBefore
+- [ ] La reconnaissance vocale manque de finesse
 

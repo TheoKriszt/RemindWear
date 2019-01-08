@@ -85,6 +85,7 @@ Task implements Serializable {
 	public void setDateDeb(Calendar dateDeb) {this.dateDeb = dateDeb;}
 	
 	public int getWarningBefore() {return warningBefore;}
+	public int getWarningBeforeSeconds() {return getWarningBefore() * 60;}
 	public void setWarningBefore(int warningBefore) {this.warningBefore = warningBefore;}
 	
 	public Boolean getIsActivatedNotification() {return isActivatedNotification;}
