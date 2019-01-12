@@ -12,6 +12,7 @@ import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.shared.Constants;
 
 /**
  * Created by T.Kriszt on 04/10/2018.
@@ -23,7 +24,7 @@ public class SchedulerService extends Service {
 
     public static final String TAG = "SHEDULER_SERVICE";
 
-    public static final int POSTPONE_TIME_MINUTES = 60;
+    public static final int POSTPONE_TIME_MINUTES = Constants.POSTPONE_DELAY;
 
     public static final String TASK_TAG = "TASK_ID";
     private Tasker tasker;

@@ -338,11 +338,20 @@ public class WearActivity extends WearableActivity
 
     }
 
-    public void setButton(String msg, int color) {
+    public void setButton(final String msg, final int color) {
 //        Log.w(TAG, "setButton: " + msg + "; " + getResources().getResourceEntryName(color));
 
-        button.setText(msg);
-        button.setBackgroundTintList(getResources().getColorStateList(color, null));
+        // Cette méthode est potentiellement appelée d'un thread secondaire
+        // Les manips de l'UI doivent se faire dans le Thread principal
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                button.setText(msg);
+                button.setBackgroundTintList(getResources().getColorStateList(color, null));
+            }
+        });
+
     }
 
     public String getButtonText(){
@@ -355,11 +364,16 @@ public class WearActivity extends WearableActivity
         try {
             stepListener = StepListenerFactory.getStepListener(sensorManager);
             hasPodometer = true;
+            Log.w(TAG, "createSensors: Step sensor type : " + stepListener.getClass().getSimpleName());
         } catch (UnavailableSensorException e) {
             hasPodometer = false;
         }
 
+//        Log.w(TAG, "createSensors: Has GPS : " + getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS));
+//        Log.w(TAG, "createSensors: Has another location sensor : " + getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION));
         hasGPS = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
+//        hasGPS = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION);
+
         hasCardiometer = getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE);
 
         if (hasCardiometer){

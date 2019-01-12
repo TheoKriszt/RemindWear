@@ -57,32 +57,17 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
 //        long startTime = getIntent().getLongExtra("startTime+", -1);
         Log.w(TAG, "onCreate: SportTask ID = " + id);
         sTask = tasker.getSportTaskByID(id);
+        Log.w(TAG, "onCreate: extracted task : " + sTask);
         listCoordinate = sTask.getListCoord();
+        Log.w(TAG, "onCreate: " + listCoordinate.size() + " coords found : ");
+        Log.w(TAG, "onCreate: " + listCoordinate);
 
         graph = findViewById(R.id.graph);
 
-        ArrayList<DataPoint> listPoint = new ArrayList<>();
-        int i = 0;
-        for (Coordinates c : sTask.getListCoord()){
-            if (c != null){
-                listPoint.add(new DataPoint(i++, c.getAltitude()));
-            }
+
+        if (sTask.getDataset().hasGPS()) {
+            loadMap();
         }
-//        for(int i=0; i<sTask.getListCoord().size(); i++){
-//            listPoint.add(new DataPoint(i,sTask.getListCoord().get(i).getAltitude()));
-//        }
-
-        DataPoint[] simpleArray = new DataPoint[ listPoint.size() ];
-        listPoint.toArray( simpleArray );
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(simpleArray);
-
-        series.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-        series.setDrawBackground(true);
-        graph.addSeries(series);
-
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
 
 
         String res;
@@ -105,6 +90,29 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         duration.setText(res);
 
         hideUnusedFields(sTask.getDataset());
+    }
+
+    private void loadMap() {
+
+        ArrayList<DataPoint> listPoint = new ArrayList<>();
+        int i = 0;
+        for (Coordinates c : sTask.getListCoord()){
+            if (c != null){
+                listPoint.add(new DataPoint(i++, c.getAltitude()));
+            }
+        }
+
+        DataPoint[] simpleArray = new DataPoint[ listPoint.size() ];
+        listPoint.toArray( simpleArray );
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(simpleArray);
+
+        series.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        series.setDrawBackground(true);
+        graph.addSeries(series);
+
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
     }
 
@@ -139,6 +147,7 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.w(TAG, "onMapReady: ");
         mMap = googleMap;
 
         ArrayList<LatLng> listTracker = new ArrayList<>();
@@ -148,7 +157,6 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
             }
         }
 
-//        //TODO REMO-ew LatLng(-32.491, 147.309));
 
         double minLat = 200;
         double maxLat = -200;

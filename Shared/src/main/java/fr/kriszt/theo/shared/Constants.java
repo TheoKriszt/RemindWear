@@ -30,6 +30,7 @@ public class Constants {
     public static final String KEY_DATE = "DATE";
     public static final String KEY_MINUTES = "MINUTES";
     public static final String KEY_HOUR = "HOUR";
+    public static final int POSTPONE_DELAY = 10;
 
     private Constants() {};
 }

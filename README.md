@@ -69,4 +69,7 @@ heure :
 - [ ] En créant une catégorie, elle ne s'affiche qu'après être retourné par l'accueil
 - [x] Le getDuration ne prend pas en compte le warningBefore
 - [ ] La reconnaissance vocale manque de finesse
+- [ ] Vocal : chercher un sport générique lance de la marche
+- [ ] Imposible d'afficher les details du sport
+- [x] Wear : changement du bouton impossible : thread secondaire
 

@@ -134,9 +134,10 @@ public class   WearDataService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.w(TAG, "onStartCommand: intent = " + intent);
 //        Log.w(TAG, "onStartCommand: " + intent.getAction());
 
-        if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_END_TRACK)){
+        if (intent != null && intent.getAction() != null && intent.getAction().equals(Constants.ACTION_END_TRACK)){
 //            Log.w(TAG, "onStartCommand: Fin du tracking");
 
             if (intent.getExtras() != null){

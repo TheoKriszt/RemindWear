@@ -2,11 +2,14 @@ package fr.kriszt.theo.remindwear;
 
 import android.app.Notification;
 //import android.app.PendingIntent;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -46,7 +49,25 @@ public class RemindNotification {
 
 
 
+
+
         NotificationCompat.Builder builder = build(task);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            CharSequence name = getString(R.string.channel_name);
+//            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("REMINDWEAR_CHANNEL", "RemindWear", importance);
+            channel.setDescription("RemindWear Global Notifications");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            builder.setChannelId(channel.getId());
+        }
+
         NotificationCompat.WearableExtender extender = new NotificationCompat.WearableExtender();
 
         addActions(task, builder);
@@ -87,7 +108,7 @@ public class RemindNotification {
         }
 
         builder.addAction(new NotificationCompat.Action(
-                R.drawable.ic_snooze, "+10 min", pendingPostponeIntent
+                R.drawable.ic_snooze, "+"+ Constants.POSTPONE_DELAY + " min", pendingPostponeIntent
         ));
 
     }
@@ -95,6 +116,10 @@ public class RemindNotification {
     private NotificationCompat.Builder build(Task task){
         int categoryIcon = task.getCategory().getIcon();
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+
+
+
 
         return new NotificationCompat.Builder(context, notification_channel)
                 .setSmallIcon(categoryIcon)
@@ -105,7 +130,8 @@ public class RemindNotification {
                 .setColor(task.getCategory().getColor())
                 .setStyle( bigText )
                 .setVibrate(new long[] { 200, 200, 200, 200, 1000 })
-                .setSound(alarmSound);
+                .setSound(alarmSound)
+                ;
     }
 
     public void show(){
@@ -116,6 +142,7 @@ public class RemindNotification {
         //we give each notification the ID of the event it's describing,
         //to ensure they all show up and there are no duplicates
         notificationManager.notify(taskId, notification);
+
     }
 
 }

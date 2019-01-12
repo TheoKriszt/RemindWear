@@ -71,6 +71,11 @@ public class SportDataSet implements Serializable {
         return res;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof SportDataSet && ((SportDataSet) o).toJson().equals(this.toJson());
+    }
+
     public static SportDataSet fromJson(String json){
         return new Gson().fromJson(json, SportDataSet.class);
     }
@@ -149,10 +154,13 @@ public class SportDataSet implements Serializable {
         }
 
         for (int i = coords.size()-1 ; i >= 0; i++){
-            if (coords.get(i) != null){
-                last = coords.get(i).getTimestamp();
-                break;
-            }
+            try {
+                if (coords.get(i) != null){
+                    last = coords.get(i).getTimestamp();
+                    break;
+                }
+            } catch (IndexOutOfBoundsException ignored){}
+
         }
 
 
