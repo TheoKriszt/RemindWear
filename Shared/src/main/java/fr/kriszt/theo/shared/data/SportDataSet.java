@@ -144,28 +144,34 @@ public class SportDataSet implements Serializable {
     }
 
     public long getDuration(){
-        long first = 0, last = 0;
-        List<Coordinates> coords = getCoordinates();
-        for (int i = 0; i < coords.size(); i++){
-            if (coords.get(i) != null){
-                first = coords.get(i).getTimestamp();
-                break;
-            }
+        Log.w(TAG, "getDuration: ");
+        for (SportDataPoint sdp : getPoints().values()){
+            Log.e(TAG, "getDuration: Point :: " + sdp);
         }
-
-        for (int i = coords.size()-1 ; i >= 0; i++){
-            try {
-                if (coords.get(i) != null){
-                    last = coords.get(i).getTimestamp();
-                    break;
-                }
-            } catch (IndexOutOfBoundsException ignored){}
-
-        }
-
-
-        return (last - first) / 1000;
-//        return lastPoint().coords.getTimestamp() - firstPoint().coords.getTimestamp();
+        long diff = lastPoint().getCreatedAt().getTimeInMillis() - firstPoint().getCreatedAt().getTimeInMillis();
+        return diff / 1000;
+//        long first = 0, last = 0;
+//        List<Coordinates> coords = getCoordinates();
+//        List<SportDataPoint> dataPoints = getDataPoints();
+//        for (int i = 0; i < coords.size(); i++){
+//            if (coords.get(i) != null){
+//                first = coords.get(i).getTimestamp();
+//                break;
+//            }
+//        }
+//
+//        for (int i = coords.size()-1 ; i >= 0; i++){
+//            try {
+//                if (coords.get(i) != null){
+//                    last = coords.get(i).getTimestamp();
+//                    break;
+//                }
+//            } catch (IndexOutOfBoundsException e){
+//                break;
+//            }
+//
+//        }
+//        return (last - first) / 1000;
     }
 
     public float getDistance(){

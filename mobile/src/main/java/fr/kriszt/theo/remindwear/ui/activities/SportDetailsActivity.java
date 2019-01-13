@@ -29,12 +29,12 @@ import fr.kriszt.theo.shared.Coordinates;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.shared.SportType;
+import fr.kriszt.theo.shared.data.SportDataPoint;
 import fr.kriszt.theo.shared.data.SportDataSet;
 
 public class SportDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = SportDetailsActivity.class.getSimpleName();
-    private List<Coordinates> listCoordinate;
     private SportTask sTask;
 
     private GraphView graph;
@@ -54,20 +54,19 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
 
 
         int id = getIntent().getIntExtra("idSportTask", -1);
-//        long startTime = getIntent().getLongExtra("startTime+", -1);
         Log.w(TAG, "onCreate: SportTask ID = " + id);
         sTask = tasker.getSportTaskByID(id);
         Log.w(TAG, "onCreate: extracted task : " + sTask);
-        listCoordinate = sTask.getListCoord();
-        Log.w(TAG, "onCreate: " + listCoordinate.size() + " coords found : ");
-        Log.w(TAG, "onCreate: " + listCoordinate);
+        Log.w(TAG, "onCreate: DataPoints are : ");
+//        for (SportDataPoint sdp : sTask.getDataset().getPoints().values()){
+//            Log.w(TAG, "onCreate: DataPoint : " + sdp);
+//        }
+//        Log.w(TAG, "onCreate: ...xXx");
 
-        graph = findViewById(R.id.graph);
+//        List<Coordinates> listCoordinate = sTask.getListCoord();
+//        Log.w(TAG, "onCreate: " + listCoordinate.size() + " coords found : ");
+//        Log.w(TAG, "onCreate: " + listCoordinate);
 
-
-        if (sTask.getDataset().hasGPS()) {
-            loadMap();
-        }
 
 
         String res;
@@ -75,24 +74,47 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         res = String.valueOf(sTask.getSteps());
         steps.setText(res);
 
+        Log.w(TAG, "onCreate: steps loaded");
+
         heart = findViewById(R.id.heart);
         res = String.valueOf(sTask.getHeart());
         heart.setText(res);
 
+        Log.w(TAG, "onCreate: heartrate loaded");
+
         distance = findViewById(R.id.distance);
-//        sTask.caculateDistance();
         res = String.valueOf(String.format("%.2f", sTask.getDistance()));
         distance.setText(res);
 
-        duration = findViewById(R.id.duration);
+        Log.w(TAG, "onCreate: distance loaded");
+
         long s = sTask.getDuration();
+        Log.w(TAG, "onCreate: duration="+s);
         res = String.format("%02d : %02d : %02d", s / 3600, (s % 3600) / 60, (s % 60));
+        Log.w(TAG, "onCreate: touching field");
+        duration = findViewById(R.id.duration);
         duration.setText(res);
+        Log.w(TAG, "onCreate: duration loaded");
+
+        Log.w(TAG, "onCreate: Simple fileds loaded");
+
+        if (sTask.getDataset().hasGPS()) {
+            graph = findViewById(R.id.graph);
+            loadMap();
+        }
 
         hideUnusedFields(sTask.getDataset());
+
+        Log.w(TAG, "onCreate: DONE");
     }
 
     private void loadMap() {
+        Log.w(TAG, "loadMap: ");
+
+        if (! sTask.getDataset().hasGPS()){
+            Log.w(TAG, "loadMap: GPS unavailable : skipping");
+            return;
+        }
 
         ArrayList<DataPoint> listPoint = new ArrayList<>();
         int i = 0;
@@ -112,7 +134,9 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
     }
 
@@ -148,6 +172,12 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.w(TAG, "onMapReady: ");
+
+        if (!sTask.getDataset().hasGPS()) {
+            Log.w(TAG, "onMapReady: No GPS, skipping");
+            return;
+        }
+
         mMap = googleMap;
 
         ArrayList<LatLng> listTracker = new ArrayList<>();

@@ -30,6 +30,7 @@ import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 public class EditCategoryActivity extends AppCompatActivity {
 
+    static final String TAG = EditCategoryActivity.class.getSimpleName();
     private LayoutInflater inflator;
     private int color;
     private int icon;
@@ -52,6 +53,7 @@ public class EditCategoryActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.w(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 

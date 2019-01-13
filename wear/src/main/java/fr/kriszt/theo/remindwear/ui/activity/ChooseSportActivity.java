@@ -45,32 +45,24 @@ public class ChooseSportActivity extends WearableActivity  {
         Integer taskId = null;
 
         if (getIntent().getExtras() != null) {
-            if (getIntent().getExtras().getString(Constants.KEY_TASK_ID) != null){
-                String params = getIntent().getExtras().getString(Constants.KEY_TASK_ID);
-                HashMap<String, String> map = new Gson().fromJson(params, HashMap.class);
-                Log.w(TAG, "onCreate: PARAMS " + map.keySet());
-                if (map.containsKey(Constants.KEY_TASK_ID)) {
-                    taskId = Integer.parseInt(map.get(Constants.KEY_TASK_ID));
+            if (getIntent().getExtras().get(Constants.KEY_PARAMS) != null){
+                HashMap<String, String> params = (HashMap<String, String>) getIntent().getExtras().get(Constants.KEY_PARAMS);
+                Log.w(TAG, "onCreate: params : " + params);
+//                HashMap<String, String> map = new Gson().fromJson(params, HashMap.class);
+//                Log.w(TAG, "onCreate: PARAMS " + map.keySet());
+                if (params.containsKey(Constants.KEY_TASK_ID)) {
+                    taskId = Integer.parseInt(params.get(Constants.KEY_TASK_ID));
                 }
 
-                if (map.containsKey(Constants.KEY_SPORT_TYPE)) {
+                if (params.containsKey(Constants.KEY_SPORT_TYPE)) {
 //                    Log.w(TAG, "onCreate: Sport Type :: " + map.get(Constants.KEY_SPORT_TYPE));
-                    sportType = map.get(Constants.KEY_SPORT_TYPE);
+                    sportType = params.get(Constants.KEY_SPORT_TYPE);
                     Log.w(TAG, "onCreate: Sport Type :: " + sportType);
-                }else Log.w(TAG, "onCreate: No SportType provided");
+                }else {
+                    Log.w(TAG, "onCreate: No SportType provided");
+                }
             }
 
-        }
-
-        if (sportType != null){
-            Intent startIntent = new Intent(this, WearActivity.class);
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            startIntent.putExtra(Constants.KEY_SPORT_TYPE, sportType);
-            startIntent.putExtra(Constants.KEY_TASK_ID, taskId);
-
-            startActivity(startIntent);
         }
 
         Log.w(TAG, "onCreate: TaskId = " + taskId);
@@ -92,6 +84,32 @@ public class ChooseSportActivity extends WearableActivity  {
         boolean hasCardio = SensorUtils.isHeartRateAvailable(this);
 
         myDataSet.addAll(SportTypeItem.getAvailableSportTypes(this, hasGPS, hasPodo, hasCardio));
+
+        if (sportType != null){
+
+            boolean canStart = false;
+
+            for (SportTypeItem sti : myDataSet){
+                if (sti.name.equals(sportType)){
+                    canStart = true;
+                    break;
+                }
+            }
+
+            if ( canStart ) {
+                Intent startIntent = new Intent(this, WearActivity.class);
+                startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+                startIntent.putExtra(Constants.KEY_SPORT_TYPE, sportType);
+                startIntent.putExtra(Constants.KEY_TASK_ID, taskId);
+
+                startActivity(startIntent);
+            }
+
+        }
+
+
 
         mAdapter = new RecyclerViewAdapter(myDataSet, this, taskId);
         mWearableRecyclerView.setAdapter(mAdapter);

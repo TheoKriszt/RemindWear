@@ -52,7 +52,7 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
 //    private static final String START_ACTIVITY_PATH = "/start-activity";
 
     private int taskId;
-    private SportType sportType;
+    private SportType sportType = null;
 
 
     @Override
@@ -74,6 +74,8 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
             if (intent.getExtras().get(Constants.KEY_SPORT_TYPE) != null) {
                 sportType = (SportType) intent.getExtras().get(Constants.KEY_SPORT_TYPE);
             }
+
+            Log.w(TAG, "onStartCommand: SportType :: " + sportType);
 
             int refererId = intent.getExtras().getInt(Constants.KEY_TASK_ID); // ID de la tâche d'origine
             Tasker tasker = Tasker.getInstance(getApplicationContext());
@@ -163,25 +165,22 @@ public class PhoneDataService extends Service implements DataClient.OnDataChange
         }
 
         if (sportTask == null){
-            // TODO
-            Log.w(TAG, "onMessageReceived: TODO : créer une sportTask a la volee");
+            Log.w(TAG, "onMessageReceived:  : créer une sportTask a la volee");
             Category sport = tasker.getCategoryByName(Tasker.CATEGORY_SPORT_TAG);
             Calendar cal = new GregorianCalendar();
             fr.kriszt.theo.remindwear.tasker.Task nullReferer = new fr.kriszt.theo.remindwear.tasker.Task("Sport libre : " + sportDataSet.getSportType().getName(), "", sport, cal, 0, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
             sportTask = new SportTask(nullReferer);
+            sportTask.setDataset(sportDataSet);
             tasker.addSportTask(sportTask);
-            sportTask.setDataset(sportDataSet);
-            tasker.serializeLists();
-        }else {
-            sportTask.setDataset(sportDataSet);
         }
+        sportTask.setDataset(sportDataSet);
         tasker.serializeLists();
 
     }
 
     @Override
     public void onCapabilityChanged(final CapabilityInfo capabilityInfo) {
-//        LOGD("onCapabilityChanged: " + capabilityInfo);
+        Log.w(TAG, "onCapabilityChanged: " + capabilityInfo);
 
     }
 

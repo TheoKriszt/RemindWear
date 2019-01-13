@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import fr.kriszt.theo.shared.Constants;
 
 public class AddTaskActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private static final String TAG = AddTaskActivity.class.getSimpleName();
     LayoutInflater inflator;
     private Tasker tasker;
     private Task task;
@@ -127,6 +129,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AddCategoryActivity.class);
+                startActivityForResult(intent, 41361);
                 startActivity(intent);
             }
         });
@@ -137,7 +140,8 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), EditCategoryActivity.class);
                 intent.putExtra("idCategory", category.getID() );
-                startActivity(intent);
+//                startActivity(intent);
+                startActivityForResult(intent, 41360);
             }
         });
         if(categoryTemp.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
@@ -147,25 +151,9 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             editCategory.setVisibility(View.VISIBLE);
         }
 
-        spinner = findViewById(R.id.spinner);
-        spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
-        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                category = tasker.getListCategories().get(position);
-                if(category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
-                        category.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
-                    editCategory.setVisibility(View.GONE);
-                }else{
-                    editCategory.setVisibility(View.VISIBLE);
-                }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
 
-        });
+        prepareCategoriesSpinner();
 
         calendarView = findViewById(R.id.calendar);
         Calendar today = new GregorianCalendar();
@@ -212,6 +200,28 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             setValuesFromIntent(getIntent().getExtras());
         }
 
+    }
+
+    private void prepareCategoriesSpinner() {
+        spinner = findViewById(R.id.spinner);
+        spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
+        inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                category = tasker.getListCategories().get(position);
+                if(category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                        category.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+                    editCategory.setVisibility(View.GONE);
+                }else{
+                    editCategory.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {}
+
+        });
     }
 
     private void setValuesFromIntent(Bundle extras) {
@@ -315,6 +325,27 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             }
         }
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.w(TAG, "onActivityResult: Category was updated");
+        // Check which request we're responding to
+        if (requestCode == 41361) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                spinner.setVisibility(View.INVISIBLE);
+                spinner.setVisibility(View.VISIBLE);
+                // The user picked a contact.
+                // The Intent's data Uri identifies which contact was selected.
+
+                // Do something with the contact here (bigger example below)
+//                Tasker.getInstance(this).unserializeLists();
+//                prepareCategoriesSpinner();
+                Log.w(TAG, "onActivityResult: Category was updated");
+            }
+        }
     }
 
     @Override

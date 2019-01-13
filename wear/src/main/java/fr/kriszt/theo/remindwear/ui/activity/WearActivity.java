@@ -217,17 +217,26 @@ public class WearActivity extends WearableActivity
         setContentView(R.layout.activity_wear);
         ButterKnife.bind(this);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addApi(Wearable.API)  // used for data layer API
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+
 
         createSensors();
 
         hideMissingSensors();
         hideUnusedSensors();
+
+        if (hasGPS) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addApi(Wearable.API)  // used for data layer API
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+
+        if (hasGPS) {
+            askForGPSPermission();
+            setupGPSSensor();
+        }
 
         sportDataSet = new SportDataSet(sportType, hasPodometer, hasGPS, hasCardiometer, taskId);
 
@@ -236,15 +245,8 @@ public class WearActivity extends WearableActivity
         layoutUpdater = new Handler();
         timeStatusChecker.run(); // démarrer le màj du layout
 
-        askForGPSPermission();
-        setupGPSSensor();
 
-//        boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
-//
-//        if (!hasGPSPermission){
-//            Log.w(TAG, "onCreate: Asking for GPS access");
-//            askForGPSPermission();
-//        }
+
     }
 
     private void getSportType() {
@@ -389,7 +391,7 @@ public class WearActivity extends WearableActivity
         boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (hasGPSPermission){
-            Log.w(TAG, "GPS permission already granted");
+//            Log.w(TAG, "GPS permission already granted");
             return;
         }
         // Requesting ACCESS_FINE_LOCATION using Dexter library
@@ -421,7 +423,9 @@ public class WearActivity extends WearableActivity
     @Override
     public void onResume() {
         super.onResume();
-        mGoogleApiClient.connect();
+        if (hasGPS && mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
@@ -502,7 +506,7 @@ public class WearActivity extends WearableActivity
 
     @Override
     public void onLocationChanged(Location location) {
-//        Log.i(TAG, "onLocationChanged: " + location);
+        Log.i(TAG, "onLocationChanged: " + location);
     }
 
     @Override
@@ -536,10 +540,10 @@ public class WearActivity extends WearableActivity
 
         sensorManager.unregisterListener(heartRateSensorListener);
 
-        if (mGoogleApiClient.isConnected()) { // GPS
+        if (hasGPS && mGoogleApiClient != null && mGoogleApiClient.isConnected()) { // GPS
             LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
+            mGoogleApiClient.disconnect();
         }
-        mGoogleApiClient.disconnect();
     }
 
     private void disableDisplayUpdate(){

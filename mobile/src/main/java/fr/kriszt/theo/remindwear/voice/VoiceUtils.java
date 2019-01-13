@@ -240,6 +240,7 @@ public class VoiceUtils {
 
         if (bikeCount == walkCount && walkCount == runCount){
 //            Log.w(TAG, "parseSpeech: Quel type de sport ? ");
+            startIntent.removeExtra(Constants.KEY_SPORT_TYPE);
             context.startService(startIntent);
             Toast.makeText(context, "Choisissez un sport sur la montre", Toast.LENGTH_LONG).show();
             return startIntent;

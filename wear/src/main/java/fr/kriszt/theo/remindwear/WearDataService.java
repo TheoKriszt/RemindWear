@@ -85,7 +85,7 @@ public class   WearDataService extends Service implements
 
     @Override
     public boolean onUnbind(Intent intent) {
-//        Log.w(TAG, "onUnbind: ");
+        Log.w(TAG, "onUnbind: ");
 
         Wearable.getDataClient(this).removeListener(this);
         Wearable.getMessageClient(this).removeListener(this);
@@ -114,20 +114,21 @@ public class   WearDataService extends Service implements
 //            Log.w(TAG, "onMessageReceived: key " + k + " :-> " + params.get(k));
 //        }
 
-        String taskId = new String(messageEvent.getData()).replace("Data", "");
+        String taskId = (String) params.get(Constants.KEY_TASK_ID);
 //        Log.w(TAG, "onMessageReceived: TaskID : " + taskId);
 //        byte[] taskIdPayload = BigInteger.valueOf(taskId).toByteArray();
 
 
         // Check to see if the message is to start an activity
         if (messageEvent.getPath().equals(Constants.START_ACTIVITY_PATH)) {
+            Log.w(TAG, "onMessageReceived: params : " + params);
+            Log.w(TAG, "onMessageReceived: taskId : " + taskId);
             Intent startIntent = new Intent(this, ChooseSportActivity.class);
             startIntent.putExtra(Constants.KEY_TASK_ID, taskId);
+            startIntent.putExtra(Constants.KEY_PARAMS, params);
             startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             startActivity(startIntent);
-        }else {
-//            Log.w(TAG, "onMessageReceived: " + messageEvent.getPath());
         }
     }
 
@@ -203,6 +204,7 @@ public class   WearDataService extends Service implements
 
     @Override
     public void onCapabilityChanged(@NonNull CapabilityInfo capabilityInfo) {
+        Log.w(TAG, "onCapabilityChanged: " + capabilityInfo);
     }
 
     private class StopDispatcher extends AsyncTask<Void, Void, Void> {
@@ -226,6 +228,7 @@ public class   WearDataService extends Service implements
 
         try {
             List<Node> nodes = Tasks.await(nodeListTask);
+            Log.w(TAG, "getNodes: nodes size : " + nodes.size());
 
             for (Node node : nodes) {
                 results.add(node.getId());

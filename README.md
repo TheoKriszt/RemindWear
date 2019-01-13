@@ -61,15 +61,16 @@ heure :
 
 
 ### Tests à faire
-- [ ] Tester l'affichage de la montre sur vraie Wear
+- [x] Tester l'affichage de la montre sur vraie Wear
 - [ ] Vérifier le podomètre "classique" sur une vraie montre
-- [ ] Vérifier le podomètre "émulé" sur une vraie montre (et ajuster le threshold)
+- [x] Vérifier le podomètre "émulé" sur une vraie montre (et ajuster le threshold)
 
 ### Bugfix
 - [ ] En créant une catégorie, elle ne s'affiche qu'après être retourné par l'accueil
 - [x] Le getDuration ne prend pas en compte le warningBefore
 - [ ] La reconnaissance vocale manque de finesse
-- [ ] Vocal : chercher un sport générique lance de la marche
-- [ ] Imposible d'afficher les details du sport
+- [x] Vocal : chercher un sport générique lance de la marche
+- [x] Vocal : lancer un sport indispo sur la montre le lance quand même
+- [x] Imposible d'afficher les details du sport
 - [x] Wear : changement du bouton impossible : thread secondaire
 

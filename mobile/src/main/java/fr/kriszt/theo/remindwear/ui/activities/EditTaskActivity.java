@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import fr.kriszt.theo.remindwear.tasker.Tasker;
 
 public class EditTaskActivity extends AppCompatActivity {
 
+    private static final String TAG = EditTaskActivity.class.getSimpleName();
     LayoutInflater inflator;
     private Tasker tasker;
     private Task task;
@@ -68,6 +70,7 @@ public class EditTaskActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 

@@ -116,8 +116,11 @@ public class Tasker {
 //	}
 
 	public Boolean addSportTask(SportTask t) {
+		Log.w(TAG, "addSportTask: Adding Sport Task " + t);
 		for(SportTask x : listSportTasks) {
-			if(x.toString().equals(t.toString())) {
+			Log.w(TAG, "addSportTask: comparing " + x.getDataset() +" AND " + t.getDataset());
+			if(x.getDataset() != null && x.getDataset().equals(t.getDataset())) {
+                Log.w(TAG, "addSportTask: SportTask already exists, skipping...");
 				return false;
 			}
 		}
@@ -193,8 +196,7 @@ public class Tasker {
             fis.close();
 
         }catch (Exception e){
-			Log.w(TAG, "unserializeListCategories:  fishiers dispos : " + Arrays.toString(context.fileList())
-            );
+			Log.w(TAG, "unserializeListCategories:  fichiers dispos : " + Arrays.toString(context.fileList()));
 			context.fileList();
             serializeLists();
             try{
