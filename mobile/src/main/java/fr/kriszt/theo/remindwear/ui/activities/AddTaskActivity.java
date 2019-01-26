@@ -62,6 +62,8 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private ImageView addCategory;
     private ImageView editCategory;
 
+    private Bundle extras = null;
+
     public AddTaskActivity() {
 
     }
@@ -72,6 +74,15 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 
+        if (getIntent() != null && getIntent().getExtras() != null){
+            Bundle extras = getIntent().getExtras();
+            this.extras = extras;
+            Log.w(TAG, "onCreate: Extras : ");
+
+            for (String k : extras.keySet()){
+                Log.w(TAG, "onCreate: " + k + " ==> " + extras.get(k));
+            }
+        }
 
         tasker = Tasker.getInstance(this);
         Category categoryTemp = tasker.getListCategories().get(0);
@@ -80,7 +91,13 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         description = findViewById(R.id.description);
 
         Calendar forTimePicker = new GregorianCalendar();
-        forTimePicker.add(Calendar.MINUTE, 1);
+        if (extras != null && extras.get("HOUR") != null && extras.get("MINUTES") != null){
+            forTimePicker.set(Calendar.HOUR_OF_DAY, extras.getInt("HOUR"));
+            forTimePicker.set(Calendar.MINUTE, extras.getInt("MINUTES"));
+        }else {
+
+            forTimePicker.add(Calendar.MINUTE, 1);
+        }
 //        forTimePicker.add(Calendar.MINUTE, 5);
 
         calendar = new GregorianCalendar();
@@ -107,7 +124,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                 calendar = new GregorianCalendar( calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) ,time_picker_hour.getValue(),time_picker_min.getValue());
             }
         });
-        preventBefore = (NumberPicker) findViewById(R.id.preventBefore);
+        preventBefore = findViewById(R.id.preventBefore);
         preventBefore.setMinValue(0);
         preventBefore.setMaxValue(18);
         preventBefore.setValue(0);
@@ -196,14 +213,27 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
+
+
         if (getIntent().getExtras()!= null && getIntent().getExtras().get(Constants.KEY_SUBJECT) != null){
             setValuesFromIntent(getIntent().getExtras());
+        }else if (getIntent().getExtras() != null && getIntent().getExtras().get(Constants.KEY_DATE) != null){
+            long timeMillis = extras.getLong(Constants.KEY_DATE);
+            GregorianCalendar calendar = new GregorianCalendar();
+            Log.w(TAG, "setValuesFromIntent: Well..." + extras.getLong(Constants.KEY_DATE));
+            calendar.setTimeInMillis(timeMillis);
+            calendarView.setDate(timeMillis);
         }
 
     }
 
     private void prepareCategoriesSpinner() {
+        tasker.unserializeLists();
         spinner = findViewById(R.id.spinner);
+        Log.w(TAG, "prepareCategoriesSpinner: Rechergement des categories : ");
+        for (Category c : tasker.getListCategories()){
+            Log.w(TAG, "prepareCategoriesSpinner: \t" + c.getName() + ", color="+c.getColor());
+        }
         spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -222,6 +252,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             public void onNothingSelected(AdapterView<?> parentView) {}
 
         });
+//        spinner.invalidate();
     }
 
     private void setValuesFromIntent(Bundle extras) {
@@ -229,6 +260,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         int hour, minutes;
         long timeMillis = extras.getLong(Constants.KEY_DATE);
         GregorianCalendar calendar = new GregorianCalendar();
+        Log.w(TAG, "setValuesFromIntent: Well..." + extras.getLong(Constants.KEY_DATE));
         calendar.setTimeInMillis(timeMillis);
         calendarView.setDate(timeMillis);
 
@@ -285,7 +317,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     c.add(Calendar.MINUTE, -60);
 
                     if(calendar.before(c)){
-                        Toast.makeText(getApplicationContext(), "Ajoutez une date a partir d'aujourd'hui", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Ajoutez une date et une heure à venir", Toast.LENGTH_LONG).show();
                         return;
                     }
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
@@ -330,13 +362,15 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.w(TAG, "onActivityResult: Category was updated");
+        Log.w(TAG, "onActivityResult: Category was updated, requestCode is " + requestCode);
         // Check which request we're responding to
-        if (requestCode == 41361) {
+        if (requestCode == 41360) {
+            Log.w(TAG, "onActivityResult: Une catégorie a été màj");
             // Make sure the request was successful
+            prepareCategoriesSpinner();
             if (resultCode == RESULT_OK) {
-                spinner.setVisibility(View.INVISIBLE);
-                spinner.setVisibility(View.VISIBLE);
+//                spinner.setVisibility(View.INVISIBLE);
+//                spinner.setVisibility(View.VISIBLE);
                 // The user picked a contact.
                 // The Intent's data Uri identifies which contact was selected.
 

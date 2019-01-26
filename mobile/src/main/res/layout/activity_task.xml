@@ -87,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:ems="10"
                         android:inputType="textPersonName"
-                        android:hint="Titre" />
+                        android:hint=" Titre" />
 
                 </LinearLayout>
 
@@ -100,7 +100,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
-                        android:text="Description: "
+                        android:text=" Description: "
                         android:textStyle="bold" />
 
                     <EditText
@@ -108,7 +108,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:hint="Description"
+                        android:hint=" Description"
                         android:inputType="textMultiLine" />
 
                 </LinearLayout>
@@ -122,7 +122,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
-                        android:text="heure: "
+                        android:text=" Heure: "
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -151,7 +151,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:text="Select category:"
+                        android:text=" Catégorie:"
                         android:layout_gravity="center_vertical"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -196,7 +196,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:text="prevenir avant:"
+                        android:text=" Prévenir avant:"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"

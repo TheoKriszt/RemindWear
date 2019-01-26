@@ -113,8 +113,6 @@ public class TaskListFragment extends Fragment {
         voiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.w(TAG, "onClick: Clic sur bouton voix");
-
                 VoiceUtils.startSpeechRecognizer(TaskListFragment.this);
 
             }
@@ -222,6 +220,9 @@ public class TaskListFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Intent intent = VoiceUtils.getRecognizedSpeech(requestCode, resultCode, data, this.getContext());
+        if (intent != null) {
+            startActivity(intent);
+        }
 
 
         super.onActivityResult(requestCode, resultCode, data);

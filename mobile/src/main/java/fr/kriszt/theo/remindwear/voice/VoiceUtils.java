@@ -2,6 +2,7 @@ package fr.kriszt.theo.remindwear.voice;
 
 import android.content.Context;
 import android.content.Intent;
+import android.service.autofill.FieldClassification;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -24,17 +25,16 @@ import static android.app.Activity.RESULT_OK;
 import static fr.kriszt.theo.shared.Constants.ACTION_LAUNCH_WEAR_APP;
 
 public class VoiceUtils {
-
-//    private static final String SPEECH_REQUEST_CODE = "fr.kriszt.theo.remindwear.SPEECH_TASK_REQUEST";
     private static final int SPEECH_REQUEST_CODE = 0;
     private static final String TAG = VoiceUtils.class.getSimpleName();
+    private static final Pattern sportPattern = Pattern.compile("^(?:faire|commencer?|lancer?) ?(?:le|un|du|de la) ?(?:exercice|tracking|suivi|sport)? ?(?:sportif)? ?(?:de)? ?(vélo|course|marche)?(?: à pied)?");
+    private static final Pattern remindPattern = Pattern.compile("^(?:mets-moi|ajoute-moi|ajoute|mets) une? (?:rappel|tâche)|rappelle-moi");
 
     public static void startSpeechRecognizer(Fragment fragment){
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-// Start the activity, the intent will be populated with the speech text
         fragment.startActivityForResult(intent, SPEECH_REQUEST_CODE);
     }
 
@@ -46,218 +46,163 @@ public class VoiceUtils {
             String spokenText = results.get(0);
             Log.w(TAG, "getRecognizedSpeech: GOT \"" + spokenText  + "\"");
             return parseSpeech(spokenText, context);
-            // Do something with spokenText
         }
         return null;
     }
 
     private static Intent parseSpeech(String spokenText, Context context) {
-        ArrayList<String> action_remind_keywords = new ArrayList<>();
-        action_remind_keywords.add("rappelle");
-        action_remind_keywords.add("rappelle-moi");
-        action_remind_keywords.add("rappel");
-        action_remind_keywords.add("crée");
-        action_remind_keywords.add("tâche");
-        action_remind_keywords.add("ajoute");
-
-        ArrayList<String> action_track_keywords = new ArrayList<>();
-        action_track_keywords.add("track");
-        action_track_keywords.add("tracking");
-        action_track_keywords.add("suivi");
-        action_track_keywords.add("sportif");
-        action_track_keywords.add("exercice");
-        action_track_keywords.add("vélo");
-        action_track_keywords.add("course");
-        action_track_keywords.add("marche");
-
-        String[] tokens = spokenText.split("[ ']");
-
-        SpeechIntent speechIntent = SpeechIntent.UNKNOWN;
-
-        int track_count = 0;
-        int remind_count = 0;
-
-        for (String token : tokens){
-            if (action_track_keywords.contains(token)) track_count++;
-            if (action_remind_keywords.contains(token)) remind_count++;
-        }
-
-        if (track_count > remind_count) {
-            speechIntent = SpeechIntent.START_TRACKING;
-        } else if (track_count < remind_count){
-            speechIntent = SpeechIntent.CREATE_TASK;
-        }
-        if (speechIntent == SpeechIntent.UNKNOWN && spokenText.contains("sport")){
-            speechIntent = SpeechIntent.START_TRACKING;
-        }
-
-        if (speechIntent == SpeechIntent.UNKNOWN && spokenText.startsWith("rappelle-moi")){
-            speechIntent = SpeechIntent.CREATE_TASK;
-        }
+        Matcher sportMatcher = sportPattern.matcher(spokenText);
+        Matcher remindMatcher = remindPattern.matcher(spokenText);
 
 
-        Log.w(TAG, "parseSpeech: Speech Intent is " + speechIntent);
-
-
-        if (speechIntent == SpeechIntent.START_TRACKING){
-
-            return parseTrackingIntent(tokens, context);
-        } else if ( speechIntent == SpeechIntent.CREATE_TASK ){
-            return parseRemindIntent(tokens, context);
+        if (sportMatcher.find()){
+            Log.w(TAG, "parseSpeech: Demande de sport reconnue");
+            return startTrackingIntent(sportMatcher.group(1), context);
+        }else if (remindMatcher.find()){
+            Log.w(TAG, "parseSpeech: Demande de rappel reconnue");
+            String matched = remindMatcher.group(0);
+            return parseRemindIntent(matched, spokenText, context);
         } else {
             Toast.makeText(context, "Demande non reconnue", Toast.LENGTH_SHORT).show();
             return null;
         }
-
-
     }
 
-    private static Intent parseRemindIntent(String[] tokens, Context context) {
-        String phrase = Arrays.toString(tokens).replaceAll(",|\\[|\\]", "");
-//        Log.w(TAG, "parseRemindIntent: tokens string : " + phrase);
-
-
-        Pattern fullPattern = Pattern.compile("(?:rappelle-moi|ajoute un rappel|ajoute une t.che) (?:dans la catégorie (\\S+))? ?(?:de|d')? (.*) (demain|aujourd'hui|le \\d+ \\w+)? ?à (\\d+h\\d*|midi|minuit)");
-        Matcher fullMatcher = fullPattern.matcher(phrase);
-//        Log.w(TAG, "parseRemindIntent: groupCount is " + fullMatcher.groupCount());
-        if (!fullMatcher.find()) {
-            // Todo : non reconnu
-            Toast.makeText(context, "Demande de rappel non reconnue", Toast.LENGTH_SHORT).show();
-//            Log.w(TAG, "parseRemindIntent: non reconnu :");
-
-
-        } else {
-
-            for (int i = 0; i < fullMatcher.groupCount() + 1; i++) {
-                Log.w(TAG, "parseRemindIntent: group " + i + " :: " + fullMatcher.group(i));
-            }
-
-            String cat = fullMatcher.group(1);
-            String whatAndWhen = fullMatcher.group(2);
-            String time = fullMatcher.group(4);
-            String what = whatAndWhen;
-            String when = "aujourd'hui";
-
-            Pattern whatwhenPattern = Pattern.compile("(.*) (demain|aujourd'hui|le \\d+ \\w+)");
-            Matcher whatwhenMatcher = whatwhenPattern.matcher(whatAndWhen);
-            // ex : "faire la vaisselle le 5 janvier"  => séparer le quoi et le quand
-//            Log.w(TAG, "parseRemindIntent: What and chen vaut " + whatAndWhen);
-            if (whatwhenMatcher.find()) {
-//                Log.w(TAG, "parseRemindIntent: What and where 0 :: " + whatwhenMatcher.group(0));
-//                Log.w(TAG, "parseRemindIntent: What and where 1 :: " + whatwhenMatcher.group(1));
-//                Log.w(TAG, "parseRemindIntent: What and where 2 :: " + whatwhenMatcher.group(2));
-                what = whatwhenMatcher.group(1);
-                if (whatwhenMatcher.group(2) != null) {
-                    when = whatwhenMatcher.group(2);
-                }
-            } else {
-                Log.w(TAG, "parseRemindIntent: Impossible de savoir quoi faire et quand avec " + whatAndWhen);
-            }
-
-            if (time.equals("midi")) time = "12h";
-            if (time.equals("minuit")) time = "0h";
-
-            if (time.endsWith("h")) time += "00";
-
-            Calendar calendar = new GregorianCalendar();
-            if (when.equals("demain")) {
-                calendar.add(Calendar.HOUR, 24);
-            } else if (when.matches("le \\d+ \\w+")) {
-//                Log.w(TAG, "parseRemindIntent: Parsing d'un jour type ==" + when);
-                Pattern datePattern = Pattern.compile("(?:le)? ?(\\d+) (\\w+)");
-                Matcher dateMatcher = datePattern.matcher(when);
-                if (dateMatcher.find()) {
-//                    Log.w(TAG, "parseRemindIntent: jour : " + dateMatcher.group(1));
-//                    Log.w(TAG, "parseRemindIntent: mois : " + dateMatcher.group(2));
-
-                    int month = Calendar.JANUARY;
-                    int dayOfMonth = Integer.parseInt(dateMatcher.group(1));
-                    String[] months = {"janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"};
-                    for (int i = 0; i < months.length; i++) {
-                        if (dateMatcher.group(2).equals(months[i])) {
-                            month = i;
-                        }
-                    }
-
-
-                    calendar.set(Calendar.MONTH, month);
-                    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                }
-
-            }
-
-            int hour = Integer.parseInt(time.split("h")[0]);
-            int minutes = Integer.parseInt(time.split("h")[1]);
-
-
-//            Log.w(TAG, "parseRemindIntent: Time: " + hour + " h " + minutes);
-            calendar.set(Calendar.HOUR_OF_DAY, hour);
-            calendar.set(Calendar.MINUTE, minutes);
-//            Log.w(TAG, "parseRemindIntent: DateTime" + new Date(calendar.getTimeInMillis()));
-//            Log.w(TAG, "parseRemindIntent: Categorie :: " + cat);
-//            Log.w(TAG, "parseRemindIntent: Quoi ?  :: " + what);
-
-            Intent startIntent = new Intent(context, AddTaskActivity.class);
-            startIntent.putExtra(Constants.KEY_HOUR, hour);
-            startIntent.putExtra(Constants.KEY_MINUTES, minutes);
-            startIntent.putExtra(Constants.KEY_DATE, calendar.getTimeInMillis());
-            startIntent.putExtra(Constants.KEY_SUBJECT, what);
-            startIntent.putExtra(Constants.KEY_CATEGORY, cat);
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            context.startActivity(startIntent);
-
-
-
-        }
-
-        return null;
-    }
-
-    private static Intent parseTrackingIntent(String[] tokens, Context context) {
-        SportType sportType = SportType.SPORT_RUN;
-
-        int bikeCount = 0;
-        int walkCount = 0;
-        int runCount = 0;
-
-        for (String token : tokens){
-            if (token.equals("vélo")) bikeCount++;
-            if (token.equals("course")) runCount++;
-            if (token.equals("marche")) walkCount++;
-        }
-
-        if (bikeCount > walkCount && bikeCount > runCount) {
-            sportType = SportType.SPORT_BIKE;
-        } else if (walkCount > runCount && walkCount > bikeCount){
-            sportType = SportType.SPORT_WALK;
-        }
-
+    private static Intent startTrackingIntent(String sportName, Context context) {
         Intent startIntent = new Intent(context, PhoneDataService.class);
         startIntent.setAction(ACTION_LAUNCH_WEAR_APP);
         startIntent.putExtra(Constants.KEY_TASK_ID, 0);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        if (bikeCount == walkCount && walkCount == runCount){
-//            Log.w(TAG, "parseSpeech: Quel type de sport ? ");
+        if (sportName == null){
             startIntent.removeExtra(Constants.KEY_SPORT_TYPE);
             context.startService(startIntent);
             Toast.makeText(context, "Choisissez un sport sur la montre", Toast.LENGTH_LONG).show();
             return startIntent;
 
         } else {
-//            Log.w(TAG, "parseSpeech: Type de sport : " + sportType);
+
+            SportType sportType;
+            switch (sportName){
+                case "course":
+                    sportType = SportType.SPORT_RUN;
+                    break;
+                case "vélo":
+                    sportType = SportType.SPORT_BIKE;
+                    break;
+                    default: sportType = SportType.SPORT_WALK;
+            }
             startIntent.putExtra(Constants.KEY_SPORT_TYPE, sportType);
-            Toast.makeText(context, "Démarrage d'un exercice de " + sportType.getName(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Démarrage d'un exercice de " + sportType.getName() + " sur la montre", Toast.LENGTH_LONG).show();
             context.startService(startIntent);
             return startIntent;
         }
-
     }
 
-    enum SpeechIntent {
-        CREATE_TASK,
-        START_TRACKING,
-        UNKNOWN
+    private static Intent parseRemindIntent(String matched, String spokenText, Context context) {
+        spokenText = spokenText.replace(matched, "");
+
+        Pattern categoryPattern = Pattern.compile(" ?dans la catégorie ?(\\S+)");
+        Matcher categoryMatcher = categoryPattern.matcher(spokenText);
+        String category = null;
+        if (categoryMatcher.find()){
+            category = categoryMatcher.group(1);
+            spokenText = spokenText.replace(categoryMatcher.group(0), "");
+        }
+
+        String time = null;
+        Pattern timePattern = Pattern.compile(" ?à (midi|minuit|\\d{1,2}h|\\d{1,2}h\\d{1,2})$");
+        Matcher timeMatcher = timePattern.matcher(spokenText);
+        if (timeMatcher.find()){
+            time = timeMatcher.group(1);
+            spokenText = spokenText.replace( timeMatcher.group(0), "" );
+        }
+
+        String date = null;
+        Pattern datePattern = Pattern.compile("(?:\\ble )?(aujourd'hui|demain|après demain|\\d{1,2}|\\d{1,2} \\w+)$");
+        Matcher dateMatcher = datePattern.matcher(spokenText);
+        if (dateMatcher.find()){
+            date = dateMatcher.group(1);
+            spokenText = spokenText.replace( dateMatcher.group(0), "" );
+        }
+
+        String what = null;
+        Pattern whatPattern = Pattern.compile("(?:de|pour|d\\') ?(.*)");
+        Matcher whatMatcher = whatPattern.matcher(spokenText);
+        if (whatMatcher.find()){
+            what = whatMatcher.group(1);
+        }
+        Log.w(TAG, "WHAT : " + what);
+        Log.w(TAG, "CATEGORY : " + category);
+        Log.w(TAG, "DATE: " + date);
+        Log.w(TAG, "TIME: " + time);
+
+
+
+
+
+
+        Calendar calendar = new GregorianCalendar();
+        if (date != null) {
+            switch (date) {
+                case "demain":
+                    calendar.add(Calendar.DAY_OF_YEAR, 1);
+                    break;
+                case "après-demain":
+                    calendar.add(Calendar.DAY_OF_YEAR, 2);
+                    break;
+                default:
+                    Pattern ddmmPattern = Pattern.compile("(\\d{1,2}) ?(\\w+)?");
+                    Matcher ddmmMatcher = ddmmPattern.matcher(date);
+                    if (ddmmMatcher.find()) {
+                        if (ddmmMatcher.group(1) != null) {
+                            calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(ddmmMatcher.group(1)));
+                        }
+
+                        if (ddmmMatcher.group(2) != null) {
+                            ArrayList<String> months = new ArrayList<>(Arrays.asList("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"));
+                            if (months.contains( ddmmMatcher.group(2) )){
+                                calendar.set(Calendar.MONTH, months.indexOf( ddmmMatcher.group(2) ));
+                            }
+                        }
+//                    for (int i = 0; i < ddmmMatcher.groupCount() + 1; i++) {
+//                        Log.w(TAG, "group " + i + " :: " + ddmmMatcher.group(i));
+//                    }
+                    } else Log.w(TAG, "Date non reconnue : " + date);
+                    break;
+            }
+        }
+
+        Intent startIntent = new Intent(context, AddTaskActivity.class);
+
+        if (time != null){
+            if (time.equals("midi")){
+                time = "12h";
+            }else if (time.equals("minuit")){
+                time = "00h";
+            }
+            if (time.endsWith("h")){
+                time += "00";
+            }
+
+            String[] timeTokens = time.split("h");
+            startIntent.putExtra(Constants.KEY_HOUR, Integer.parseInt(timeTokens[0]));
+            startIntent.putExtra(Constants.KEY_MINUTES, Integer.parseInt(timeTokens[1]));
+
+        }
+
+        startIntent.putExtra(Constants.KEY_DATE, calendar.getTimeInMillis());
+        if (what != null){
+            startIntent.putExtra(Constants.KEY_SUBJECT, what);
+        }
+
+        if (category != null){ // TODO : chek if category exists
+            startIntent.putExtra(Constants.KEY_CATEGORY, category);
+        }
+
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        return startIntent;
     }
+
 }
