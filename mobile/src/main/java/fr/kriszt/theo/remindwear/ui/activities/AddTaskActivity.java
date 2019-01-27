@@ -77,11 +77,11 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         if (getIntent() != null && getIntent().getExtras() != null){
             Bundle extras = getIntent().getExtras();
             this.extras = extras;
-            Log.w(TAG, "onCreate: Extras : ");
+//            Log.w(TAG, "onCreate: Extras : ");
 
-            for (String k : extras.keySet()){
-                Log.w(TAG, "onCreate: " + k + " ==> " + extras.get(k));
-            }
+//            for (String k : extras.keySet()){
+//                Log.w(TAG, "onCreate: " + k + " ==> " + extras.get(k));
+//            }
         }
 
         tasker = Tasker.getInstance(this);
@@ -217,23 +217,29 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
         if (getIntent().getExtras()!= null && getIntent().getExtras().get(Constants.KEY_SUBJECT) != null){
             setValuesFromIntent(getIntent().getExtras());
-        }else if (getIntent().getExtras() != null && getIntent().getExtras().get(Constants.KEY_DATE) != null){
-            long timeMillis = extras.getLong(Constants.KEY_DATE);
-            GregorianCalendar calendar = new GregorianCalendar();
-            Log.w(TAG, "setValuesFromIntent: Well..." + extras.getLong(Constants.KEY_DATE));
-            calendar.setTimeInMillis(timeMillis);
-            calendarView.setDate(timeMillis);
-        }
+        }else if (getIntent().getExtras().get(Constants.KEY_DATE) != null)
+            if (getIntent().getExtras() != null) {
+
+                long timeMillis = extras.getLong(Constants.KEY_DATE);
+                GregorianCalendar calendar = new GregorianCalendar();
+                calendar.setTimeInMillis(timeMillis);
+                calendarView.setDate(timeMillis);
+            }
+
+            if (getIntent().getExtras().get(Constants.KEY_CATEGORY)!= null){
+                String cat = getIntent().getExtras().getString(Constants.KEY_CATEGORY);
+//                Log.w(TAG, "onCreate: on tente la categorie " + cat);
+                Category category = tasker.getCategoryByName(cat);
+                if (category != null){
+                    spinner.setSelection(tasker.getListCategories().indexOf(category));
+                }
+            }
 
     }
 
     private void prepareCategoriesSpinner() {
         tasker.unserializeLists();
         spinner = findViewById(R.id.spinner);
-        Log.w(TAG, "prepareCategoriesSpinner: Rechergement des categories : ");
-        for (Category c : tasker.getListCategories()){
-            Log.w(TAG, "prepareCategoriesSpinner: \t" + c.getName() + ", color="+c.getColor());
-        }
         spinner.setAdapter(new NewAdapter(tasker.getListCategories()));
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -260,7 +266,6 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         int hour, minutes;
         long timeMillis = extras.getLong(Constants.KEY_DATE);
         GregorianCalendar calendar = new GregorianCalendar();
-        Log.w(TAG, "setValuesFromIntent: Well..." + extras.getLong(Constants.KEY_DATE));
         calendar.setTimeInMillis(timeMillis);
         calendarView.setDate(timeMillis);
 
@@ -271,6 +276,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         hour = extras.getInt(Constants.KEY_HOUR);
 
 
+        Log.w(TAG, "setValuesFromIntent: Trying to set to category" + cat );
         if (tasker.getCategoryByName(cat) != null){
             category = tasker.getCategoryByName(cat);
             spinner.setSelection(tasker.getListCategories().indexOf(category));
@@ -279,7 +285,9 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         time_picker_hour.setValue((hour));
         time_picker_min.setValue((minutes));
 
-        name.setText(what);
+        if (what != null) {
+            name.setText(what);
+        }
 
     }
 

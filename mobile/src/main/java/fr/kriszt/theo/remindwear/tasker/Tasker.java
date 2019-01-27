@@ -496,13 +496,27 @@ public class Tasker {
 	}
 
 	public Category getCategoryByName(String catName){
-	    if (catName == null) return null;
-//        Log.w(TAG, "getCategoryByName: recherche de la cat " + catName);
+	    if (catName == null) {
+            return null;
+        }else {
+            catName = catName.toLowerCase();
+        }
+
     	for (Category c : listCategories){
-//            Log.w(TAG, "getCategoryByName: compare avec " + c.getName());
-    		if (c.getName().toLowerCase().equals(catName.toLowerCase())){
-    			return c;
-			}
+    	    String name = c.getName().toLowerCase();
+
+            if (name.endsWith("s")){
+                name = name.substring(0, name.length()-1);
+            }
+
+            if (catName.endsWith("s")){
+                catName = catName.substring(0, catName.length()-1);
+            }
+
+            Log.w(TAG, "getCategoryByName: Comparaison de " + catName + " sur " + name );
+
+    	    if (name.equals(catName)) return c;
+
 		}
 		return null;
 	}
