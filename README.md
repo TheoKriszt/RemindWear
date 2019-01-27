@@ -11,45 +11,57 @@
 ## Reconnaissance vocale:
 ### Lancer un suivi sportif :
 Doit contenir un mot clé spécifique (vélo, marche, course) ou générique (suivi sportif, exercice, tracking)
-> Je veux faire du sport
 
+    [Faire | Commence(r) | Lance(r)] [ le | un | du | de la ] [ exercice | tracking | suivi | sport ] <sportif> <de> [vélo | course | marche ] <à pied>
+
+ __Exemples :__
 > Lance un suivi sportif
 
-> Je vais faire du vélo
+> Faire du vélo
+
+> Commencer un exercice de marche à pied
+
+> etc.
 
 ### Créer et préremplir une tâche :
-Doit contenir suivre le format et l'ordre suivant :
+Doit commencer par une intention de rappel comme suit:
 
-` <formule de rappel> [dans la catégorie <nom catégorie>]  de <nom de la tâche> <date> à <heure> `
-
-Formules de rappel :
+    rappelle-moi | [mets-moi | ajoute-moi | ajoute | mets] <une> [rappel | tâche]
 
 > rappelle-moi
 
-> ajoute un rappel
+> mets-moi un rappel
 
 > ajoute une tâche
 
- date :
+Les intentions liées à la date, l'heure la catégorie et l'objet du rappel peuvent suivre :
+
+ __date :__
   > demain
 
-  > aujourd'hui
+  > après demain
 
-  > le XX <un mois de l'année>
+  > le 25
 
-heure :
- > midi
+  > le 6 janvier
+
+__heure :__
+ > à midi
 
  > minuit
 
- > XX heures, minutes
+ > à 16h25
 
- **Exemples :**
- > rappelle-moi dans la catégorie ``course`` d'``acheter du beurre`` ``demain`` à ``16h``
+ __Catégorie :__
 
- > ajoute un rappel ``aller chercher ma convocation`` le ``29 janvier`` à ``midi``
+ > dans la catégorie nom_catégorie
 
- > ajoute une tâche ``soutenance de mobile`` ``demain`` à ``9h50``
+ **Exemples complets:**
+ > rappelle-moi dans la catégorie ``courses`` d'``acheter du beurre`` ``demain`` à ``16h``
+
+ > mets-moi un rappel ``aller chercher ma convocation`` le ``29 janvier`` à ``midi``
+
+ > ajoute une tâche ``soutenance de mobile`` ``demain`` à ``11h555``
 
 
 -----------------
