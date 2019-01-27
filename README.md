@@ -48,7 +48,7 @@ Les intentions liées à la date, l'heure la catégorie et l'objet du rappel peu
 __heure :__
  > à midi
 
- > minuit
+ > à minuit
 
  > à 16h25
 
@@ -57,24 +57,24 @@ __heure :__
  > dans la catégorie nom_catégorie
 
  **Exemples complets:**
- > rappelle-moi dans la catégorie ``courses`` d'``acheter du beurre`` ``demain`` à ``16h``
+ > rappelle-moi dans la catégorie ``courses`` d'``acheter du café`` ``demain`` à ``16h``
 
  > mets-moi un rappel ``aller chercher ma convocation`` le ``29 janvier`` à ``midi``
 
- > ajoute une tâche ``soutenance de mobile`` ``demain`` à ``11h555``
+ > ajoute une tâche ``soutenance de mobile`` ``demain`` à ``11h55``
 
 
 -----------------
 ## TODO :
-[x] Ajout de tâches à la voix
+- [x] Ajout de tâches à la voix
 
-[x] Transfert des données vers le mobile
+- [x] Transfert des données vers le mobile
 
-[x] Affichage des données (suivi sportif), côté téléphone
+- [x] Affichage des données (suivi sportif), côté téléphone
 
-[x] Selection du type de sport
+- [x] Selection du type de sport
 
-[x] Tâches de sport indépendantes de tâches normales (tracking sportif séparé)
+- [x] Tâches de sport indépendantes de tâches normales (tracking sportif séparé)
 
 
 ### Tests à faire
@@ -90,6 +90,3 @@ __heure :__
 - [x] Vocal : lancer un sport indispo sur la montre le lance quand même
 - [x] Imposible d'afficher les details du sport
 - [x] Wear : changement du bouton impossible : thread secondaire
-
-
-
