@@ -214,12 +214,10 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         });
 
 
-
-        if (getIntent().getExtras()!= null && getIntent().getExtras().get(Constants.KEY_SUBJECT) != null){
-            setValuesFromIntent(getIntent().getExtras());
-        }else if (getIntent().getExtras().get(Constants.KEY_DATE) != null)
-            if (getIntent().getExtras() != null) {
-
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().get(Constants.KEY_SUBJECT) != null) {
+                setValuesFromIntent(getIntent().getExtras());
+            } else if (getIntent().getExtras().get(Constants.KEY_DATE) != null) {
                 long timeMillis = extras.getLong(Constants.KEY_DATE);
                 GregorianCalendar calendar = new GregorianCalendar();
                 calendar.setTimeInMillis(timeMillis);
@@ -228,13 +226,12 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
             if (getIntent().getExtras().get(Constants.KEY_CATEGORY)!= null){
                 String cat = getIntent().getExtras().getString(Constants.KEY_CATEGORY);
-//                Log.w(TAG, "onCreate: on tente la categorie " + cat);
                 Category category = tasker.getCategoryByName(cat);
                 if (category != null){
                     spinner.setSelection(tasker.getListCategories().indexOf(category));
                 }
             }
-
+        }
     }
 
     private void prepareCategoriesSpinner() {
@@ -377,14 +374,6 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             // Make sure the request was successful
             prepareCategoriesSpinner();
             if (resultCode == RESULT_OK) {
-//                spinner.setVisibility(View.INVISIBLE);
-//                spinner.setVisibility(View.VISIBLE);
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
-
-                // Do something with the contact here (bigger example below)
-//                Tasker.getInstance(this).unserializeLists();
-//                prepareCategoriesSpinner();
                 Log.w(TAG, "onActivityResult: Category was updated");
             }
         }
