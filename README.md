@@ -59,7 +59,7 @@ __heure :__
  **Exemples complets:**
  > rappelle-moi dans la catégorie ``courses`` d'``acheter du café`` ``demain`` à ``16h``
 
- > mets-moi un rappel ``aller chercher ma convocation`` le ``29 janvier`` à ``midi``
+ > mets-moi un rappel ``aller chercher ma convocation`` le ``4 février`` à ``midi``
 
  > ajoute une tâche ``soutenance de mobile`` ``demain`` à ``11h55``
 
