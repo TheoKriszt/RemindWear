@@ -7,11 +7,11 @@ import fr.kriszt.theo.remindwear.sensors.steps.StepListener;
 
 public abstract class AbstractStepListener implements StepListener {
 
-    protected int count = 0;
-    protected SensorEventListener sensorEventListener = null;
-    protected SensorManager sensorManager;
+    int count = 0;
+    private SensorEventListener sensorEventListener = null;
+    private SensorManager sensorManager;
 
-    public AbstractStepListener(SensorManager sm){
+    AbstractStepListener(SensorManager sm) {
         sensorManager = sm;
     }
 
@@ -32,7 +32,7 @@ public abstract class AbstractStepListener implements StepListener {
 
     @Override
     public void unregisterSensor() {
-        if (sensorEventListener != null){
+        if (sensorEventListener != null) {
             sensorManager.unregisterListener(sensorEventListener);
         }
     }

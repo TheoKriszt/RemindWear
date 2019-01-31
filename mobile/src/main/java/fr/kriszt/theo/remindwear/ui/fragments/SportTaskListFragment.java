@@ -1,8 +1,8 @@
 package fr.kriszt.theo.remindwear.ui.fragments;
 
 
-import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,19 +18,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
-import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
-import fr.kriszt.theo.shared.Coordinates;
-import fr.kriszt.theo.shared.SportType;
-import fr.kriszt.theo.shared.data.SportDataPoint;
-import fr.kriszt.theo.shared.data.SportDataSet;
 
 
 public class SportTaskListFragment extends Fragment {
@@ -51,19 +43,20 @@ public class SportTaskListFragment extends Fragment {
     private ImageView close;
     private Tasker tasker;
 
-    public SportTaskListFragment(){}
+    public SportTaskListFragment() {
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView =  inflater.inflate(R.layout.fragment_sport_list, container, false);
-        tasker  = Tasker.getInstance(getContext());
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.fragment_sport_list, container, false);
+        tasker = Tasker.getInstance(getContext());
         tasker.addObserver(this);
         return rootView;
 
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Tasker myTasker = Tasker.getInstance(getContext());
 
@@ -74,16 +67,11 @@ public class SportTaskListFragment extends Fragment {
 
 
         tasksSportList = myTasker.getListSportTasks();
-//        Log.w(TAG, "onViewCreated: Jai retrouvé " + tasksSportList.size() + " activites sportives");
-
-
-//        myTasker.unserializeLists();
-
 
         myTasker.sportSort(false);
         myTasker.serializeLists();
 
-         sportList = rootView.findViewById(R.id.sportList);
+        sportList = rootView.findViewById(R.id.sportList);
         tasksSportAdapter = new SportTaskListAdapterFragment(getContext(), tasksSportList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
@@ -94,7 +82,8 @@ public class SportTaskListFragment extends Fragment {
         searchBar = rootView.findViewById(R.id.searchBar);
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -104,7 +93,8 @@ public class SportTaskListFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         upper = rootView.findViewById(R.id.upper);
@@ -134,7 +124,7 @@ public class SportTaskListFragment extends Fragment {
             }
         });
 
-        search = (ImageView) rootView.findViewById(R.id.search);
+        search = rootView.findViewById(R.id.search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,8 +158,7 @@ public class SportTaskListFragment extends Fragment {
 
     }
 
-    public void updateRecyclerView(){
-//        Log.w(TAG, "updateRecyclerView: ");
+    public void updateRecyclerView() {
         sportList = rootView.findViewById(R.id.sportList);
         tasker.unserializeLists();
         tasksSportList = tasker.getListSportTasks();
@@ -189,8 +178,7 @@ public class SportTaskListFragment extends Fragment {
     }
 
     @Override
-    public void onResume(){
-        Log.w(TAG, "onResume: ");
+    public void onResume() {
         updateRecyclerView();
         super.onResume();
     }

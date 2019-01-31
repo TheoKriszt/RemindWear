@@ -13,8 +13,6 @@ import fr.kriszt.theo.remindwear.sensors.steps.StepListenerImpl.BuiltinStepDetec
 
 public class StepListenerFactory {
 
-    private static final String TAG = StepListenerFactory.class.getSimpleName();
-
     // Types de capteurs utilisables en pédomètre, par ordre de priorité
     private static int[] stepSensorTypes = new int[]{
             Sensor.TYPE_STEP_DETECTOR,
@@ -31,7 +29,6 @@ public class StepListenerFactory {
         for (int sensorType : stepSensorTypes){
             for (int availableSensor : availableSensors){
                 if (sensorType == availableSensor){
-                    // La capteur est dispo : l'utiliser
                     stepSensor = sensorManager.getDefaultSensor(sensorType);
                 }
             }

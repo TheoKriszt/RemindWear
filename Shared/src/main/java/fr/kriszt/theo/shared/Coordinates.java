@@ -2,14 +2,13 @@ package fr.kriszt.theo.shared;
 
 import android.location.Location;
 import android.location.LocationManager;
-import android.util.Log;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Date;
 
 public class Coordinates implements Serializable {
 
-    private static final String TAG = "Coordinates";
     private final double MS_TO_KMH = 3.6;
 
     private transient Location location = null;
@@ -19,7 +18,7 @@ public class Coordinates implements Serializable {
     private double lng;
     private double altitude;
 
-    public Coordinates(double lat, double lng, double alt, double speed_ms){
+    private Coordinates(double lat, double lng, double alt, double speed_ms) {
         this.lat = lat;
         this.lng = lng;
         this.altitude = alt;
@@ -29,34 +28,32 @@ public class Coordinates implements Serializable {
     }
 
     public Coordinates(Location location) {
-        this( location.getLatitude(), location.getLongitude(), location.getAltitude(), location.getSpeed() );
+        this(location.getLatitude(), location.getLongitude(), location.getAltitude(), location.getSpeed());
         this.location = location;
     }
 
-    public double getLat() {return lat;}
-    public void setLat(double lat) {this.lat = lat;}
+    public double getLat() {
+        return lat;
+    }
 
-    public double getLng() {return lng;}
-    public void setLng(double lng) {this.lng = lng;}
+    public double getLng() {
+        return lng;
+    }
 
-    public double getAltitude() {return altitude;}
-
-    public void setAltitude(double altitude) {this.altitude = altitude;}
+    public double getAltitude() {
+        return altitude;
+    }
 
     public double getSpeedkmh() {
         return MS_TO_KMH * speed;
     }
 
-    public double getSpeedMS() {
+    private double getSpeedMS() {
         return speed;
     }
 
-    public long getTimestamp(){
-        return timestamp;
-    }
-
     public float distanceTo(Coordinates coordinates) {
-        if (location == null){
+        if (location == null) {
             location = new Location(LocationManager.GPS_PROVIDER);
             location.setLatitude(lat);
             location.setLongitude(lng);
@@ -68,13 +65,14 @@ public class Coordinates implements Serializable {
         return location.distanceTo(coordinates.location);
     }
 
+    @NonNull
     @Override
-    public String toString(){
-        return "Lat="+lat+", Lon="+lng+", speed="+getSpeedkmh();
+    public String toString() {
+        return "Lat=" + lat + ", Lon=" + lng + ", speed=" + getSpeedkmh();
     }
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         return o instanceof Coordinates && ((Coordinates) o).lat == lat && ((Coordinates) o).lng == lng;
     }
 }

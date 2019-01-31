@@ -27,10 +27,10 @@ import static fr.kriszt.theo.shared.Constants.ACTION_LAUNCH_WEAR_APP;
 public class VoiceUtils {
     private static final int SPEECH_REQUEST_CODE = 0;
     private static final String TAG = VoiceUtils.class.getSimpleName();
-    private static final Pattern sportPattern = Pattern.compile("^(?:faire|commencer?|lancer?) ?(?:le|un|du|de la) ?(?:exercice|tracking|suivi|sport)? ?(?:sportif)? ?(?:de)? ?(vélo|course|marche)?(?: à pied)?");
+    private static final Pattern sportPattern = Pattern.compile("^(?:démarrer?|faire|commencer?|lancer?) ?(?:le|un|du|de la) ?(?:exercice|tracking|suivi|sport)? ?(?:sportif)? ?(?:de)? ?(vélo|course|marche)?(?: à pied)?");
     private static final Pattern remindPattern = Pattern.compile("^(?:mets-moi|ajoute-moi|ajoute|mets) une? (?:rappel|tâche)|rappelle-moi");
 
-    public static void startSpeechRecognizer(Fragment fragment){
+    public static void startSpeechRecognizer(Fragment fragment) {
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -44,7 +44,6 @@ public class VoiceUtils {
             List<String> results = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
             String spokenText = results.get(0);
-            Log.w(TAG, "getRecognizedSpeech: GOT \"" + spokenText  + "\"");
             return parseSpeech(spokenText, context);
         }
         return null;
@@ -55,11 +54,9 @@ public class VoiceUtils {
         Matcher remindMatcher = remindPattern.matcher(spokenText);
 
 
-        if (sportMatcher.find()){
-            Log.w(TAG, "parseSpeech: Demande de sport reconnue");
+        if (sportMatcher.find()) {
             return startTrackingIntent(sportMatcher.group(1), context);
-        }else if (remindMatcher.find()){
-            Log.w(TAG, "parseSpeech: Demande de rappel reconnue");
+        } else if (remindMatcher.find()) {
             String matched = remindMatcher.group(0);
             return parseRemindIntent(matched, spokenText, context);
         } else {
@@ -74,7 +71,7 @@ public class VoiceUtils {
         startIntent.putExtra(Constants.KEY_TASK_ID, 0);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        if (sportName == null){
+        if (sportName == null) {
             startIntent.removeExtra(Constants.KEY_SPORT_TYPE);
             context.startService(startIntent);
             Toast.makeText(context, "Choisissez un sport sur la montre", Toast.LENGTH_LONG).show();
@@ -83,14 +80,15 @@ public class VoiceUtils {
         } else {
 
             SportType sportType;
-            switch (sportName){
+            switch (sportName) {
                 case "course":
                     sportType = SportType.SPORT_RUN;
                     break;
                 case "vélo":
                     sportType = SportType.SPORT_BIKE;
                     break;
-                    default: sportType = SportType.SPORT_WALK;
+                default:
+                    sportType = SportType.SPORT_WALK;
             }
             startIntent.putExtra(Constants.KEY_SPORT_TYPE, sportType);
             Toast.makeText(context, "Démarrage d'un exercice de " + sportType.getName() + " sur la montre", Toast.LENGTH_LONG).show();
@@ -105,7 +103,7 @@ public class VoiceUtils {
         Pattern categoryPattern = Pattern.compile(" ?dans la catégorie ?(\\S+)");
         Matcher categoryMatcher = categoryPattern.matcher(spokenText);
         String category = null;
-        if (categoryMatcher.find()){
+        if (categoryMatcher.find()) {
             category = categoryMatcher.group(1);
             spokenText = spokenText.replace(categoryMatcher.group(0), "");
         }
@@ -113,33 +111,25 @@ public class VoiceUtils {
         String time = null;
         Pattern timePattern = Pattern.compile(" ?à (midi|minuit|\\d{1,2}h|\\d{1,2}h\\d{1,2})$");
         Matcher timeMatcher = timePattern.matcher(spokenText);
-        if (timeMatcher.find()){
+        if (timeMatcher.find()) {
             time = timeMatcher.group(1);
-            spokenText = spokenText.replace( timeMatcher.group(0), "" );
+            spokenText = spokenText.replace(timeMatcher.group(0), "");
         }
 
         String date = null;
         Pattern datePattern = Pattern.compile("(?:\\ble )?(aujourd'hui|demain|après demain|\\d{1,2}|\\d{1,2} \\w+)$");
         Matcher dateMatcher = datePattern.matcher(spokenText);
-        if (dateMatcher.find()){
+        if (dateMatcher.find()) {
             date = dateMatcher.group(1);
-            spokenText = spokenText.replace( dateMatcher.group(0), "" );
+            spokenText = spokenText.replace(dateMatcher.group(0), "");
         }
 
         String what = null;
-        Pattern whatPattern = Pattern.compile("(?:de|pour|d\\') ?(.*)");
+        Pattern whatPattern = Pattern.compile("(?:de|pour|d')? ?(.*)");
         Matcher whatMatcher = whatPattern.matcher(spokenText);
-        if (whatMatcher.find()){
+        if (whatMatcher.find()) {
             what = whatMatcher.group(1);
         }
-        Log.w(TAG, "WHAT : " + what);
-        Log.w(TAG, "CATEGORY : " + category);
-        Log.w(TAG, "DATE: " + date);
-        Log.w(TAG, "TIME: " + time);
-
-
-
-
 
 
         Calendar calendar = new GregorianCalendar();
@@ -148,7 +138,7 @@ public class VoiceUtils {
                 case "demain":
                     calendar.add(Calendar.DAY_OF_YEAR, 1);
                     break;
-                case "après-demain":
+                case "après demain":
                     calendar.add(Calendar.DAY_OF_YEAR, 2);
                     break;
                 default:
@@ -161,13 +151,11 @@ public class VoiceUtils {
 
                         if (ddmmMatcher.group(2) != null) {
                             ArrayList<String> months = new ArrayList<>(Arrays.asList("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"));
-                            if (months.contains( ddmmMatcher.group(2) )){
-                                calendar.set(Calendar.MONTH, months.indexOf( ddmmMatcher.group(2) ));
+                            if (months.contains(ddmmMatcher.group(2))) {
+                                calendar.set(Calendar.MONTH, months.indexOf(ddmmMatcher.group(2)));
                             }
                         }
-//                    for (int i = 0; i < ddmmMatcher.groupCount() + 1; i++) {
-//                        Log.w(TAG, "group " + i + " :: " + ddmmMatcher.group(i));
-//                    }
+
                     } else Log.w(TAG, "Date non reconnue : " + date);
                     break;
             }
@@ -175,13 +163,13 @@ public class VoiceUtils {
 
         Intent startIntent = new Intent(context, AddTaskActivity.class);
 
-        if (time != null){
-            if (time.equals("midi")){
+        if (time != null) {
+            if (time.equals("midi")) {
                 time = "12h";
-            }else if (time.equals("minuit")){
+            } else if (time.equals("minuit")) {
                 time = "00h";
             }
-            if (time.endsWith("h")){
+            if (time.endsWith("h")) {
                 time += "00";
             }
 
@@ -192,11 +180,11 @@ public class VoiceUtils {
         }
 
         startIntent.putExtra(Constants.KEY_DATE, calendar.getTimeInMillis());
-        if (what != null){
+        if (what != null) {
             startIntent.putExtra(Constants.KEY_SUBJECT, what);
         }
 
-        if (category != null){ // TODO : chek if category exists
+        if (category != null) {
             startIntent.putExtra(Constants.KEY_CATEGORY, category);
         }
 

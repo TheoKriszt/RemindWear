@@ -12,15 +12,15 @@ import fr.kriszt.theo.remindwear.sensors.steps.StepListenerFactory;
 
 public class SensorUtils {
 
-    private static List<Sensor> getAvailableSensors(SensorManager sm){
+    private static List<Sensor> getAvailableSensors(SensorManager sm) {
         return sm.getSensorList(Sensor.TYPE_ALL);
     }
 
-    public static int[] getAvailableSensorsTypes(SensorManager sm){
+    public static int[] getAvailableSensorsTypes(SensorManager sm) {
         List<Sensor> sensors = getAvailableSensors(sm);
         int[] sensorTypes = new int[sensors.size()];
 
-        for (int i = 0; i < sensors.size(); i++){
+        for (int i = 0; i < sensors.size(); i++) {
             sensorTypes[i] = sensors.get(i).getType();
         }
 
@@ -28,22 +28,15 @@ public class SensorUtils {
 
     }
 
-    public static boolean isSensorAvailable(SensorManager sm, int sensorType){
-        for (Sensor s : getAvailableSensors(sm)){
-            if (s.getType() == sensorType) return true;
-        }
-        return false;
-    }
-
-    public static boolean isGPSAvailable(Context c){
+    public static boolean isGPSAvailable(Context c) {
         return c.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
     }
 
-    public static boolean isHeartRateAvailable(Context c){
+    public static boolean isHeartRateAvailable(Context c) {
         return c.getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE);
     }
 
-    public static boolean isPodometerAvailable(SensorManager sm){
+    public static boolean isPodometerAvailable(SensorManager sm) {
         try {
             StepListenerFactory.getStepListener(sm);
             return true;

@@ -1,12 +1,11 @@
 package fr.kriszt.theo.remindwear.ui.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,15 +20,13 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import fr.kriszt.theo.remindwear.R;
-import fr.kriszt.theo.remindwear.ui.fragments.SportTaskListFragment;
-import fr.kriszt.theo.shared.Coordinates;
 import fr.kriszt.theo.remindwear.tasker.SportTask;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.shared.Constants;
+import fr.kriszt.theo.shared.Coordinates;
 import fr.kriszt.theo.shared.SportType;
-import fr.kriszt.theo.shared.data.SportDataPoint;
 import fr.kriszt.theo.shared.data.SportDataSet;
 
 public class SportDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -38,13 +35,7 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
     private SportTask sTask;
 
     private GraphView graph;
-    private GoogleMap mMap;
-    private TextView steps;
-    private TextView heart;
-    private TextView distance;
-    private TextView duration;
     private Tasker tasker;
-    private CardView stepsCard, heartCard, distanceCard, durationCard, mapCard, elevationCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,50 +44,28 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         tasker = Tasker.getInstance(this);
 
 
-        int id = getIntent().getIntExtra("idSportTask", -1);
-        Log.w(TAG, "onCreate: SportTask ID = " + id);
+        int id = getIntent().getIntExtra(Constants.KEY_TASK_ID, -1);
         sTask = tasker.getSportTaskByID(id);
-        Log.w(TAG, "onCreate: extracted task : " + sTask);
-        Log.w(TAG, "onCreate: DataPoints are : ");
-//        for (SportDataPoint sdp : sTask.getDataset().getPoints().values()){
-//            Log.w(TAG, "onCreate: DataPoint : " + sdp);
-//        }
-//        Log.w(TAG, "onCreate: ...xXx");
-
-//        List<Coordinates> listCoordinate = sTask.getListCoord();
-//        Log.w(TAG, "onCreate: " + listCoordinate.size() + " coords found : ");
-//        Log.w(TAG, "onCreate: " + listCoordinate);
-
-
 
         String res;
-        steps = findViewById(R.id.steps);
+        TextView steps = findViewById(R.id.steps);
         res = String.valueOf(sTask.getSteps());
         steps.setText(res);
 
-        Log.w(TAG, "onCreate: steps loaded");
-
-        heart = findViewById(R.id.heart);
+        TextView heart = findViewById(R.id.heart);
         res = String.valueOf(sTask.getHeart());
         heart.setText(res);
 
-        Log.w(TAG, "onCreate: heartrate loaded");
-
-        distance = findViewById(R.id.distance);
+        TextView distance = findViewById(R.id.distance);
         res = String.valueOf(String.format("%.2f", sTask.getDistance()));
         distance.setText(res);
 
-        Log.w(TAG, "onCreate: distance loaded");
-
         long s = sTask.getDuration();
-        Log.w(TAG, "onCreate: duration="+s);
-        res = String.format("%02d : %02d : %02d", s / 3600, (s % 3600) / 60, (s % 60));
-        Log.w(TAG, "onCreate: touching field");
-        duration = findViewById(R.id.duration);
-        duration.setText(res);
-        Log.w(TAG, "onCreate: duration loaded");
 
-        Log.w(TAG, "onCreate: Simple fileds loaded");
+        res = String.format("%02d : %02d : %02d", s / 3600, (s % 3600) / 60, (s % 60));
+
+        TextView duration = findViewById(R.id.duration);
+        duration.setText(res);
 
         if (sTask.getDataset().hasGPS()) {
             graph = findViewById(R.id.graph);
@@ -104,28 +73,24 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         }
 
         hideUnusedFields(sTask.getDataset());
-
-        Log.w(TAG, "onCreate: DONE");
     }
 
     private void loadMap() {
-        Log.w(TAG, "loadMap: ");
 
-        if (! sTask.getDataset().hasGPS()){
-            Log.w(TAG, "loadMap: GPS unavailable : skipping");
+        if (!sTask.getDataset().hasGPS()) {
             return;
         }
 
         ArrayList<DataPoint> listPoint = new ArrayList<>();
         int i = 0;
-        for (Coordinates c : sTask.getListCoord()){
-            if (c != null){
+        for (Coordinates c : sTask.getListCoord()) {
+            if (c != null) {
                 listPoint.add(new DataPoint(i++, c.getAltitude()));
             }
         }
 
-        DataPoint[] simpleArray = new DataPoint[ listPoint.size() ];
-        listPoint.toArray( simpleArray );
+        DataPoint[] simpleArray = new DataPoint[listPoint.size()];
+        listPoint.toArray(simpleArray);
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(simpleArray);
 
         series.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -141,27 +106,24 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
     }
 
     private void hideUnusedFields(SportDataSet dataset) {
-        stepsCard = findViewById(R.id.stepsCard);
-        heartCard = findViewById(R.id.heartCard);
-        distanceCard = findViewById(R.id.distanceCard);
-        durationCard = findViewById(R.id.durationCard);
-        mapCard = findViewById(R.id.mapCard);
-        elevationCard = findViewById(R.id.elevationCard);
-
-//        Toast.makeText(this, "Type : " + dataset.getSportType(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, "Has Podo : " + dataset.hasPodometer(), Toast.LENGTH_SHORT).show();
+        CardView stepsCard = findViewById(R.id.stepsCard);
+        CardView heartCard = findViewById(R.id.heartCard);
+        CardView distanceCard = findViewById(R.id.distanceCard);
+        CardView durationCard = findViewById(R.id.durationCard);
+        CardView mapCard = findViewById(R.id.mapCard);
+        CardView elevationCard = findViewById(R.id.elevationCard);
 
         if (dataset.getSportType() == SportType.SPORT_BIKE ||
-                !dataset.hasPodometer()){
+                !dataset.hasPodometer()) {
             stepsCard.setVisibility(View.GONE);
         }
 
-        if (!dataset.hasCardiometer()){
+        if (!dataset.hasCardiometer()) {
             heartCard.setVisibility(View.GONE);
         }
 
         if (dataset.getSportType() == SportType.SPORT_WALK ||
-                !dataset.hasGPS()){
+                !dataset.hasGPS()) {
             distanceCard.setVisibility(View.GONE);
             mapCard.setVisibility(View.GONE);
             elevationCard.setVisibility(View.GONE);
@@ -171,19 +133,15 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.w(TAG, "onMapReady: ");
 
         if (!sTask.getDataset().hasGPS()) {
-            Log.w(TAG, "onMapReady: No GPS, skipping");
             return;
         }
 
-        mMap = googleMap;
-
         ArrayList<LatLng> listTracker = new ArrayList<>();
-        for(Coordinates c : sTask.getListCoord()){
+        for (Coordinates c : sTask.getListCoord()) {
             if (c != null) {
-                listTracker.add(new LatLng(c.getLat(),c.getLng()));
+                listTracker.add(new LatLng(c.getLat(), c.getLng()));
             }
         }
 
@@ -192,7 +150,7 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         double maxLat = -200;
         double minLng = 200;
         double maxLng = -200;
-        for(LatLng x : listTracker){
+        for (LatLng x : listTracker) {
             minLat = Math.min(minLat, x.latitude);
             maxLat = Math.max(maxLat, x.latitude);
             minLng = Math.min(minLng, x.longitude);
@@ -210,8 +168,8 @@ public class SportDetailsActivity extends AppCompatActivity implements OnMapRead
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
         try {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(avg, 6));
-            mMap.animateCamera(cu);
-        }catch(Exception e){
+            googleMap.animateCamera(cu);
+        } catch (Exception e) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(avg, 6));
         }
 

@@ -1,19 +1,22 @@
 package fr.kriszt.theo.shared.data;
 
-import fr.kriszt.theo.shared.Coordinates;
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class SportDataPoint implements Serializable{
+import fr.kriszt.theo.shared.Coordinates;
+
+public class SportDataPoint implements Serializable {
 
     private final Calendar createdAt;
-    public Coordinates coords;
+    Coordinates coords;
     public int steps;
-    public int heartRate;
-    public float distance;
+    int heartRate;
+    float distance;
 
-    public SportDataPoint(Coordinates c, int stepsCount, int hRate, float dist){
+    public SportDataPoint(Coordinates c, int stepsCount, int hRate, float dist) {
         coords = c;
         steps = stepsCount;
         heartRate = hRate;
@@ -21,16 +24,16 @@ public class SportDataPoint implements Serializable{
         createdAt = new GregorianCalendar();
     }
 
+    @NonNull
     @Override
-    public String toString(){
-//        String res = "Data Point : created at " + createdAt.get(Calendar.HOUR_OF_DAY) + ":" + createdAt.get(Calendar.MINUTE) + ", " + steps + " steps; " + distance + "Km; " + heartRate + " BPM; Location: " + coords;
+    public String toString() {
         String res = "Data Point : " + steps + " steps; " + distance + "Km; " + heartRate + " BPM; Location: " + coords;
         res += " Calendar = " + createdAt;
         return res;
     }
 
 
-    public Calendar getCreatedAt() {
+    Calendar getCreatedAt() {
         return createdAt;
     }
 }

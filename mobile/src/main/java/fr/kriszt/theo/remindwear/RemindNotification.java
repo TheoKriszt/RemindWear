@@ -1,5 +1,6 @@
 package fr.kriszt.theo.remindwear;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 //import android.app.PendingIntent;
 import android.app.NotificationChannel;
@@ -33,36 +34,27 @@ public class RemindNotification {
     private int taskId;
     private Notification notification;
 
+    @SuppressLint("DefaultLocale")
     public RemindNotification(Task task, Context c){
         title = task.getName();
         content = String.format("Commence à %02dh%02d", task.getTimeHour(), task.getTimeMinutes());
         taskId = task.getID();
         context = c;
-//        bigText = "Rappel : " + task.getName() + " à " + task.getTimeHour() + "h" + task.getTimeMinutes()
-//                    + "\n\t" + content;
-
 
         String longText = "Commence à " + String.format("%02d", task.getTimeHour()) + "h" + String.format("%02d", task.getTimeMinutes())
                 + "<p>" + task.getDescription() + "</p>";
         bigText = new NotificationCompat.BigTextStyle().bigText(Html.fromHtml(longText));
-//        bigText = new NotificationCompat.BigTextStyle().bigText(task.getName() + " commence à " + task.getTimeHour() + "h" + task.getTimeMinutes());
-
-
-
-
 
         NotificationCompat.Builder builder = build(task);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            CharSequence name = getString(R.string.channel_name);
-//            String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel("REMINDWEAR_CHANNEL", "RemindWear", importance);
             channel.setDescription("RemindWear Global Notifications");
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            assert notificationManager != null;
             notificationManager.createNotificationChannel(channel);
 
             builder.setChannelId(channel.getId());
@@ -82,12 +74,10 @@ public class RemindNotification {
     }
 
     private void addActions(Task task, NotificationCompat.Builder builder) {
-        // Ajouter l'action START TRACKING pour la catégorie sport
 
         Intent trackingIntent = new Intent(context, TasksActivity.class);
         trackingIntent.putExtra(TasksActivity.FRAGMENT_TO_LAUNCH, SportTaskListFragment.class.getName());
         trackingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        PendingIntent pendingTrackingIntent = PendingIntent.getActivity(context, 0, trackingIntent, 0);
 
         Intent sendMessageIntent = new Intent(context, PhoneDataService.class);
         sendMessageIntent.setAction(Constants.ACTION_LAUNCH_WEAR_APP);
@@ -118,9 +108,6 @@ public class RemindNotification {
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
 
-
-
-
         return new NotificationCompat.Builder(context, notification_channel)
                 .setSmallIcon(categoryIcon)
                 .setContentTitle(title)
@@ -139,8 +126,6 @@ public class RemindNotification {
         NotificationManagerCompat notificationManager =
                 NotificationManagerCompat.from(context);
 
-        //we give each notification the ID of the event it's describing,
-        //to ensure they all show up and there are no duplicates
         notificationManager.notify(taskId, notification);
 
     }

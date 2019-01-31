@@ -1,7 +1,7 @@
 package fr.kriszt.theo.remindwear.ui;
 
-import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.WearableRecyclerView;
 import android.view.LayoutInflater;
@@ -20,14 +20,11 @@ import fr.kriszt.theo.shared.Constants;
 public class RecyclerViewAdapter
         extends WearableRecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    private final Context context;
     private final Integer taskId;
     private List<SportTypeItem> mListSportTypes;
 
-    public RecyclerViewAdapter(List<SportTypeItem> mListSportTypes, Context c, Integer taskId) {
+    public RecyclerViewAdapter(List<SportTypeItem> mListSportTypes, Integer taskId) {
         this.mListSportTypes = mListSportTypes;
-
-        this.context = c;
 
         this.taskId = taskId;
 
@@ -39,14 +36,11 @@ public class RecyclerViewAdapter
 
         ViewHolder(View view) {
             super(view);
-            name =  view.findViewById(R.id.health_tip);
-            icon =  view.findViewById(R.id.tip_details);
+            name = view.findViewById(R.id.health_tip);
+            icon = view.findViewById(R.id.tip_details);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
-//                    Log.w("RecyclerView on clic", "Task ID = " + RecyclerViewAdapter.this.taskId);
-
 
                     Intent startIntent = new Intent(view.getContext(), WearActivity.class);
                     startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -63,8 +57,9 @@ public class RecyclerViewAdapter
 
     }
 
+    @NonNull
     @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.sport_type_row, parent, false);
 
@@ -72,7 +67,7 @@ public class RecyclerViewAdapter
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.name.setText(mListSportTypes.get(position).name);
         holder.icon.setImageDrawable(mListSportTypes.get(position).icon);
     }

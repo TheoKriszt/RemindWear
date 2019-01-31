@@ -15,7 +15,6 @@ import fr.kriszt.theo.remindwear.tasker.Tasker;
 import fr.kriszt.theo.shared.Constants;
 
 /**
- * Created by T.Kriszt on 04/10/2018.
  * Service de planification : peut être appelé via un Intent
  * Reporte une tâche à plus tard (10 minutes)
  * S'utilise avec l'action "Plus Tard" de la notification (équivalent du 'Snooze' pour un réveil)
@@ -31,34 +30,31 @@ public class SchedulerService extends Service {
 
     @Override
     public void onCreate() {
-//        Log.w(TAG, "onCreate: ");
         super.onCreate();
         tasker = Tasker.getInstance(getApplicationContext());
     }
 
-    @Override
+
     /**
      * @param intent dont l'extra contient la tâche sérialisée à planifier
      */
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (intent != null){
+        if (intent != null) {
 
             Bundle extras = intent.getExtras();
 
-            if (extras != null){
-                for (String k : extras.keySet()){
+            if (extras != null) {
+                for (String k : extras.keySet()) {
                     Log.w(TAG, "found key " + k + " = " + extras.get(k));
                 }
 
                 Task task = (Task) extras.getSerializable(TASK_TAG);
+                assert task != null;
                 postponeTask(task);
 
 
-
-
-            }else {
-                Log.w(TAG, "onStartCommand: Les extras sont NULL");
             }
 
         }
@@ -74,14 +70,15 @@ public class SchedulerService extends Service {
 
     /**
      * Reporte une tâche de POSTPONE_TIME_MINUTES minutes
+     *
      * @param task une copie (potentiellement par serialisation) de la tâche a reporter
-     * Gère la persistance côté Tasker
+     *             Gère la persistance côté Tasker
      */
     private void postponeTask(Task task) {
 
-        Log.i(TAG, "postponeTask: La tâche " + task.getName() + " est reportée à dans "+ POSTPONE_TIME_MINUTES +" minutes");
-
-        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+        NotificationManager notificationManager =
+                (NotificationManager) getApplicationContext().getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+        assert notificationManager != null;
         notificationManager.cancel(task.getID());
 
         Task alteredTask = tasker.getTaskByID(task.getID()); // get actual tasker's Task, not just a copy

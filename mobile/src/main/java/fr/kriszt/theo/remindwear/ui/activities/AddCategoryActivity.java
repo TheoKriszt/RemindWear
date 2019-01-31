@@ -3,6 +3,7 @@ package fr.kriszt.theo.remindwear.ui.activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,6 @@ import com.skydoves.colorpickerpreference.ColorListener;
 import com.skydoves.colorpickerpreference.ColorPickerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
@@ -28,15 +28,11 @@ import fr.kriszt.theo.remindwear.tasker.Tasker;
 public class AddCategoryActivity extends AppCompatActivity {
 
     LayoutInflater inflator;
-    private int color;
-    private int icon;
-    private String name;
     ArrayList<Integer> listIcons = new ArrayList<>();
 
     private EditText title;
     private Spinner spinner;
     private ColorPickerView colorPickerView;
-    private Button submit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,12 +71,12 @@ public class AddCategoryActivity extends AppCompatActivity {
         colorPickerView.setColorListener(new ColorListener() {
             @Override
             public void onColorSelected(ColorEnvelope colorEnvelope) {
-                ImageView colorView  = findViewById(R.id.colorView);
+                ImageView colorView = findViewById(R.id.colorView);
                 colorView.setBackgroundColor(colorEnvelope.getColor());
             }
         });
 
-        submit = findViewById(R.id.submit);
+        Button submit = findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,17 +85,16 @@ public class AddCategoryActivity extends AppCompatActivity {
         });
 
 
-
     }
 
     private void actionSubmit() {
-        if(title.getText().toString().equals("")){
+        if (title.getText().toString().equals("")) {
             Toast.makeText(this, "Inscrire le nom de la catégorie", Toast.LENGTH_SHORT).show();
-        }else{
-            this.name = title.getText().toString();
-            this.color = colorPickerView.getColor();
-            this.icon = listIcons.get(spinner.getSelectedItemPosition());
-            Category newCategory = new Category(this.name, this.icon, this.color);
+        } else {
+            String name = title.getText().toString();
+            int color = colorPickerView.getColor();
+            int icon = listIcons.get(spinner.getSelectedItemPosition());
+            Category newCategory = new Category(name, icon, color);
             Tasker.getInstance(getApplicationContext()).addCategory(newCategory);
             Tasker.getInstance(getApplicationContext()).serializeLists();
 
@@ -116,7 +111,7 @@ public class AddCategoryActivity extends AppCompatActivity {
 
         private ArrayList<Integer> items;
 
-        public NewAdapter(ArrayList<Integer> items) {
+        NewAdapter(ArrayList<Integer> items) {
             this.items = items;
         }
 
@@ -132,7 +127,7 @@ public class AddCategoryActivity extends AppCompatActivity {
 
         @Override
         public long getItemId(int position) {
-            return position ;
+            return position;
         }
 
         @Override
@@ -142,8 +137,8 @@ public class AddCategoryActivity extends AppCompatActivity {
                 convertView = inflator.inflate(R.layout.content_icon_spinner, null);
                 viewHolder = new ViewHolder(convertView);
                 convertView.setTag(viewHolder);
-            }else{
-                viewHolder  = (ViewHolder) convertView.getTag();
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
             }
             int ic = (Integer) getItem(position);
 
@@ -152,15 +147,15 @@ public class AddCategoryActivity extends AppCompatActivity {
         }
 
 
-}
-
-private class ViewHolder {
-    ImageView itemIcon;
-
-    public ViewHolder(View view) {
-        itemIcon = view.findViewById(R.id.icon);
     }
-}
+
+    private class ViewHolder {
+        ImageView itemIcon;
+
+        ViewHolder(@NonNull View view) {
+            itemIcon = view.findViewById(R.id.icon);
+        }
+    }
 
 
 }

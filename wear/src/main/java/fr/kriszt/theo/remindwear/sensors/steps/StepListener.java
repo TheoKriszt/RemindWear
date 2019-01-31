@@ -8,6 +8,7 @@ public interface StepListener {
     int getSteps(); // Nombre de pas depuis le démarrage du listener
 
     void step(SensorEvent event);
+
     void step();
 
     void setSensorEventListener(SensorEventListener sel);

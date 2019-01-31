@@ -52,14 +52,13 @@ import fr.kriszt.theo.shared.SportType;
 import fr.kriszt.theo.shared.data.SportDataPoint;
 import fr.kriszt.theo.shared.data.SportDataSet;
 
-
 public class WearActivity extends WearableActivity
-    implements
+        implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener
-{
+        LocationListener {
 
+    @SuppressLint("StaticFieldLeak")
     public static WearActivity lastInstance;
     private boolean hasGPS = false;
     private boolean hasPodometer = false;
@@ -72,13 +71,13 @@ public class WearActivity extends WearableActivity
     public TextView heartRateValue;
 
     @BindView(R.id.timeTextValue)
-     public TextView timeValue;
+    public TextView timeValue;
 
     @BindView(R.id.speedTextValue)
-     public TextView speedValue;
+    public TextView speedValue;
 
     @BindView(R.id.distanceTextValue)
-     public TextView distanceValue;
+    public TextView distanceValue;
 
     @BindView(R.id.stepIcon)
     public ImageView stepIcon;
@@ -122,6 +121,11 @@ public class WearActivity extends WearableActivity
     private GoogleApiClient mGoogleApiClient;
     private LocationCallback locationCallback;
 
+    private SportType sportType = SportType.SPORT_WALK;
+    private SportDataSet sportDataSet;
+    private SensorEventListener heartRateSensorListener;
+    private String taskId = null;
+
 
     // Thread parallele : met à jour l'affichage
     private Handler layoutUpdater;
@@ -138,12 +142,7 @@ public class WearActivity extends WearableActivity
         }
     };
 
-    private SportType sportType = SportType.SPORT_WALK;
-    private SportDataSet sportDataSet;
-    private boolean GPShasFix = false;
-    private Sensor  heartRateSensor;
-    private SensorEventListener heartRateSensorListener;
-    private String taskId = null;
+
 
     private void updateValues() {
         if (coordinates == null) {
@@ -152,14 +151,14 @@ public class WearActivity extends WearableActivity
             currentSpeed = (float) coordinates.getSpeedkmh();
         }
 
-        if (hasGPS/* && GPShasFix*/){
-            if (lastCoordinates != null && coordinates != null && !coordinates.equals(lastCoordinates)){
+        if (hasGPS) {
+            if (lastCoordinates != null && coordinates != null && !coordinates.equals(lastCoordinates)) {
                 totalDistance += lastCoordinates.distanceTo(coordinates) / 1000; // en km
                 lastCoordinates = null;
             }
         } else coordinates = null;
 
-        if (hasPodometer){
+        if (hasPodometer) {
             stepsCount = stepListener.getSteps();
         }
 
@@ -170,7 +169,7 @@ public class WearActivity extends WearableActivity
     }
 
     @SuppressLint("DefaultLocale")
-    private void updateDisplay(){
+    private void updateDisplay() {
         long timeDiff = (System.currentTimeMillis() - startTime) / 1000; // secondes
         long hours = timeDiff / 3600;
         long minutes = timeDiff % 3600 / 60;
@@ -182,12 +181,12 @@ public class WearActivity extends WearableActivity
             stepValue.setText(String.format("%d", stepsCount));
         }
 
-        if (hasGPS){
+        if (hasGPS) {
             distanceValue.setText(String.format("%.2f %s", totalDistance, distanceUnit));
             speedValue.setText(String.format("%.2f %s", currentSpeed, speedUnit));
         }
 
-        if (hasCardiometer){
+        if (hasCardiometer) {
 
             heartRateValue.setText(String.format("%d %s", heartRate, heartRateUnit));
 
@@ -197,7 +196,6 @@ public class WearActivity extends WearableActivity
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,18 +203,15 @@ public class WearActivity extends WearableActivity
 
 
         Bundle extras = getIntent().getExtras();
-        if (extras != null){
-            Integer tID = extras.getInt(Constants.KEY_TASK_ID);
-            if ( tID != null){
-                this.taskId = tID+"";
-            }
+        if (extras != null) {
+            int tID = extras.getInt(Constants.KEY_TASK_ID);
+            this.taskId = tID + "";
         }
 
 
         getSportType();
         setContentView(R.layout.activity_wear);
         ButterKnife.bind(this);
-
 
 
         createSensors();
@@ -240,11 +235,8 @@ public class WearActivity extends WearableActivity
 
         sportDataSet = new SportDataSet(sportType, hasPodometer, hasGPS, hasCardiometer, taskId);
 
-        Log.w(TAG, "onCreate: Creating dataset for taskId =" + taskId);
-        Log.w(TAG, sportDataSet.toString());
         layoutUpdater = new Handler();
         timeStatusChecker.run(); // démarrer le màj du layout
-
 
 
     }
@@ -253,11 +245,11 @@ public class WearActivity extends WearableActivity
         Intent createIntent = getIntent();
         Bundle extras = createIntent.getExtras();
 
-        if (extras != null){
+        if (extras != null) {
             String intendedSport = extras.getString(Constants.KEY_SPORT_TYPE);
-            if (intendedSport != null){
-                for (SportType st : SportType.values()){
-                    if (st.getName().equals(intendedSport)){
+            if (intendedSport != null) {
+                for (SportType st : SportType.values()) {
+                    if (st.getName().equals(intendedSport)) {
                         sportType = st;
                         return;
                     }
@@ -267,27 +259,27 @@ public class WearActivity extends WearableActivity
     }
 
     private void hideMissingSensors() {
-        if (!hasGPS){
+        if (!hasGPS) {
             speedValue.setVisibility(View.INVISIBLE);
             distanceValue.setVisibility(View.INVISIBLE);
             distanceIcon.setVisibility(View.INVISIBLE);
             speedIcon.setVisibility(View.INVISIBLE);
         }
 
-        if (!hasPodometer){
+        if (!hasPodometer) {
             stepValue.setVisibility(View.INVISIBLE);
             stepIcon.setVisibility(View.INVISIBLE);
 
 
         }
-        if (!hasCardiometer){
+        if (!hasCardiometer) {
             heartRateValue.setVisibility(View.GONE);
             heartRateIcon.setVisibility(View.GONE);
         }
     }
 
-    private void hideUnusedSensors(){
-        switch (sportType){
+    private void hideUnusedSensors() {
+        switch (sportType) {
             case SPORT_BIKE: // Vélo : Pas de compteur de pas
                 stepValue.setVisibility(View.INVISIBLE);
                 stepIcon.setVisibility(View.INVISIBLE);
@@ -309,7 +301,7 @@ public class WearActivity extends WearableActivity
      * Envoie les données au Service Data Wear
      * Coupe les capteurs
      */
-    public void stopTracking(View view){
+    public void stopTracking(View view) {
 
         disableDisplayUpdate();
         disableSensors();
@@ -324,25 +316,11 @@ public class WearActivity extends WearableActivity
         stopIntent.putExtra(Constants.KEY_DATASET, json);
         stopIntent.putExtra(Constants.KEY_TASK_ID, taskId);
 
-//        WearDataService.setObserver(this);
-//        if (!getButtonText().startsWith("Sending")) {
-//            setButton("Send", R.color.blue);
-//        }
-
-//        if (button.getText().equals("Send")){
-//            setButton("Send", R.color.grey);
-//        }else {
-//            setButton("Send", R.color.green);
-//        }
-
-
         startService(stopIntent);
 
     }
 
     public void setButton(final String msg, final int color) {
-//        Log.w(TAG, "setButton: " + msg + "; " + getResources().getResourceEntryName(color));
-
         // Cette méthode est potentiellement appelée d'un thread secondaire
         // Les manips de l'UI doivent se faire dans le Thread principal
         Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -356,13 +334,13 @@ public class WearActivity extends WearableActivity
 
     }
 
-    public String getButtonText(){
+    public String getButtonText() {
         return button.getText().toString();
     }
 
     private void createSensors() {
         // Essayer de trouver un moyen d'obtenir un capteur de pas
-        sensorManager = ((SensorManager)getSystemService(SENSOR_SERVICE));
+        sensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
         try {
             stepListener = StepListenerFactory.getStepListener(sensorManager);
             hasPodometer = true;
@@ -371,27 +349,22 @@ public class WearActivity extends WearableActivity
             hasPodometer = false;
         }
 
-//        Log.w(TAG, "createSensors: Has GPS : " + getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS));
-//        Log.w(TAG, "createSensors: Has another location sensor : " + getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION));
         hasGPS = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
-//        hasGPS = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION);
 
         hasCardiometer = getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE);
 
-        if (hasCardiometer){
+        if (hasCardiometer) {
             registerCardiometer();
         }
 
     }
 
 
-
     public void askForGPSPermission() {
 
         boolean hasGPSPermission = SensorUtils.checkPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (hasGPSPermission){
-//            Log.w(TAG, "GPS permission already granted");
+        if (hasGPSPermission) {
             return;
         }
         // Requesting ACCESS_FINE_LOCATION using Dexter library
@@ -401,8 +374,6 @@ public class WearActivity extends WearableActivity
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
                         Log.i(TAG, "onPermissionGranted: GPS access OK");
-//                        mRequestingLocationUpdates = true;
-//                        startLocationUpdates();
                     }
 
                     @Override
@@ -447,7 +418,7 @@ public class WearActivity extends WearableActivity
             return;
         }
 
-        locationCallback = new LocationCallback(){
+        locationCallback = new LocationCallback() {
 
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -455,14 +426,11 @@ public class WearActivity extends WearableActivity
                 Location lastLocation = locationResult.getLastLocation();
                 lastCoordinates = coordinates;
                 coordinates = new Coordinates(lastLocation);
-//                Log.w(TAG, "onLocationResult: " + coordinates.getLat() + "; "+coordinates.getLng());
             }
 
             @Override
             public void onLocationAvailability(LocationAvailability locationAvailability) {
                 super.onLocationAvailability(locationAvailability);
-                Log.w(TAG, "onLocationAvailability: " + locationAvailability);
-                GPShasFix = locationAvailability.isLocationAvailable();
             }
         };
 
@@ -471,15 +439,14 @@ public class WearActivity extends WearableActivity
     }
 
     private void registerCardiometer() {
-        this.heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+        Sensor heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
-        this.heartRateSensorListener = new SensorEventListener()
-        {
+        this.heartRateSensorListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
-                if (sensorEvent.accuracy > SensorManager.SENSOR_STATUS_UNRELIABLE){
+                if (sensorEvent.accuracy > SensorManager.SENSOR_STATUS_UNRELIABLE) {
                     heartRate = (int) sensorEvent.values[0];
-                }else heartRate = -1;
+                } else heartRate = -1;
             }
 
             @Override
@@ -488,54 +455,46 @@ public class WearActivity extends WearableActivity
             }
         };
 
-        sensorManager.registerListener(this.heartRateSensorListener, this.heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this.heartRateSensorListener, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
 
     @Override
     protected void onPause() {
         super.onPause();
-//        Log.i(TAG, "onPause: ");
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-//        Log.i(TAG, "onConnectionSuspended: ");
     }
 
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, "onLocationChanged: " + location);
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-//        Log.i(TAG, "onStatusChanged: " + provider);
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-//        Log.i(TAG, "onProviderEnabled: ");
 
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-//        Log.i(TAG, "onProviderDisabled: ");
 
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-//        Log.i(TAG, "onConnectionFailed: ");
-
     }
 
     /**
      * Arrête les capteurs
      */
-    private void disableSensors(){
+    private void disableSensors() {
         stepListener.unregisterSensor(); // Capteur de pas
 
         sensorManager.unregisterListener(heartRateSensorListener);
@@ -546,7 +505,7 @@ public class WearActivity extends WearableActivity
         }
     }
 
-    private void disableDisplayUpdate(){
+    private void disableDisplayUpdate() {
         layoutUpdater.removeCallbacks(timeStatusChecker);
     }
 

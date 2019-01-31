@@ -3,6 +3,7 @@ package fr.kriszt.theo.remindwear.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +25,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import fr.kriszt.theo.remindwear.R;
@@ -38,7 +38,6 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private static final String TAG = AddTaskActivity.class.getSimpleName();
     LayoutInflater inflator;
     private Tasker tasker;
-    private Task task;
     public Calendar calendar = null;
     private Category category;
 
@@ -57,9 +56,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
     private CheckBox checkBoxFriday;
     private CheckBox checkBoxSaturday;
     private CheckBox checkBoxSunday;
-    private Button submit;
     private NumberPicker preventBefore;
-    private ImageView addCategory;
     private ImageView editCategory;
 
     private Bundle extras = null;
@@ -74,14 +71,8 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 
-        if (getIntent() != null && getIntent().getExtras() != null){
-            Bundle extras = getIntent().getExtras();
-            this.extras = extras;
-//            Log.w(TAG, "onCreate: Extras : ");
-
-//            for (String k : extras.keySet()){
-//                Log.w(TAG, "onCreate: " + k + " ==> " + extras.get(k));
-//            }
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            this.extras = getIntent().getExtras();
         }
 
         tasker = Tasker.getInstance(this);
@@ -91,14 +82,13 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         description = findViewById(R.id.description);
 
         Calendar forTimePicker = new GregorianCalendar();
-        if (extras != null && extras.get("HOUR") != null && extras.get("MINUTES") != null){
-            forTimePicker.set(Calendar.HOUR_OF_DAY, extras.getInt("HOUR"));
-            forTimePicker.set(Calendar.MINUTE, extras.getInt("MINUTES"));
-        }else {
+        if (extras != null && extras.get(Constants.KEY_HOUR) != null && extras.get(Constants.KEY_MINUTES) != null) {
+            forTimePicker.set(Calendar.HOUR_OF_DAY, extras.getInt(Constants.KEY_HOUR));
+            forTimePicker.set(Calendar.MINUTE, extras.getInt(Constants.KEY_MINUTES));
+        } else {
 
             forTimePicker.add(Calendar.MINUTE, 1);
         }
-//        forTimePicker.add(Calendar.MINUTE, 5);
 
         calendar = new GregorianCalendar();
 
@@ -114,34 +104,34 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         time_picker_min.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                calendar = new GregorianCalendar( calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) ,time_picker_hour.getValue(),time_picker_min.getValue());
+                calendar = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), time_picker_hour.getValue(), time_picker_min.getValue());
             }
         });
 
         time_picker_hour.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                calendar = new GregorianCalendar( calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) ,time_picker_hour.getValue(),time_picker_min.getValue());
+                calendar = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), time_picker_hour.getValue(), time_picker_min.getValue());
             }
         });
         preventBefore = findViewById(R.id.preventBefore);
         preventBefore.setMinValue(0);
         preventBefore.setMaxValue(18);
         preventBefore.setValue(0);
-//        preventBefore.setValue(6);
+
         String[] minuteValues = new String[19];
         for (int i = 0; i < minuteValues.length; i++) {
-            String number = "";
-            if(i == 0){
-                number = Integer.toString(i*5)+" minute";
-            }else{
-                number = Integer.toString(i*5)+" minutes";
+            String number;
+            if (i == 0) {
+                number = Integer.toString(i * 5) + " minute";
+            } else {
+                number = Integer.toString(i * 5) + " minutes";
             }
-            minuteValues[i] =  number;
+            minuteValues[i] = number;
         }
         preventBefore.setDisplayedValues(minuteValues);
 
-        addCategory  = findViewById(R.id.addCategory);
+        ImageView addCategory = findViewById(R.id.addCategory);
         addCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,23 +141,22 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             }
         });
 
-        editCategory  = findViewById(R.id.editCategory);
+        editCategory = findViewById(R.id.editCategory);
         editCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), EditCategoryActivity.class);
-                intent.putExtra("idCategory", category.getID() );
+                intent.putExtra(Constants.KEY_ID_CATEGORY, category.getID());
 //                startActivity(intent);
                 startActivityForResult(intent, 41360);
             }
         });
-        if(categoryTemp.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
-                categoryTemp.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+        if (categoryTemp.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                categoryTemp.getName().equals(Tasker.CATEGORY_SPORT_TAG)) {
             editCategory.setVisibility(View.GONE);
-        }else{
+        } else {
             editCategory.setVisibility(View.VISIBLE);
         }
-
 
 
         prepareCategoriesSpinner();
@@ -177,20 +166,20 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         calendarView.setMinDate(today.getTime().getTime());
         calendarView.setDate(today.getTime().getTime() + 1000);
 
-        calendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
-            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                calendar = new GregorianCalendar( year, month, dayOfMonth ,time_picker_hour.getValue(),time_picker_min.getValue());
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                calendar = new GregorianCalendar(year, month, dayOfMonth, time_picker_hour.getValue(), time_picker_min.getValue());
             }
         });
         layout_repete = findViewById(R.id.layout_repete);
         checkBox = findViewById(R.id.checkBox);
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-                if(checkBox.isChecked()){
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (checkBox.isChecked()) {
                     calendarView.setVisibility(View.GONE);
                     layout_repete.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     calendarView.setVisibility(View.VISIBLE);
                     layout_repete.setVisibility(View.GONE);
                 }
@@ -205,7 +194,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         checkBoxSaturday = findViewById(R.id.checkBoxSaturday);
         checkBoxSunday = findViewById(R.id.checkBoxSunday);
 
-        submit = findViewById(R.id.submit);
+        Button submit = findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -224,10 +213,10 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                 calendarView.setDate(timeMillis);
             }
 
-            if (getIntent().getExtras().get(Constants.KEY_CATEGORY)!= null){
+            if (getIntent().getExtras().get(Constants.KEY_CATEGORY) != null) {
                 String cat = getIntent().getExtras().getString(Constants.KEY_CATEGORY);
                 Category category = tasker.getCategoryByName(cat);
-                if (category != null){
+                if (category != null) {
                     spinner.setSelection(tasker.getListCategories().indexOf(category));
                 }
             }
@@ -243,19 +232,19 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 category = tasker.getListCategories().get(position);
-                if(category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
-                        category.getName().equals(Tasker.CATEGORY_SPORT_TAG)){
+                if (category.getName().equals(Tasker.CATEGORY_NONE_TAG) ||
+                        category.getName().equals(Tasker.CATEGORY_SPORT_TAG)) {
                     editCategory.setVisibility(View.GONE);
-                }else{
+                } else {
                     editCategory.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
 
         });
-//        spinner.invalidate();
     }
 
     private void setValuesFromIntent(Bundle extras) {
@@ -272,9 +261,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         minutes = extras.getInt(Constants.KEY_MINUTES);
         hour = extras.getInt(Constants.KEY_HOUR);
 
-
-        Log.w(TAG, "setValuesFromIntent: Trying to set to category" + cat );
-        if (tasker.getCategoryByName(cat) != null){
+        if (tasker.getCategoryByName(cat) != null) {
             category = tasker.getCategoryByName(cat);
             spinner.setSelection(tasker.getListCategories().indexOf(category));
         }
@@ -288,14 +275,14 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
     }
 
-    private void submitAction(){
+    private void submitAction() {
 
 
         tasker.unserializeLists();
 
-        if(name.getText().toString().equals("")){
+        if (name.getText().toString().equals("")) {
             Toast.makeText(getApplicationContext(), "Ajoutez un titre", Toast.LENGTH_LONG).show();
-        }else{
+        } else {
             String mName = name.getText().toString();
             String mDescription = description.getText().toString();
             int mHour = time_picker_hour.getValue();
@@ -313,50 +300,46 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                     checkBoxSaturday.isChecked(),
                     checkBoxSunday.isChecked()
             };
-            if(!checkBox.isChecked()){
-                if(calendar == null){
+            Task task;
+            if (!checkBox.isChecked()) {
+                if (calendar == null) {
                     Toast.makeText(getApplicationContext(), "Ajoutez une date", Toast.LENGTH_LONG).show();
-                    return;
-                }else{
+                } else {
                     Calendar c = new GregorianCalendar();
                     c.add(Calendar.MINUTE, -60);
 
-                    if(calendar.before(c)){
+                    if (calendar.before(c)) {
                         Toast.makeText(getApplicationContext(), "Ajoutez une date et une heure à venir", Toast.LENGTH_LONG).show();
                         return;
                     }
                     task = new Task(mName, mDescription, cat, calendar, mPreventBefore, mHour, mMin);
 
 
-
                     tasker.unserializeLists();
-                    tasker.getInstance(getApplicationContext()).addTask(task);
+                    tasker.addTask(task);
                     tasker.serializeLists();
 
                     Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
-                    //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                     startActivity(intent);
                 }
-            }else{
-                Boolean bool = false;
-                for(Boolean b : bools){
-                    if(b){
+            } else {
+                boolean bool = false;
+                for (Boolean b : bools) {
+                    if (b) {
                         bool = true;
-                       break;
+                        break;
                     }
                 }
-                if(!bool){
+                if (!bool) {
                     Toast.makeText(getApplicationContext(), "Ajoutez une répétition", Toast.LENGTH_LONG).show();
-                    return;
-                }else{
+                } else {
                     task = new Task(mName, mDescription, cat, null, mPreventBefore, mHour, mMin, bools);
 
                     tasker.unserializeLists();
-                    tasker.getInstance(getApplicationContext()).addTask(task);
+                    tasker.addTask(task);
                     tasker.serializeLists();
 
                     Intent intent = new Intent(getApplicationContext(), TasksActivity.class);
-                    //intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                     startActivity(intent);
                 }
             }
@@ -367,33 +350,27 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.w(TAG, "onActivityResult: Category was updated, requestCode is " + requestCode);
-        // Check which request we're responding to
-        if (requestCode == 41360) {
-            Log.w(TAG, "onActivityResult: Une catégorie a été màj");
-            // Make sure the request was successful
-            prepareCategoriesSpinner();
-            if (resultCode == RESULT_OK) {
-                Log.w(TAG, "onActivityResult: Category was updated");
-            }
-        }
+        prepareCategoriesSpinner();
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         tasker.unserializeLists();
 
     }
 
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {}
-    public void onNothingSelected(AdapterView<?> parent) {}
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
 
     class NewAdapter extends BaseAdapter {
 
         private ArrayList<Category> items;
 
-        public NewAdapter(ArrayList<Category> items) {
+        NewAdapter(ArrayList<Category> items) {
             this.items = items;
         }
 
@@ -409,7 +386,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
 
         @Override
         public long getItemId(int position) {
-            return position ;
+            return position;
         }
 
         @Override
@@ -419,10 +396,10 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
                 convertView = inflator.inflate(R.layout.content_text_and_icon_spinner, null);
                 viewHolder = new ViewHolder(convertView);
                 convertView.setTag(viewHolder);
-            }else{
-                viewHolder  = (ViewHolder) convertView.getTag();
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
             }
-            Category cat  = (Category) getItem(position);
+            Category cat = (Category) getItem(position);
 
             viewHolder.itemName.setText(cat.getName());
             viewHolder.itemIcon.setImageResource(cat.getIcon());
@@ -438,7 +415,7 @@ public class AddTaskActivity extends AppCompatActivity implements AdapterView.On
         ImageView itemIcon;
         LinearLayout itemLayout;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             itemName = view.findViewById(R.id.name);
             itemIcon = view.findViewById(R.id.icon);
             itemLayout = view.findViewById(R.id.changeColor);

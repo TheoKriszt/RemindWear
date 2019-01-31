@@ -7,4 +7,6 @@
     <string name="title_activity_add_category">AddCategoryActivity</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_basic">BasicActivity</string>
+    <string name="Modifier_categorie">Modifier une catégorie</string>
+    <string name="Modifier_tache">Modifier une tâche</string>
 </resources>

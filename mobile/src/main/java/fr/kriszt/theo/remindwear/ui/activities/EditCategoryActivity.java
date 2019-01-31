@@ -27,43 +27,31 @@ import fr.kriszt.theo.remindwear.R;
 import fr.kriszt.theo.remindwear.tasker.Category;
 import fr.kriszt.theo.remindwear.tasker.Task;
 import fr.kriszt.theo.remindwear.tasker.Tasker;
+import fr.kriszt.theo.shared.Constants;
 
 public class EditCategoryActivity extends AppCompatActivity {
 
     static final String TAG = EditCategoryActivity.class.getSimpleName();
     private LayoutInflater inflator;
-    private int color;
-    private int icon;
-    private String name;
     private Category category;
     private ArrayList<Integer> listIcons = new ArrayList<>();
-
-    Tasker tasker;
-
     private EditText title;
     private ImageView colorView;
     private Spinner spinner;
     private ColorPickerView colorPickerView;
-    private Button submit;
-    private CardView cardView;
-    private TextView textView;
-    private ImageView cancel;
-    private ImageView validate;
 
+    Tasker tasker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.w(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
         Intent mIntent = getIntent();
-        int id = mIntent.getIntExtra("idCategory", 0);
+        int id = mIntent.getIntExtra(Constants.KEY_ID_CATEGORY, 0);
         tasker = Tasker.getInstance(getApplicationContext());
         tasker.unserializeLists();
         category = Tasker.getInstance(getApplicationContext()).getCategoryByID(id);
-        Category tempCategory = category;
-
 
         listIcons.add(R.drawable.baseline_directions_run_24);
         listIcons.add(R.drawable.ic_base_1);
@@ -86,13 +74,13 @@ public class EditCategoryActivity extends AppCompatActivity {
         listIcons.add(R.drawable.ic_base_15);
         listIcons.add(R.drawable.ic_base_17);
 
-        cardView = findViewById(R.id.cardView);
+        CardView cardView = findViewById(R.id.cardView);
         cardView.setVisibility(View.VISIBLE);
 
-        textView = findViewById(R.id.textView);
-        textView.setText("Modifier une catégorie");
+        TextView textView = findViewById(R.id.textView);
+        textView.setText(R.string.Modifier_categorie);
 
-        cancel = findViewById(R.id.cancel);
+        ImageView cancel = findViewById(R.id.cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,7 +88,7 @@ public class EditCategoryActivity extends AppCompatActivity {
             }
         });
 
-        validate = findViewById(R.id.validate);
+        ImageView validate = findViewById(R.id.validate);
         validate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,7 +111,6 @@ public class EditCategoryActivity extends AppCompatActivity {
         spinner.setSelection(resPositionCategory);
         inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        //TODO set colorpicker
         colorPickerView = findViewById(R.id.colorPickerView);
         colorPickerView.setColorListener(new ColorListener() {
             @Override
@@ -135,7 +122,7 @@ public class EditCategoryActivity extends AppCompatActivity {
         colorView  = findViewById(R.id.colorView);
         colorView.setBackgroundColor(category.getColor());
 
-        submit = findViewById(R.id.submit);
+        Button submit = findViewById(R.id.submit);
         submit.setVisibility(View.GONE);
 
     }
@@ -144,13 +131,10 @@ public class EditCategoryActivity extends AppCompatActivity {
         if(title.getText().toString().equals("")){
             Toast.makeText(this, "Inscrire le nom de la catégorie", Toast.LENGTH_SHORT).show();
         }else{
-            this.name = title.getText().toString();
-            this.color = colorPickerView.getColor();
-            this.icon = listIcons.get(spinner.getSelectedItemPosition());
-            Category newCategory = new Category(this.name, this.icon, this.color);
-            Log.e("this.name", this.name);
-            Log.e("this.color", String.valueOf(this.color));
-            Log.e("this.icon", String.valueOf(this.icon));
+            String name = title.getText().toString();
+            int color = colorPickerView.getColor();
+            int icon = listIcons.get(spinner.getSelectedItemPosition());
+            Category newCategory = new Category(name, icon, color);
             tasker.editCategoryById(category.getID(), newCategory);
             tasker.serializeLists();
             onBackPressed();
@@ -161,7 +145,7 @@ public class EditCategoryActivity extends AppCompatActivity {
 
         private ArrayList<Integer> items;
 
-        public NewAdapter(ArrayList<Integer> items) {
+        NewAdapter(ArrayList<Integer> items) {
             this.items = items;
         }
 
@@ -202,7 +186,7 @@ public class EditCategoryActivity extends AppCompatActivity {
     private class ViewHolder {
         ImageView itemIcon;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             itemIcon = view.findViewById(R.id.icon);
         }
     }

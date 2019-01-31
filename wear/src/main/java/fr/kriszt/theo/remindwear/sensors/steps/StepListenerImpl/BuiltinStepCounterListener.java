@@ -20,7 +20,7 @@ public class BuiltinStepCounterListener extends AbstractStepListener {
     public void step(SensorEvent event) {
 
         int totalSteps = (int) event.values[0];
-        if (initialCount == null){
+        if (initialCount == null) {
             initialCount = totalSteps;
         }
 
